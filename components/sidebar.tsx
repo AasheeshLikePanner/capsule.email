@@ -36,7 +36,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "fixed inset-y-0 left-0 z-10 hidden flex-col border-r bg-background transition-[width] ease-in-out duration-300 sm:flex",
+        "fixed inset-y-0 left-0 z-10 hidden flex-col bg-background transition-[width] ease-in-out duration-300 sm:flex",
         isExpanded ? "w-56" : "w-16"
       )}
     >
@@ -50,7 +50,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
           href="#"
           className={cn(
             "group flex items-center gap-2 font-semibold text-white ",
-            isExpanded ? "rounded-md px-3 py-2" : "h-9 w-9 shrink-0 justify-center rounded-full bg-primary md:h-8 md:w-8"
+            isExpanded ? "rounded-md px-3 py-2" : "h-9 w-9 shrink-0 justify-center rounded-full md:h-8 md:w-8"
           )}
         >
           <Image src="/icon.svg" alt="Brand Co Logo" width={40} height={40}/>
@@ -69,9 +69,10 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
         <Link
           href="/create"
           className={cn(
-            "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:text-primary hover:bg-accent",
-            pathname === "/create" && "bg-accent text-accent-foreground",
-            !isExpanded && "justify-center"
+            "flex items-center rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:text-primary hover:bg-accent",
+            isExpanded && "gap-3",
+            pathname === "/create" && "bg-muted text-foreground",
+            !isExpanded ? "justify-center" : "justify-start"
           )}
         >
           <PlusCircle className="h-5 w-5 shrink-0" />
@@ -91,9 +92,10 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
             key={item.href}
             href={item.href}
             className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:text-primary hover:bg-accent",
-              pathname === item.href && "bg-accent text-accent-foreground",
-              !isExpanded && "justify-center"
+              "flex items-center rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:text-primary hover:bg-accent",
+              isExpanded && "gap-3",
+              pathname === item.href && "bg-muted text-foreground",
+              !isExpanded ? "justify-center" : "justify-start"
             )}
           >
             <item.icon className="h-5 w-5 shrink-0" />
@@ -112,9 +114,10 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
       <nav className="mt-auto flex flex-col gap-2 p-2">
         <Button
           variant="ghost"
-          className={cn(
-            "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:text-primary",
-            isExpanded ? "justify-start" : "justify-center"
+            className={cn(
+            "flex items-center rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:text-primary",
+            isExpanded && "gap-3",
+            !isExpanded ? "justify-center" : "justify-start"
           )}
           onClick={() => setExpanded(!isExpanded)}
         >

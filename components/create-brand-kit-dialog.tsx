@@ -1,45 +1,65 @@
-
 "use client";
 
 import { useState } from "react";
 import {
-  Dialog,  DialogContent,  DialogHeader,  DialogTitle, 
+  Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { FaSpinner, FaPlus } from "react-icons/fa";
-import {FiLink} from "react-icons/fi"
-import { TbMichelinStarGreen } from "react-icons/tb";
+import { FaPlus, FaSpinner } from "react-icons/fa";
+import { FiLink } from "react-icons/fi"
 import { cn } from "@/lib/utils";
+import axios from 'axios';
 
-export function CreateBrandKitDialog({ open, onOpenChange }:any) {
+export function CreateBrandKitDialog({ open, onOpenChange, onProcessingChange }: { open: boolean; onOpenChange: (open: boolean) => void; onProcessingChange: (processing: boolean) => void; }) {
   const [step, setStep] = useState("options"); // "options" | "match"
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleMatchBrand = async () => {
     setLoading(true);
+    onProcessingChange(true); // Set processing to true when API call starts
+    const timeoutId = setTimeout(() => {
+      onOpenChange(false);
+    }, 5000);
+
     try {
-      const response = await fetch("/api/brand-kit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ url }),
-      });
-      // Handle response
+      const response = await axios.post("/api/brand-kit", { url });
+      console.log(response);
+      
+      const jsonString = response.data.emailTemplate.replace(/^```json\s*/i, '').replace(/```$/, '');
+
+      if (!jsonString) {
+        console.error("emailTemplate is undefined or null in response.data");
+        return;
+      }
+
+      let parsedData;
+      try {
+        parsedData = JSON.parse(jsonString);
+
+      } catch (_error: any) {
+        return;
+      }
+
+      const data = parsedData.component;
+      console.log(data);
+      clearTimeout(timeoutId); // Clear the timeout if the API call finishes before 5 seconds
+      onOpenChange(false); // Close dialog on success
     } catch (error) {
-      console.error("Error matching brand:", error);
+      console.error("Error matching brand:", error); // This should now catch the JSON.parse error
+      clearTimeout(timeoutId); // Clear the timeout on error as well
     } finally {
       setLoading(false);
+      onProcessingChange(false); 
     }
   };
 
-  const handleOpenChange = (isOpen:any) => {
+  const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
       setTimeout(() => {
         setStep("options");
-      }, 200); // Delay to allow fade-out animation to finish
+      }, 200);
     }
     onOpenChange(isOpen);
   };
@@ -66,7 +86,7 @@ export function CreateBrandKitDialog({ open, onOpenChange }:any) {
               <FiLink className="w-8 h-8 mb-3 text-muted-foreground" />
               <h3 className="font-semibold text-base">Match my brand</h3>
               <p className="text-xs text-muted-foreground text-center mt-1">
-                Automatically match your website's branding
+                Automatically match your website&#39;s branding
               </p>
             </div>
             <div className="flex flex-col items-center justify-center p-8 bg-neutral-800 rounded-2xl cursor-pointer transition-colors hover:bg-neutral-700">
@@ -97,7 +117,9 @@ export function CreateBrandKitDialog({ open, onOpenChange }:any) {
                 className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg"
               >
                 {loading ? (
-                  <img src="/loader.svg" alt="Loading" className="w-8 h-8 animate-slow-spin" />
+                  <div className="w-8 h-8 flex items-center justify-center">
+                    <FaSpinner className="animate-spin" />
+                  </div>
                 ) : (
                   "Match Brand"
                 )}

@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
 
 interface BrandKitDialogProps {
   isOpen: boolean;
@@ -12,7 +12,7 @@ export function BrandKitDialog({ isOpen, onOpenChange }: BrandKitDialogProps) {
         <DialogHeader>
           <DialogTitle>Brand Kit</DialogTitle>
           <DialogDescription>
-            Manage your brand's colors, fonts, and logos here.
+            Manage your brand&#39;s colors, fonts, and logos here.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">

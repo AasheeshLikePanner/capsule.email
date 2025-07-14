@@ -25,7 +25,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
 
   const navItems = [
     { href: "/", icon: Home, label: "Home" },
-    { href: "/brand-kit", icon: Palette, label: "Brand Kit" },
+    { href: "/brand-kit", icon: Palette, label: "RenderPart Kit" },
   ];
 
   const bottomNavItems = [
@@ -49,11 +49,11 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
         <Link
           href="#"
           className={cn(
-            "group flex items-center gap-2 font-semibold text-white ",
+            "group flex items-center gap-2 font-semibold text-foreground hover:bg-accent hover:text-primary",
             isExpanded ? "rounded-md px-3 py-2" : "h-9 w-9 shrink-0 justify-center rounded-full md:h-8 md:w-8"
           )}
         >
-          <Image src="/icon.svg" alt="Brand Co Logo" width={40} height={40}/>
+          <Image src="/icon.svg" alt="RenderPart Logo" width={40} height={40}/>
           <span
             className={cn(
               `whitespace-nowrap transition-opacity ease-in-out duration-200`,
@@ -61,7 +61,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
             )}
             aria-hidden={!isExpanded}
           >
-            Brand Co
+            RenderPart
           </span>
         </Link>
       </div>
@@ -69,10 +69,11 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
         <Link
           href="/create"
           className={cn(
-            "flex items-center rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:text-primary hover:bg-accent",
+            "flex items-center rounded-lg text-muted-foreground transition-colors hover:text-primary",
             isExpanded && "gap-3",
             pathname === "/create" && "bg-muted text-foreground",
-            !isExpanded ? "justify-center" : "justify-start"
+            !isExpanded ? "justify-center" : "justify-start",
+            isExpanded && "bg-muted text-foreground rounded-full px-4 py-2 hover:bg-accent/80"
           )}
         >
           <PlusCircle className="h-5 w-5 shrink-0" />
@@ -83,7 +84,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
             )}
             aria-hidden={!isExpanded}
           >
-            Create New
+            New Email
           </span>
         </Link>
         <div className="my-2 border-t" />
@@ -115,7 +116,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
         <Button
           variant="ghost"
             className={cn(
-            "flex items-center rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:text-primary",
+            "flex items-center rounded-lg text-muted-foreground transition-colors hover:text-primary hover:bg-accent",
             isExpanded && "gap-3",
             !isExpanded ? "justify-center" : "justify-start"
           )}

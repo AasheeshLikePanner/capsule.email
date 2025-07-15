@@ -31,7 +31,7 @@ export default function EmailEditor() {
     kitName: "Notch Clipboard",
     website: "https://notchclip.vercel.app/",
     brandSummary:
-      "Notch Clipboard is a modern, minimalist clipboard management tool with a clean design aesthetic. The brand emphasizes simplicity and efficiency with a focus on fast and easy clipboard access. The visual style features a white/light background with subtle gradients, rounded corners, and a sophisticated color palette dominated by dark grays and blacks for text and UI elements.",
+      " Notch Clipboard is a modern, minimalist clipboard management tool with a clean design aesthetic. The brand emphasizes simplicity and efficiency with a focus on fast and easy clipboard access. The visual style features a white/light background with subtle gradients, rounded corners, and a sophisticated color palette dominated by dark grays and blacks for text and UI elements.",
     address: "123 Main Street, City, Country",
     toneOfVoice: "Friendly",
     copyright: "Add your copyright notice",
@@ -39,7 +39,7 @@ export default function EmailEditor() {
     disclaimers: "Add any disclaimers or legal information needed",
     socials: "",
     logos: {
-      primary: "",
+      primary: "https://notchclip.vercel.app/icon.png",
       icon: "",
     },
     colors: {
@@ -132,12 +132,12 @@ export default function EmailEditor() {
       </div>
       <div
         ref={mainContentRef}
-        className="flex-1 w-full overflow-y-auto h-full rounded-lg shadow-sm border-l border-border"
+        className="flex-grow-[2] overflow-y-auto h-full rounded-lg shadow-sm border-l border-border"
       >
         <h1 className="text-lg font-medium mb-4 ml-5">Brand Name</h1>
         <BrandKitForm brandKit={brandKit} setBrandKit={setBrandKit} />
       </div>
-      <div className="w-full lg:w-1/3 p-6 rounded-lg shadow-sm border-l border-border">
+      <div className="w-full lg:w-5/12 rounded-xl shadow-sm border-l border-border">
         <MemoizedEmailPreview brandKit={brandKit} />
       </div>
     </div>

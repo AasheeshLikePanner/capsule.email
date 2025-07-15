@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 interface ColorPickerInputProps {
   color: string;
@@ -55,6 +56,15 @@ export default function ColorPickerInput({
         </DialogHeader>
         <div className="flex justify-center">
           <HexColorPicker color={color} onChange={handleColorChange} />
+        </div>
+        <div className="mt-4">
+          <Label htmlFor="hex-code">Hex Code</Label>
+          <Input
+            id="hex-code"
+            value={color}
+            onChange={(e) => onChange(e.target.value)}
+            className="mt-1"
+          />
         </div>
       </DialogContent>
     </Dialog>

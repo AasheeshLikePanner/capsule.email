@@ -17,14 +17,11 @@ export default function BrandKitPage() {
 
   const handleProcessingChange = (isProcessing: boolean) => {
     if (isProcessing) {
-      // Simulate adding a new processing brand kit
       setBrandKits((prev) => [
         ...prev,
         { id: Date.now(), name: "New Brand Kit", logo: "", isProcessing: true },
       ]);
     } else {
-      // Simulate removing the processing brand kit or updating its status
-      // In a real app, you'd update the specific kit's status based on an ID
       setBrandKits((prev) =>
         prev.map((kit) =>
           kit.isProcessing ? { ...kit, isProcessing: false } : kit
@@ -34,34 +31,34 @@ export default function BrandKitPage() {
   };
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="w-full p-10  py-5">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-semibold text-foreground">Brand Kit</h1>
+        <h1 className="text-xl font-medium text-foreground">Brand Kit</h1>
         <Button
           className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold py-2 px-4 rounded-xl"
           onClick={() => setIsDialogOpen(true)}
         >
-          Create Brand Kit
+          Create
         </Button>
       </div>
 
       {brandKits.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-20">
           {brandKits.map((kit) => (
-            <Card key={kit.id} className="bg-[#262626] text-white p-6 rounded-xl shadow-lg relative">
+            <Card key={kit.id} className="bg-muted/20 text-white p-6 rounded-xl h-80 shadow-lg relative">
               {kit.isProcessing && (
-                <div className="absolute top-2 right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full z-10">
+                <div className="absolute top-2 right-2 bg-muted/40 border text-white text-xs px-2 py-1 rounded-full z-10">
                   Processing
                 </div>
               )}
               <CardContent className="flex items-center justify-center h-full">
                 {kit.isProcessing ? (
                   <Image
-                    src="/loader.svg"
+                    src="/icon.svg"
                     alt="Processing"
                     width={50}
                     height={50}
-                    className="animate-spin-slow"
+                    className="animate-spin-slow opacity-50"
                   />
                 ) : (
                   kit.logo && (
@@ -93,7 +90,7 @@ export default function BrandKitPage() {
               className="mt-8 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold py-3 px-6 rounded-xl"
               onClick={() => setIsDialogOpen(true)}
             >
-              Create Brand Kit
+              Create
             </Button>
           </div>
         </div>

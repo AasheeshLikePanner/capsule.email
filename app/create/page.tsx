@@ -138,7 +138,7 @@ export default function CreatePage() {
       <div className="w-full max-w-2xl relative rounded-2xl border border-input bg-muted/20 flex flex-col p-4">
         <Textarea
           placeholder={`Write an email to ${placeholderSuffix}`}
-          className="w-full h-40 text-base p-3 pr-20 rounded-lg resize-none border-nne focus-visible:ring-0o focus-visible:ring-offset-0 bg-transparent"
+          className="w-full h-40 text-base p-3 pr-20 rounded-lg resize-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
           value={emailContent}
           onChange={(e) => {
             // Clear any ongoing animation when user starts typing

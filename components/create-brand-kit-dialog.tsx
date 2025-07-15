@@ -2,16 +2,28 @@
 
 import { useState } from "react";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { FaPlus, FaSpinner } from "react-icons/fa";
-import { FiLink } from "react-icons/fi"
+import { FiLink } from "react-icons/fi";
 import { cn } from "@/lib/utils";
-import axios from 'axios';
+import axios from "axios";
+import Link from "next/link";
 
-export function CreateBrandKitDialog({ open, onOpenChange, onProcessingChange }: { open: boolean; onOpenChange: (open: boolean) => void; onProcessingChange: (processing: boolean) => void; }) {
+export function CreateBrandKitDialog({
+  open,
+  onOpenChange,
+  onProcessingChange,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onProcessingChange: (processing: boolean) => void;
+}) {
   const [step, setStep] = useState("options"); // "options" | "match"
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,8 +38,10 @@ export function CreateBrandKitDialog({ open, onOpenChange, onProcessingChange }:
     try {
       const response = await axios.post("/api/brand-kit", { url });
       console.log(response);
-      
-      const jsonString = response.data.emailTemplate.replace(/^```json\s*/i, '').replace(/```$/, '');
+
+      const jsonString = response.data.emailTemplate
+        .replace(/^```json\s*/i, "")
+        .replace(/```$/, "");
 
       if (!jsonString) {
         console.error("emailTemplate is undefined or null in response.data");
@@ -37,7 +51,6 @@ export function CreateBrandKitDialog({ open, onOpenChange, onProcessingChange }:
       let parsedData;
       try {
         parsedData = JSON.parse(jsonString);
-
       } catch (_error: any) {
         return;
       }
@@ -51,7 +64,7 @@ export function CreateBrandKitDialog({ open, onOpenChange, onProcessingChange }:
       clearTimeout(timeoutId); // Clear the timeout on error as well
     } finally {
       setLoading(false);
-      onProcessingChange(false); 
+      onProcessingChange(false);
     }
   };
 
@@ -89,13 +102,15 @@ export function CreateBrandKitDialog({ open, onOpenChange, onProcessingChange }:
                 Automatically match your website&#39;s branding
               </p>
             </div>
-            <div className="flex flex-col items-center justify-center p-8 bg-neutral-800 rounded-2xl cursor-pointer transition-colors hover:bg-neutral-700">
-              <FaPlus className="w-8 h-8 mb-3 text-muted-foreground" />
-              <h3 className="font-semibold text-base">Start from scratch</h3>
-              <p className="text-xs text-muted-foreground text-center mt-1">
-                Upload your own logos, colors, and branded assets
-              </p>
-            </div>
+            <Link href="/email-editor">
+              <div className="h-80 flex flex-col items-center justify-center p-8 bg-neutral-800 rounded-2xl cursor-pointer transition-colors hover:bg-neutral-700">
+                <FaPlus className="w-8 h-8 mb-3 text-muted-foreground" />
+                <h3 className="font-semibold text-base">Start from scratch</h3>
+                <p className="text-xs text-muted-foreground text-center mt-1">
+                  Upload your own logos, colors, and branded assets
+                </p>
+              </div>
+            </Link>
           </div>
         )}
         {step === "match" && (
@@ -113,7 +128,9 @@ export function CreateBrandKitDialog({ open, onOpenChange, onProcessingChange }:
               />
               <Button
                 onClick={handleMatchBrand}
-                disabled={loading || !url || !/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(url)}
+                disabled={
+                  loading || !url || !/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(url)
+                }
                 className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg"
               >
                 {loading ? (

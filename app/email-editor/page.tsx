@@ -1,7 +1,8 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import BrandKitForm from "@/components/brand-kit-form";
 import EmailPreview from "@/components/email-preview";
+const MemoizedEmailPreview = memo(EmailPreview);
 import { cn } from "@/lib/utils";
 import { Building, FileText, Palette, Users, BadgeInfo } from 'lucide-react';
 
@@ -131,13 +132,13 @@ export default function EmailEditor() {
       </div>
       <div
         ref={mainContentRef}
-        className="flex-1 p-6 w-1/2 overflow-y-auto h-full rounded-lg shadow-sm border-l border-border"
+        className="flex-1 w-full overflow-y-auto h-full rounded-lg shadow-sm border-l border-border"
       >
-        <h1 className="text-2xl font-bold mb-4">Brand Kit</h1>
+        <h1 className="text-lg font-medium mb-4 ml-5">Brand Name</h1>
         <BrandKitForm brandKit={brandKit} setBrandKit={setBrandKit} />
       </div>
       <div className="w-full lg:w-1/3 p-6 rounded-lg shadow-sm border-l border-border">
-        <EmailPreview brandKit={brandKit} />
+        <MemoizedEmailPreview brandKit={brandKit} />
       </div>
     </div>
   );

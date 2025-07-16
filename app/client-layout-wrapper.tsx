@@ -28,7 +28,7 @@ export function RootLayoutClient({
             isSidebarExpanded ? "sm:pl-56" : "sm:pl-16"
           )}
         >
-          <div className="flex-1 bg-muted/40 rounded-l-2xl">
+          <div className="flex-1 bg-muted/40 rounded-2xl">
             {children}
           </div>
         </main>

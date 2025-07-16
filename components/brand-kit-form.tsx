@@ -13,15 +13,12 @@ export default function BrandKitForm({ brandKit, setBrandKit }: any) {
 
   const handleInputChange = (e: any) => {
     const { name, value, files } = e.target;
-    if (name === "primaryLogo" && files && files[0]) {
+    if (name === "logo_primary" && files && files[0]) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setBrandKit({
           ...brandKit,
-          logos: {
-            ...brandKit.logos,
-            primary: reader.result,
-          },
+          logo_primary: reader.result,
         });
       };
       reader.readAsDataURL(files[0]);
@@ -33,10 +30,7 @@ export default function BrandKitForm({ brandKit, setBrandKit }: any) {
   const handleRemoveLogo = () => {
     setBrandKit({
       ...brandKit,
-      logos: {
-        ...brandKit.logos,
-        primary: null,
-      },
+      logo_primary: null,
     });
   };
 
@@ -55,11 +49,11 @@ export default function BrandKitForm({ brandKit, setBrandKit }: any) {
         <div className="space-y-4">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
-              <Label htmlFor="kitName" className="text-muted-foreground">Kit Name</Label>
+              <Label htmlFor="kit_name" className="text-muted-foreground">Kit Name</Label>
               <Input
-                id="kitName"
-                name="kitName"
-                value={brandKit.kitName}
+                id="kit_name"
+                name="kit_name"
+                value={brandKit.kit_name}
                 onChange={handleInputChange}
                 className="rounded-xl"
               />
@@ -76,11 +70,11 @@ export default function BrandKitForm({ brandKit, setBrandKit }: any) {
             </div>
           </div>
           <div>
-            <Label htmlFor="brandSummary" className="text-muted-foreground">Brand Summary</Label>
+            <Label htmlFor="brand_summary" className="text-muted-foreground">Brand Summary</Label>
             <Textarea
-              id="brandSummary"
-              name="brandSummary"
-              value={brandKit.brandSummary}
+              id="brand_summary"
+              name="brand_summary"
+              value={brandKit.brand_summary}
               onChange={handleInputChange}
               className="rounded-xl h-30"
             />
@@ -96,11 +90,11 @@ export default function BrandKitForm({ brandKit, setBrandKit }: any) {
             />
           </div>
           <div>
-            <Label htmlFor="toneOfVoice" className="text-muted-foreground">Tone of Voice</Label>
+            <Label htmlFor="tone_of_voice" className="text-muted-foreground">Tone of Voice</Label>
             <Input
-              id="toneOfVoice"
-              name="toneOfVoice"
-              value={brandKit.toneOfVoice}
+              id="tone_of_voice"
+              name="tone_of_voice"
+              value={brandKit.tone_of_voice}
               onChange={handleInputChange}
               className="rounded-xl"
             />
@@ -149,39 +143,18 @@ export default function BrandKitForm({ brandKit, setBrandKit }: any) {
           <div className="flex items-center gap-2"><Users size={20} /> Social</div>
         </div>
         <div className="space-y-4">
-          {brandKit.socials && brandKit.socials.length > 0 && brandKit.socials.map((social: any, index: number) => (
+          {brandKit.socials && brandKit.socials.map((socialUrl: string, index: number) => (
             <div key={index} className="flex items-center gap-2">
-              <Select
-                value={social.platform}
-                onValueChange={(value) => {
-                  const newSocials = [...brandKit.socials];
-                  newSocials[index].platform = value;
-                  setBrandKit({ ...brandKit, socials: newSocials });
-                }}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select Social" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="linkedin">LinkedIn</SelectItem>
-                  <SelectItem value="github">GitHub</SelectItem>
-                  <SelectItem value="pinterest">Pinterest</SelectItem>
-                  <SelectItem value="twitter">Twitter</SelectItem>
-                  <SelectItem value="facebook">Facebook</SelectItem>
-                  <SelectItem value="instagram">Instagram</SelectItem>
-                  <SelectItem value="youtube">YouTube</SelectItem>
-                </SelectContent>
-              </Select>
               <Input
-                name="url"
-                value={social.url}
+                name="socialUrl"
+                value={socialUrl}
                 onChange={(e) => {
                   const newSocials = [...brandKit.socials];
-                  newSocials[index].url = e.target.value;
+                  newSocials[index] = e.target.value;
                   setBrandKit({ ...brandKit, socials: newSocials });
                 }}
                 className="rounded-xl flex-1"
-                placeholder="Enter URL"
+                placeholder="Enter Social URL"
               />
               <Button
                 variant="ghost"
@@ -198,7 +171,7 @@ export default function BrandKitForm({ brandKit, setBrandKit }: any) {
           <Button
             variant="outline"
             className="mx-auto block w-1/2"
-            onClick={() => setBrandKit({ ...brandKit, socials: [...(brandKit.socials || []), { platform: '', url: '' }] })}
+            onClick={() => setBrandKit({ ...brandKit, socials: [...(brandKit.socials || []), ''] })}
           >
             Add Social Link
           </Button>
@@ -211,9 +184,9 @@ export default function BrandKitForm({ brandKit, setBrandKit }: any) {
           </div>
         <div className="space-y-4 flex justify-center items-center">
             <div className="relative h-60 w-60 rounded-3xl border border-dashed flex items-center justify-center cursor-pointer bg-muted/40" onClick={handleLogoClick}>
-              {brandKit.logos?.primary ? (
+              {brandKit.logo_primary ? (
                 <>
-                  <img src={brandKit.logos.primary} alt="Brand Logo" className="h-full w-full object-contain rounded-3xl" />
+                  <img src={brandKit.logo_primary} alt="Brand Logo" className="h-full w-full object-contain rounded-3xl" />
                   <Button
                     variant="ghost"
                     size="icon"
@@ -229,11 +202,11 @@ export default function BrandKitForm({ brandKit, setBrandKit }: any) {
               ) : (
                 <div className="h-full w-full flex items-center justify-center bg-accent rounded-3xl">
                   <span className="text-white text-4xl font-bold">
-                    {brandKit.kitName.charAt(0).toUpperCase()}
+                    {brandKit.kit_name.charAt(0).toUpperCase()}
                   </span>
                 </div>
               )}
-              <Input id="primaryLogo" type="file" className="hidden" ref={fileInputRef} onChange={handleInputChange} name="primaryLogo"/>
+              <Input id="primaryLogo" type="file" className="hidden" ref={fileInputRef} onChange={handleInputChange} name="logo_primary"/>
             </div>
           </div>
       </div>
@@ -243,32 +216,32 @@ export default function BrandKitForm({ brandKit, setBrandKit }: any) {
         </div>
         <div className="grid grid-cols-2 items-center justify-items-center gap-8 min-h-[300px] mt-8">
           <ColorPickerInput
-            color={brandKit.colors.background}
-            onChange={(color) => setBrandKit({ ...brandKit, colors: { ...brandKit.colors, background: color } })}
+            color={brandKit.color_background}
+            onChange={(color) => setBrandKit({ ...brandKit, color_background: color })}
             label="Background"
             description="The main background of your email"
           />
           <ColorPickerInput
-            color={brandKit.colors.container}
-            onChange={(color) => setBrandKit({ ...brandKit, colors: { ...brandKit.colors, container: color } })}
+            color={brandKit.color_container}
+            onChange={(color) => setBrandKit({ ...brandKit, color_container: color })}
             label="Container"
             description="The content box of the email"
           />
           <ColorPickerInput
-            color={brandKit.colors.accent}
-            onChange={(color) => setBrandKit({ ...brandKit, colors: { ...brandKit.colors, accent: color } })}
+            color={brandKit.color_accent}
+            onChange={(color) => setBrandKit({ ...brandKit, color_accent: color })}
             label="Accent"
             description="Buttons, links, and highlights"
           />
           <ColorPickerInput
-            color={brandKit.colors.buttonText}
-            onChange={(color) => setBrandKit({ ...brandKit, colors: { ...brandKit.colors, buttonText: color } })}
+            color={brandKit.color_button_text}
+            onChange={(color) => setBrandKit({ ...brandKit, color_button_text: color })}
             label="Button Text"
             description="Text on buttons"
           />
           <ColorPickerInput
-            color={brandKit.colors.foreground}
-            onChange={(color) => setBrandKit({ ...brandKit, colors: { ...brandKit.colors, foreground: color } })}
+            color={brandKit.color_foreground}
+            onChange={(color) => setBrandKit({ ...brandKit, color_foreground: color })}
             label="Foreground"
             description="Text and other content elements"
           />

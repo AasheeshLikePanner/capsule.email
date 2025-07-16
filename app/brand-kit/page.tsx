@@ -1,33 +1,48 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { CreateBrandKitDialog } from "@/components/create-brand-kit-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function BrandKitPage() {
-  const [brandKits, setBrandKits] = useState([
-    { id: 1, name: "My Awesome Brand", logo: "/icon.svg", isProcessing: false },
-    { id: 2, name: "Another Brand", logo: "/icon.svg", isProcessing: false },
-    { id: 3, name: "Third Brand", logo: "/icon.svg", isProcessing: true }, // Example of a processing kit
-  ]);
+  const [brandKits, setBrandKits] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isProcessingBrandKit, setIsProcessingBrandKit] = useState(false);
+  const [isLoadingBrandKits, setIsLoadingBrandKits] = useState(true);
+  const [errorFetchingBrandKits, setErrorFetchingBrandKits] = useState<string | null>(null);
 
-  const handleProcessingChange = (isProcessing: boolean) => {
-    if (isProcessing) {
-      setBrandKits((prev) => [
-        ...prev,
-        { id: Date.now(), name: "New Brand Kit", logo: "", isProcessing: true },
-      ]);
-    } else {
-      setBrandKits((prev) =>
-        prev.map((kit) =>
-          kit.isProcessing ? { ...kit, isProcessing: false } : kit
-        )
-      );
-    }
+  useEffect(() => {
+    const fetchBrandKits = async () => {
+      try {
+        const response = await fetch('/api/brand-kit');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setBrandKits(data);
+      } catch (error: any) {
+        console.error("Error fetching brand kits:", error);
+        setErrorFetchingBrandKits(error.message);
+      } finally {
+        setIsLoadingBrandKits(false);
+      }
+    };
+
+    fetchBrandKits();
+  }, []);
+
+  const handleBrandKitProcessingStart = () => {
+    setIsProcessingBrandKit(true);
+    setIsDialogOpen(false); // Close the dialog immediately
+  };
+
+  const handleBrandKitComplete = (newBrandKit: any) => {
+    setBrandKits((prev) => [...prev, newBrandKit]);
+    setIsProcessingBrandKit(false);
   };
 
   return (
@@ -42,38 +57,53 @@ export default function BrandKitPage() {
         </Button>
       </div>
 
-      {brandKits.length > 0 ? (
+      {isLoadingBrandKits ? (
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-8rem)]">
+          <Image
+            src="/icon.svg"
+            alt="Loading Spinner"
+            width={64}
+            height={64}
+            className="animate-spin"
+          />
+          <p className="mt-4 text-lg font-semibold text-foreground">Loading brand kits...</p>
+        </div>
+      ) : errorFetchingBrandKits ? (
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-8rem)] text-red-500">
+          <p className="text-lg font-semibold">Error: {errorFetchingBrandKits}</p>
+          <p>Please try again later.</p>
+        </div>
+      ) : isProcessingBrandKit ? (
+        <Card className="bg-muted/20 text-white p-6 rounded-xl h-80 shadow-lg relative flex items-center justify-center">
+          <div className="flex flex-col items-center">
+            <Image
+              src="/icon.svg"
+              alt="Processing Spinner"
+              width={64}
+              height={64}
+              className="animate-spin"
+            />
+            <p className="mt-4 text-lg font-semibold text-foreground">Processing your brand kit...</p>
+          </div>
+        </Card>
+      ) : brandKits.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-20">
           {brandKits.map((kit) => (
-            <Card key={kit.id} className="bg-muted/20 text-white p-6 rounded-xl h-80 shadow-lg relative">
-              {kit.isProcessing && (
-                <div className="absolute top-2 right-2 bg-muted/40 border text-white text-xs px-2 py-1 rounded-full z-10">
-                  Processing
-                </div>
-              )}
-              <CardContent className="flex items-center justify-center h-full">
-                {kit.isProcessing ? (
-                  <Image
-                    src="/icon.svg"
-                    alt="Processing"
-                    width={50}
-                    height={50}
-                    className="animate-spin-slow opacity-50"
-                  />
-                ) : (
-                  kit.logo && (
+            <Link href={`/email-editor/${kit.id}`} key={kit.id}>
+              <Card className="bg-muted/20 text-white p-6 rounded-xl h-80 shadow-lg relative">
+                <CardContent className="flex items-center justify-center h-full">
+                  {kit.logo_primary && (
                     <Image
-                      src={kit.logo}
-                      alt={`${kit.name} Logo`}
+                      src={kit.logo_primary}
+                      alt={`${kit.kit_name} Logo`}
                       width={100}
                       height={100}
                       objectFit="contain"
-                      className="grayscale"
                     />
-                  )
-                )}
-              </CardContent>
-            </Card>
+                  )}
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       ) : (
@@ -95,7 +125,7 @@ export default function BrandKitPage() {
           </div>
         </div>
       )}
-      <CreateBrandKitDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onProcessingChange={handleProcessingChange} />
+      <CreateBrandKitDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onProcessingStart={handleBrandKitProcessingStart} onBrandKitComplete={handleBrandKitComplete} />
     </div>
   );
 }

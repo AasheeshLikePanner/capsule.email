@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import puppeteer from 'puppeteer'
 import { createBrandedEmailTemplate } from '@/lib/gemini';
+import { createClient } from '@/lib/supabase/server';
 
 
 export async function POST(request: Request) {
@@ -35,11 +36,11 @@ export async function POST(request: Request) {
       };
 
       const extractSocials = () => {
-        
+
         const links = Array.from(document.querySelectorAll('footer a[href]')) as HTMLAnchorElement[];
         links.push(...Array.from(document.querySelectorAll('header a[href]')) as HTMLAnchorElement[]);
         const s = Array.from(document.querySelectorAll('header a[href]')) as HTMLAnchorElement[];
-        
+
         const socials: Record<string, string> = {};
         links.forEach(link => {
           const href = link.href;
@@ -97,16 +98,93 @@ export async function POST(request: Request) {
         disclaimers: result.footer.text.match(/(terms|disclaimer|rights|reserved).{0,100}/i)?.[0] || ''
       }
     };
-      // await sleep(10000); // Pause for 2 seconds (2000 milliseconds)
+    // await sleep(10000); // Pause for 2 seconds (2000 milliseconds)
+    console.log(brandKitData);
 
-    const emailTemplate = await createBrandedEmailTemplate(brandKitData);
-    // const emailTemplate = '```json\n{"fixedData":{"name":"Super Cool Brand","description":"Super Cool Brand specializes in developing innovative and user-centric solutions. We are dedicated to delivering high-quality products that enhance user experience and drive success.","brandSummary":"Super Cool Brand specializes in developing innovative and user-centric solutions.","logo":"https://react.email/static/logo-on-black.png","theme":{"colors":{"background":"#ffffff","container":"#f9f9f9","accent":"#000000","buttonText":"#ffffff","foreground":"#000000"}},"tone":"professional","footer":{"text":"","socials":{"twitter":"https://x.com/reactemail","linkedin":"https://linkedin.com/company/mybrand","facebook":""}}},"component":"import { Html, Head, Body, Container, Section, Text, Img, Button, Hr, Link, Preview } from \'@react-email/components\';export default function WelcomeEmail() {  const fixedData = {\\"name\\":\\"Super Cool Brand\\",\\"description\\":\\"Super Cool Brand specializes in developing innovative and user-centric solutions. We are dedicated to delivering high-quality products that enhance user experience and drive success.\\",\\"brandSummary\\":\\"Super Cool Brand specializes in developing innovative and user-centric solutions.\\",\\"logo\\":\\"https://react.email/static/logo-on-black.png\\",\\"theme\\":{\\"colors\\":{\\"background\\":\\"#ffffff\\",\\"container\\":\\"#f9f9f9\\",\\"accent\\":\\"#000000\\",\\"buttonText\\":\\"#ffffff\\",\\"foreground\\":\\"#000000\\"}},\\"tone\\":\\"professional\\",\\"footer\\":{\\"text\\":\\"\\",\\"socials\\":{\\"twitter\\":\\"https://x.com/reactemail\\",\\"linkedin\\":\\"https://linkedin.com/company/mybrand\\",\\"facebook\\":\\"\\"}}};  const main = {    backgroundColor: fixedData.theme.colors.background,    fontFamily:      \'-apple-system,BlinkMacSystemFont,\\"Segoe UI\\",Roboto,Oxygen-Sans,Ubuntu,Cantarell,\\"Helvetica Neue\\",sans-serif\',  };  const container = {    margin: \'0 auto\',    padding: \'20px\',    width: \'100%\',    maxWidth: \'600px\',    backgroundColor: fixedData.theme.colors.container,    borderRadius: \'8px\',    boxShadow: \'0 2px 10px rgba(0,0,0,0.05)\',  };  const logoSection = {    textAlign: \'center\',    paddingBottom: \'20px\',  };  const logo = {    margin: \'0 auto\',    width: \'150px\',    height: \'auto\'  };  const contentSection = {    padding: \'20px 0\',    textAlign: \'left\',  };  const heading = {    color: fixedData.theme.colors.foreground,    fontSize: \'28px\',    fontWeight: \'bold\',    marginBottom: \'15px\',    lineHeight: \'1.2\',  };  const paragraph = {    color: fixedData.theme.colors.foreground,    fontSize: \'16px\',    lineHeight: \'1.5\',    marginBottom: \'20px\',  };  const button = {    padding: \'12px 25px\',    borderRadius: \'5px\',    fontWeight: \'bold\',    textDecoration: \'none\',    textAlign: \'center\',    display: \'inline-block\',    cursor: \'pointer\',    backgroundColor: fixedData.theme.colors.accent,    color: fixedData.theme.colors.buttonText,  };  const hr = {    borderColor: \'#cccccc\',    margin: \'20px 0\',  };  const brandSummarySection = {    padding: \'10px 0 20px 0\',    textAlign: \'center\',    backgroundColor: fixedData.theme.colors.container,  };  const brandSummaryText = {    color: fixedData.theme.colors.foreground,    fontSize: \'14px\',    fontStyle: \'italic\',    padding: \'0 20px\',  };  const footerSection = {    paddingTop: \'20px\',    textAlign: \'center\',  };  const footerText = {    color: \'#888888\',    fontSize: \'12px\',    lineHeight: \'1.5\',  };  const socialLink = {    color: \'#007bff\',    fontSize: \'12px\',    margin: \'0 5px\',    textDecoration: \'underline\',  };  return (    <Html>      <Head />      <Preview>Welcome to ${fixedData.name}!</Preview>      <Body style={main}>        <Container style={container}>          <Section style={logoSection}>            {fixedData.logo && <Img src={fixedData.logo} width=\\"150\\" alt={`${fixedData.name} Logo`} style={logo} />}          </Section>          <Section style={contentSection}>            <Text style={heading}>Welcome to ${fixedData.name}!</Text>            <Text style={paragraph}>${fixedData.description}</Text>            <Button              href=\\"#\\"              style={button}            >              {`${fixedData.tone === \'professional\' ? \'Get Started\' : \'Join Now\'}`}            </Button>          </Section>          <Hr style={hr} />          <Section style={brandSummarySection}>            <Text style={brandSummaryText}>${fixedData.brandSummary}</Text>          </Section>          <Section style={footerSection}>            {fixedData.footer.socials.twitter && (              <Link href={fixedData.footer.socials.twitter} style={socialLink}>Twitter</Link>            )}            {fixedData.footer.socials.github && (              <Link href={fixedData.footer.socials.github} style={socialLink}>GitHub</Link>            )}            {fixedData.footer.text && (              <Text style={footerText}>${fixedData.footer.text}</Text>            )}          </Section>        </Container>      </Body>    </Html>  );}"}\n```'
-    return NextResponse.json({emailTemplate }, { status: 200 });
+
+    const rawFixedBrandKitString: any = await createBrandedEmailTemplate(brandKitData);
+    console.log(rawFixedBrandKitString);
+    
+
+    const cleanedString = cleanJSONBlock(rawFixedBrandKitString);
+    const parsedFixedBrandKit = JSON.parse(cleanedString);
+
+    const fixedBrandKit = parsedFixedBrandKit.fixedData;
+
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not authenticated' }, { status: 401 });
+    }
+
+    const { data, error } = await supabase
+      .from('brandkits')
+      .insert([
+        {
+          user_id: user.id,
+          kit_name: fixedBrandKit.name,
+          website: url, // Using description for website as website field is not in fixedData
+          brand_summary: fixedBrandKit.brandSummary,
+          address: fixedBrandKit.footer.address,
+          tone_of_voice: fixedBrandKit.tone,
+          copyright: fixedBrandKit.footer.copyright,
+          footer: fixedBrandKit.footer.text,
+          disclaimers: fixedBrandKit.footer.disclaimers,
+          socials: Object.values(fixedBrandKit.footer.socials),
+          logo_primary: fixedBrandKit.logo,
+          logo_icon: fixedBrandKit.logo, // Assuming logo_icon is same as logo_primary
+          color_background: fixedBrandKit.theme.background,
+          color_container: fixedBrandKit.theme.container,
+          color_accent: fixedBrandKit.theme.accent,
+          color_button_text: fixedBrandKit.theme.buttonText,
+          color_foreground: fixedBrandKit.theme.foreground,
+        },
+      ])
+      .select();
+
+    if (error) {
+      console.error('[Supabase insert error]', error);
+      return NextResponse.json({ error: 'Failed to save brand kit' }, { status: 500 });
+    }
+
+    return NextResponse.json(data[0], { status: 200 });
   } catch (err) {
     console.error('[Scraper error]', err);
     return NextResponse.json({ error: 'Failed to fetch site info' }, { status: 500 });
   }
 }
-    const sleep = (ms:any) => {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    };
+const sleep = (ms: any) => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
+
+
+function cleanJSONBlock(raw: string): string {
+  return raw
+    .replace(/```json\s*/, "")
+    .replace(/```$/, "")
+    .trim();
+}
+
+export async function GET(request: Request) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: 'User not authenticated' }, { status: 401 });
+  }
+
+  const { data: brandKits, error } = await supabase
+    .from('brandkits')
+    .select('*')
+    .eq('user_id', user.id);
+
+  if (error) {
+    console.error('[Supabase fetch error]', error);
+    return NextResponse.json({ error: 'Failed to fetch brand kits' }, { status: 500 });
+  }
+
+  return NextResponse.json(brandKits, { status: 200 });
+}
+
+

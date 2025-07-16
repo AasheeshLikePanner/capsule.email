@@ -9,12 +9,26 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
+
+    const { data: sessionData, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error && sessionData?.user) {
+      const user = sessionData.user;
+
+      const { error: insertError } = await supabase.from("users").upsert({
+        id: user.id,
+        email: user.email,
+        name: user.user_metadata?.name,
+        avatar_url: user.user_metadata?.avatar_url,
+      });
+
+      if (insertError) {
+        console.error("Failed to insert user:", insertError);
+        return redirect("/auth/error");
+      }
+
       return redirect(next);
     }
   }
 
-  // return the user to an error page with instructions
   return redirect("/auth/error");
 }

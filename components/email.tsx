@@ -13,32 +13,31 @@ import {
 } from "@react-email/components";
 
 interface BrandKit {
-  kitName: string;
-  colors: {
-    background: string;
-    container: string;
-    foreground: string;
-    accent: string;
-    buttonText: string;
-    muted: string;
-  };
-  logos?: {primary: string};
-  brandSummary?: string;
-  website?: string;
-  socials?: Array<{
-    platform: string;
-    url: string;
-  }>;
-  copyright?: string;
-  footer?: string;
-  disclaimers?: string;
-  address?: string;
+  id: string;
+  user_id: string;
+  kit_name: string;
+  website: string;
+  brand_summary: string;
+  address: string;
+  tone_of_voice: string;
+  copyright: string;
+  footer: string;
+  disclaimers: string;
+  socials: string[];
+  logo_primary: string;
+  logo_icon: string;
+  color_background: string;
+  color_container: string;
+  color_accent: string;
+  color_button_text: string;
+  color_foreground: string;
+  created_at: string;
 }
 
 export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
   const styles = {
     body: {
-      backgroundColor: brandKit.colors.background || "#fafafa",
+      backgroundColor: brandKit.color_background || "#fafafa",
       fontFamily: '"Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
       margin: "0",
       padding: "40px 20px",
@@ -56,7 +55,7 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
     },
 
     card: {
-      backgroundColor: brandKit.colors.container || "#ffffff",
+      backgroundColor: brandKit.color_container || "#ffffff",
       borderRadius: "24px",
       padding: "56px 40px",
       textAlign: "center" as const,
@@ -78,7 +77,7 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
     logosFallback: {
       width: "48px",
       height: "48px",
-      backgroundColor: brandKit.colors.accent || "#007AFF",
+      backgroundColor: brandKit.color_accent || "#007AFF",
       borderRadius: "14px",
       display: "inline-flex",
       alignItems: "center",
@@ -87,7 +86,7 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
     },
 
     logosText: {
-      color: brandKit.colors.buttonText || "#ffffff",
+      color: brandKit.color_button_text || "#ffffff",
       fontSize: "18px",
       fontWeight: "600",
       margin: "0",
@@ -98,7 +97,7 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
     heading: {
       fontSize: "24px",
       fontWeight: "700",
-      color: brandKit.colors.foreground || "#000000",
+      color: brandKit.color_foreground || "#000000",
       margin: "48px auto 0 auto",
       padding: "0",
       border: "0px solid rgb(39, 39, 42)",
@@ -113,7 +112,7 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
     paragraph: {
       fontSize: "14px",
       fontStyle: "normal",
-      color: brandKit.colors.foreground || "#000000",
+      color: brandKit.color_foreground || "#000000",
       margin: "32px auto 0 auto",
       padding: "0",
       border: "0px solid rgb(39, 39, 42)",
@@ -129,8 +128,8 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
     },
 
     button: {
-      backgroundColor: brandKit.colors.accent || "#007AFF",
-      color: brandKit.colors.buttonText || "#ffffff",
+      backgroundColor: brandKit.color_accent || "#007AFF",
+      color: brandKit.color_button_text || "#ffffff",
       padding: "12px 24px",
       borderRadius: "12px",
       textDecoration: "none",
@@ -147,7 +146,7 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
 
     supportText: {
       fontSize: "13px",
-      color: brandKit.colors.muted || "#666666",
+      color: brandKit.color_foreground || "#666666", // Using foreground for support text as muted is not in schema
       margin: "36px 0 32px 0",
       lineHeight: "1.4",
       fontFamily: '"Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
@@ -164,7 +163,7 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
 
     signatureText: {
       fontSize: "14px",
-      color: brandKit.colors.muted || "#666666",
+      color: brandKit.color_foreground || "#666666", // Using foreground for signature text
       margin: "0 0 6px 0",
       fontFamily: '"Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
       fontWeight: "400",
@@ -173,7 +172,7 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
 
     companyName: {
       fontSize: "14px",
-      color: brandKit.colors.foreground || "#000000",
+      color: brandKit.color_foreground || "#000000",
       fontWeight: "400",
       margin: "0",
       fontFamily: '"Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
@@ -181,7 +180,7 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
 
     divider: {
       height: "1px",
-      backgroundColor: brandKit.colors.muted || "#e0e0e0",
+      backgroundColor: brandKit.color_foreground || "#e0e0e0", // Using foreground for divider
       border: "none",
       margin: "40px 0",
       opacity: 0.3,
@@ -213,7 +212,7 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
 
     footerText: {
       fontSize: "12px",
-      color: brandKit.colors.muted || "#999999",
+      color: brandKit.color_foreground || "#999999", // Using foreground for footer text
       margin: "6px auto 0 auto",
       padding: "0",
       border: "0px solid rgb(39, 39, 42)",
@@ -295,7 +294,7 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
           }
         `}</style>
       </Head>
-      <Preview>Hey there, welcome to {brandKit.kitName}!</Preview>
+      <Preview>Hey there, welcome to {brandKit.kit_name}!</Preview>
       <Body style={styles.body}>
         <Container style={styles.container}>
           
@@ -304,16 +303,16 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
             
             {/* logos */}
             <Section style={styles.logosSection}>
-              {brandKit.logos?.primary ? (
+              {brandKit.logo_primary ? (
                 <Img
-                  src={brandKit.logos?.primary}
-                  alt={`${brandKit.kitName} logos`}
+                  src={brandKit.logo_primary}
+                  alt={`${brandKit.kit_name} logos`}
                   style={styles.logos}
                 />
               ) : (
                 <div style={styles.logosFallback}>
                   <Text style={styles.logosText}>
-                    {brandKit.kitName.charAt(0).toUpperCase()}
+                    {brandKit.kit_name.charAt(0).toUpperCase()}
                   </Text>
                 </div>
               )}
@@ -327,14 +326,14 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
             <Text style={styles.paragraph} className="paragraph">
               Thanks so much for joining us! We're absolutely thrilled to have you as part of our amazing community.
             </Text>
-             {/* At {brandKit.kitName}, we believe in delivering exceptional experiences. */}
+             {/* At {brandKit.kit_name}, we believe in delivering exceptional experiences. */}
             <Text style={styles.paragraph} className="paragraph">
               We'd love for you to get the full experience, so when you have a moment, please finish setting up your account.
             </Text>
 
             {brandKit.website && (
               <Button href={brandKit.website} style={styles.button} className="button">
-                Let's Get Started!
+                Visit our Website!
               </Button>
             )}
 
@@ -345,7 +344,7 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
             <Section style={styles.signature}>
               <Text style={styles.signatureText}>Cheers,</Text>
               <Text style={styles.companyName}>
-                Your friends at {brandKit.kitName}
+                Your friends at {brandKit.kit_name}
               </Text>
             </Section>
 
@@ -355,20 +354,27 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
             {/* Social Links */}
             {brandKit.socials && brandKit.socials.length > 0 && (
               <Section style={styles.socialSection}>
-                {brandKit.socials.map((social, index) => (
-                  <Link
-                    key={index}
-                    href={social.url}
-                    style={styles.socialLink}
-                    target="_blank"
-                  >
-                    <Img
-                      src={`https://www.google.com/s2/favicons?domain=${social.platform}.com&sz=32`}
-                      alt={social.platform}
-                      style={styles.socialIcon}
-                    />
-                  </Link>
-                ))}
+                {brandKit.socials.map((socialUrl, index) => {
+                  const url = new URL(socialUrl);
+                  const hostname = url.hostname;
+                  const domainParts = hostname.split('.');
+                  const platform = domainParts.length > 1 ? domainParts[domainParts.length - 2] : domainParts[0];
+
+                  return (
+                    <Link
+                      key={index}
+                      href={socialUrl}
+                      style={styles.socialLink}
+                      target="_blank"
+                    >
+                      <Img
+                        src={`https://www.google.com/s2/favicons?domain=${platform}.com&sz=32`}
+                        alt={platform}
+                        style={styles.socialIcon}
+                      />
+                    </Link>
+                  );
+                })}
               </Section>
             )}
 

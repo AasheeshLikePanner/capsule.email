@@ -1,10 +1,13 @@
-"use client";
+"use client"
 import { useState, useEffect, useRef, memo } from "react";
+import { useParams } from 'next/navigation';
 import BrandKitForm from "@/components/brand-kit-form";
 import EmailPreview from "@/components/email-preview";
+import Image from "next/image";
 const MemoizedEmailPreview = memo(EmailPreview);
 import { cn } from "@/lib/utils";
 import { Building, FileText, Palette, Users, BadgeInfo } from 'lucide-react';
+import { Suspense } from 'react';
 
 const navItems = [
   {
@@ -31,30 +34,41 @@ const navItems = [
   },
 ];
 
-export default function EmailEditor() {
-  const [brandKit, setBrandKit] = useState({
-    kitName: "Notch Clipboard",
-    website: "https://notchclip.vercel.app/",
-    brandSummary:
-      " Notch Clipboard is a modern, minimalist clipboard management tool with a clean design aesthetic. The brand emphasizes simplicity and efficiency with a focus on fast and easy clipboard access. The visual style features a white/light background with subtle gradients, rounded corners, and a sophisticated color palette dominated by dark grays and blacks for text and UI elements.",
-    address: "123 Main Street, City, Country",
-    toneOfVoice: "Friendly",
-    copyright: "Add your copyright notice",
-    footer: "Add standard footer text that appears in every email",
-    disclaimers: "Add any disclaimers or legal information needed",
-    socials: "",
-    logos: {
-      primary: "https://notchclip.vercel.app/icon.png",
-      icon: "",
-    },
-    colors: {
-      background: "#ffffff",
-      container: "#f0f0f0",
-      accent: "#000000",
-      buttonText: "#ffffff",
-      foreground: "#000000",
-    },
-  });
+
+export default function EmailEditorContent() {
+  const params = useParams();
+  const brandKitId = params.brandKitId as string;
+
+  const [brandKit, setBrandKit] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!brandKitId) {
+      setIsLoading(false);
+      setError("Brand Kit ID is missing.");
+      return;
+    }
+
+    const fetchBrandKit = async () => {
+      try {
+        const response = await fetch(`/api/brand-kit/${brandKitId}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch brand kit: ${response.statusText}`);
+        }
+        const data = await response.json();
+        console.log(data);
+        
+        setBrandKit(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBrandKit();
+  }, [brandKitId]);
 
   const [activeSection, setActiveSection] = useState("brand-details");
   const mainContentRef = useRef(null);
@@ -85,12 +99,49 @@ export default function EmailEditor() {
     };
 
     const mainContent: any = mainContentRef.current;
-    mainContent.addEventListener("scroll", handleScroll);
+    if (mainContent) {
+      mainContent.addEventListener("scroll", handleScroll);
+    }
 
     return () => {
-      mainContent.removeEventListener("scroll", handleScroll);
+      if (mainContent) {
+        mainContent.removeEventListener("scroll", handleScroll);
+      }
     };
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Image
+          src="/icon.svg"
+          alt="Loading Spinner"
+          width={64}
+          height={64}
+          className="animate-spin"
+        />
+        <p className="mt-4 text-lg font-semibold text-foreground">Loading brand kit...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen text-red-500">
+        <p className="text-lg font-semibold">Error: {error}</p>
+        <p>Please ensure the Brand Kit ID is valid and try again.</p>
+      </div>
+    );
+  }
+
+  if (!brandKit) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen text-muted-foreground">
+        <p className="text-lg font-semibold">Brand Kit not found.</p>
+        <p>Please check the URL or create a new brand kit.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col lg:flex-row h-screen p-4 lg:p-8 gap-4">

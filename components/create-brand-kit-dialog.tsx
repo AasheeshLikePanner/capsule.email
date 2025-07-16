@@ -18,11 +18,13 @@ import Link from "next/link";
 export function CreateBrandKitDialog({
   open,
   onOpenChange,
-  onProcessingChange,
+  onProcessingStart,
+  onBrandKitComplete,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onProcessingChange: (processing: boolean) => void;
+  onProcessingStart: () => void;
+  onBrandKitComplete: (brandKit: any) => void;
 }) {
   const [step, setStep] = useState("options"); // "options" | "match"
   const [url, setUrl] = useState("");
@@ -30,41 +32,17 @@ export function CreateBrandKitDialog({
 
   const handleMatchBrand = async () => {
     setLoading(true);
-    onProcessingChange(true); // Set processing to true when API call starts
-    const timeoutId = setTimeout(() => {
-      onOpenChange(false);
-    }, 5000);
-
+    onProcessingStart(); // Notify parent that processing has started
     try {
       const response = await axios.post("/api/brand-kit", { url });
       console.log(response);
 
-      const jsonString = response.data.emailTemplate
-        .replace(/^```json\s*/i, "")
-        .replace(/```$/, "");
-
-      if (!jsonString) {
-        console.error("emailTemplate is undefined or null in response.data");
-        return;
-      }
-
-      let parsedData;
-      try {
-        parsedData = JSON.parse(jsonString);
-      } catch (_error: any) {
-        return;
-      }
-
-      const data = parsedData.component;
-      console.log(data);
-      clearTimeout(timeoutId); // Clear the timeout if the API call finishes before 5 seconds
+      onBrandKitComplete(response.data); // Pass the complete brand kit data
       onOpenChange(false); // Close dialog on success
     } catch (error) {
-      console.error("Error matching brand:", error); // This should now catch the JSON.parse error
-      clearTimeout(timeoutId); // Clear the timeout on error as well
+      console.error("Error matching brand:", error);
     } finally {
       setLoading(false);
-      onProcessingChange(false);
     }
   };
 

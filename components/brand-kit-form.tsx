@@ -82,7 +82,7 @@ export default function BrandKitForm({ brandKit, setBrandKit }: any) {
               name="brandSummary"
               value={brandKit.brandSummary}
               onChange={handleInputChange}
-              className="rounded-xl h-28"
+              className="rounded-xl h-30"
             />
           </div>
           <div>

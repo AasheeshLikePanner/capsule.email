@@ -62,7 +62,13 @@ export default function ColorPickerInput({
           <Input
             id="hex-code"
             value={color}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => {
+              if (!e.target.value.includes("#")) {
+                onChange( "#" + e.target.value);
+              }else{
+                onChange(e.target.value);
+              }
+            }}
             className="mt-1"
           />
         </div>

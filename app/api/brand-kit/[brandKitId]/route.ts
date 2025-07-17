@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
 export async function GET(request: Request, { params }: { params: { brandKitId: string } }) {
-  const { brandKitId } = params;
+  const awaitedParams = await params;
+  const { brandKitId } = awaitedParams;
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

@@ -36,7 +36,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "fixed inset-y-0 left-0 z-10 hidden flex-col bg-background transition-[width] ease-in-out duration-300 sm:flex",
+        "hidden flex-col bg-background transition-[width] ease-in-out duration-300 sm:flex",
         isExpanded ? "w-56" : "w-16"
       )}
     >
@@ -162,5 +162,3 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
     </aside>
   );
 }
-
-

@@ -102,7 +102,7 @@ export function CreateBrandKitDialog({
                 placeholder="https://example.com"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className="bg-secondary border-border text-foreground focus:ring-offset-background focus:ring-ring rounded-lg"
+                className="bg-card/75 border-border text-foreground focus:ring-offset-background focus:ring-ring rounded-lg"
               />
               <Button
                 onClick={handleMatchBrand}

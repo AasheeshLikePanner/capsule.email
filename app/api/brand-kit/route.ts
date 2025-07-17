@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import puppeteer from 'puppeteer'
-import { createBrandedEmailTemplate } from '@/lib/gemini';
+import { improvteBrandKit } from '@/lib/gemini';
 import { createClient } from '@/lib/supabase/server';
-
 
 export async function POST(request: Request) {
   const { url } = await request.json();
@@ -102,9 +101,9 @@ export async function POST(request: Request) {
     console.log(brandKitData);
 
 
-    const rawFixedBrandKitString: any = await createBrandedEmailTemplate(brandKitData);
+    const rawFixedBrandKitString: any = await improvteBrandKit(brandKitData);
     console.log(rawFixedBrandKitString);
-    
+
 
     const cleanedString = cleanJSONBlock(rawFixedBrandKitString);
     const parsedFixedBrandKit = JSON.parse(cleanedString);
@@ -124,7 +123,7 @@ export async function POST(request: Request) {
         {
           user_id: user.id,
           kit_name: fixedBrandKit.name,
-          website: url, // Using description for website as website field is not in fixedData
+          website: url,
           brand_summary: fixedBrandKit.brandSummary,
           address: fixedBrandKit.footer.address,
           tone_of_voice: fixedBrandKit.tone,
@@ -154,10 +153,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to fetch site info' }, { status: 500 });
   }
 }
-const sleep = (ms: any) => {
-  return new Promise(resolve => setTimeout(resolve, ms));
-};
-
 
 function cleanJSONBlock(raw: string): string {
   return raw

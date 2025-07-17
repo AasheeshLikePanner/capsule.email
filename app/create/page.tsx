@@ -4,18 +4,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowUp, Palette, Smile, ShoppingCart, Mail, Newspaper, Receipt } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { BrandKitDialog } from "@/components/brand-kit-dialog";
+import { useRouter } from "next/navigation";
 
 export default function CreatePage() {
-  const [emailContent, setEmailContent] = useState(""); // This will hold the actual content of the textarea
-  const [animatedContent, setAnimatedContent] = useState(""); // This will hold the content to be animated
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Ref to store the typing interval ID
+  const [emailContent, setEmailContent] = useState(""); 
+  const [animatedContent, setAnimatedContent] = useState(""); 
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null); 
   const [isBrandKitDialogOpen, setIsBrandKitDialogOpen] = useState(false);
+  const router = useRouter();
 
-  // State for animated placeholder
   const [placeholderSuffix, setPlaceholderSuffix] = useState("");
   const [currentSuffixIndex, setCurrentSuffixIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [charIndex, setCharIndex] = useState(0); // Index of character in the current suffix
+  const [charIndex, setCharIndex] = useState(0); 
 
   const placeholderSuffixes = [
     "welcome user...",
@@ -26,9 +27,9 @@ export default function CreatePage() {
     "remind...",
     "gathering feedback on user..."
   ];
-  const TYPING_SPEED = 100; // Speed for typing characters
-  const DELETING_SPEED = 50; // Speed for deleting characters
-  const PAUSE_BEFORE_NEXT = 1500; // Pause before typing next phrase
+  const TYPING_SPEED = 100; 
+  const DELETING_SPEED = 50; 
+  const PAUSE_BEFORE_NEXT = 1500; 
 
   useEffect(() => {
     const currentFullSuffix = placeholderSuffixes[currentSuffixIndex];
@@ -36,45 +37,40 @@ export default function CreatePage() {
     let timeoutId: NodeJS.Timeout;
 
     if (!isDeleting) {
-      // Typing phase
       if (charIndex < currentFullSuffix.length) {
         timeoutId = setTimeout(() => {
           setPlaceholderSuffix(currentFullSuffix.substring(0, charIndex + 1));
           setCharIndex((prev) => prev + 1);
         }, TYPING_SPEED);
       } else {
-        // Done typing, pause before deleting
         timeoutId = setTimeout(() => {
           setIsDeleting(true);
         }, PAUSE_BEFORE_NEXT);
       }
     } else {
-      // Deleting phase
       if (charIndex > 0) {
         timeoutId = setTimeout(() => {
           setPlaceholderSuffix(currentFullSuffix.substring(0, charIndex - 1));
           setCharIndex((prev) => prev - 1);
         }, DELETING_SPEED);
       } else {
-        // Done deleting, move to next suffix
         setIsDeleting(false);
         setCurrentSuffixIndex((prev) => (prev + 1) % placeholderSuffixes.length);
       }
     }
 
     return () => clearTimeout(timeoutId);
-  }, [charIndex, isDeleting, currentSuffixIndex, placeholderSuffixes]); // Dependencies for the animation loop
+  }, [charIndex, isDeleting, currentSuffixIndex, placeholderSuffixes]);
 
   useEffect(() => {
-    if (animatedContent) { // Only animate if there's content to animate
+    if (animatedContent) { 
       let i = 0;
       if (animatedContent.length > 0) {
-        setEmailContent(animatedContent.charAt(0)); // Set the first character immediately
-        i = 1; // Start animation from the second character
+        setEmailContent(animatedContent.charAt(0)); 
+        i = 1; 
       } else {
-        setEmailContent(""); // If animatedContent is empty, clear the input
+        setEmailContent(""); 
       }
-      // Clear any existing timeout to prevent multiple animations
       if (typingTimeoutRef.current) {
         clearInterval(typingTimeoutRef.current);
       }
@@ -89,17 +85,16 @@ export default function CreatePage() {
             typingTimeoutRef.current = null;
           }
         }
-      }, 20); // Adjust typing speed here (milliseconds per character)
+      }, 20); 
     }
 
-    // Cleanup function for useEffect
     return () => {
       if (typingTimeoutRef.current) {
         clearInterval(typingTimeoutRef.current);
         typingTimeoutRef.current = null;
       }
     };
-  }, [animatedContent]); // Dependency on animatedContent
+  }, [animatedContent]); 
 
   const handleButtonClick = (type: string) => {
     let content = "";
@@ -125,7 +120,14 @@ export default function CreatePage() {
       default:
         content = "";
     }
-    setAnimatedContent(content); // Set content to be animated
+    setAnimatedContent(content); 
+  };
+
+  const handleSendMessage = () => {
+    if (emailContent.trim()) {
+      const chatId = Date.now().toString();
+      router.push(`/chats/${chatId}?prompt=${encodeURIComponent(emailContent)}`);
+    }
   };
 
   return (
@@ -141,13 +143,18 @@ export default function CreatePage() {
           className="w-full h-40 text-base p-3 pr-20 rounded-lg resize-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
           value={emailContent}
           onChange={(e) => {
-            // Clear any ongoing animation when user starts typing
             if (typingTimeoutRef.current) {
               clearInterval(typingTimeoutRef.current);
               typingTimeoutRef.current = null;
             }
-            setAnimatedContent(""); // Clear animated content
+            setAnimatedContent(""); 
             setEmailContent(e.target.value);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSendMessage();
+            }
           }}
         />
         <div className="absolute bottom-4 left-4">
@@ -165,6 +172,7 @@ export default function CreatePage() {
             type="submit"
             size="icon"
             className="h-9 w-9 rounded-lg"
+            onClick={handleSendMessage}
           >
             <ArrowUp className="h-4 w-4" />
           </Button>

@@ -20,14 +20,14 @@ export function RootLayoutClient({
       enableSystem
       disableTransitionOnChange
     >
-      <div className="flex h-screen w-full border-4 border-red-500"> {/* Debug Border */}
+      <div className="flex h-screen w-full "> 
         <Sidebar isExpanded={isSidebarExpanded} setExpanded={setSidebarExpanded} />
         <main
           className={cn(
-            "flex flex-col flex-1 h-full overflow-hidden w-0 border-4 border-green-500", /* Debug Border */
+            "flex flex-col flex-1 h-full overflow-hidden w-0",
           )}
         >
-          <div className="flex-1 h-full border-4 border-blue-500"> {/* Debug Border */}
+          <div className="flex-1 h-full "> 
             {children}
           </div>
         </main>

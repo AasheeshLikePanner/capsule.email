@@ -62,7 +62,7 @@ export default function ChatPage() {
     if (!messageToSend.trim()) return;
 
     setIsLoading(true);
-    const newMessages = isInitial 
+    const newMessages:any = isInitial 
       ? [{ type: 'user', content: messageToSend }]
       : [...messages, { type: 'user', content: messageToSend }];
     
@@ -113,10 +113,10 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex h-full bg-background border-4 border-purple-500"> {/* Debug Border */}
-      <div className="flex flex-col w-1/2 min-h-0 border-4 border-orange-500"> {/* Debug Border */}
+    <div className="flex h-full bg-background "> 
+      <div className="flex flex-col w-1/2 min-h-0 "> 
         {/* This main content area is the only part that scrolls */}
-        <div className="flex-1 overflow-y-auto p-6 border-4 border-yellow-500"> {/* Debug Border */}
+        <div className="flex-1 overflow-y-auto p-6 "> 
             <div className="flex flex-col space-y-5">
               {messages.map((msg, index) => (
                 <div
@@ -148,11 +148,11 @@ export default function ChatPage() {
             </div>
           </div>
           {/* This footer with the form is fixed at the bottom */}
-          <footer className="p-4 border-t flex-shrink-0 border-4 border-pink-500"> {/* Debug Border */}
+          <footer className="p-4 border-t flex-shrink-0"> 
             <form onSubmit={handleSubmit} className="relative">
               <Textarea
                 placeholder="Tell the AI what to change..."
-                className="w-full text-base p-4 pr-14 rounded-xl resize-none border-input bg-card focus-visible:ring-1 focus-visible:ring-1 focus-visible:ring-offset-0"
+                className="w-full text-base p-4 pr-14 rounded-xl resize-none border-input bg-card  focus-visible:ring-1 focus-visible:ring-offset-0"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 onKeyDown={(e) => {
@@ -174,7 +174,7 @@ export default function ChatPage() {
             </form>
           </footer>
       </div>
-      <div className="w-1/2 h-full bg-muted/30 overflow-hidden border-4 border-cyan-500"> {/* Debug Border */}
+      <div className="w-1/2 h-full bg-muted/30 overflow-hidden "> 
         <MemoizedEmailPreview initialMarkup={emailMarkup} />
       </div>
     </div>

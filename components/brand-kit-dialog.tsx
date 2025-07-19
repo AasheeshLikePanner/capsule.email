@@ -1,11 +1,37 @@
+
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
+import { useBrandKitStore } from "@/lib/store/brandKitStore";
+import { useEffect } from "react";
+import Image from "next/image";
+
+interface BrandKit {
+  id: string;
+  kit_name: string;
+  logo_primary: string | null;
+  // Add other brand kit properties as needed
+}
 
 interface BrandKitDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  onSelectBrandKit: (brandKit: BrandKit) => void;
 }
 
-export function BrandKitDialog({ isOpen, onOpenChange }: BrandKitDialogProps) {
+export function BrandKitDialog({ isOpen, onOpenChange, onSelectBrandKit }: BrandKitDialogProps) {
+  const { brandKits, isLoading, error, fetchBrandKits } = useBrandKitStore();
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchBrandKits();
+    }
+  }, [isOpen, fetchBrandKits]);
+
+  const handleSelect = (kit: BrandKit) => {
+    onSelectBrandKit(kit);
+    onOpenChange(false);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
@@ -16,9 +42,43 @@ export function BrandKitDialog({ isOpen, onOpenChange }: BrandKitDialogProps) {
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          {/* Placeholder for Brand Kit content */}
-          <p>Brand Kit content goes here.</p>
-          <p>You can add forms, color pickers, etc.</p>
+          {isLoading && (
+            <div className="flex justify-center items-center h-20">
+              <Image
+                src="/icon.svg"
+                alt="Loading"
+                width={40}
+                height={40}
+                className="animate-spin-slow"
+              />
+            </div>
+          )}
+          {error && <p className="text-red-500">Error: {error}</p>}
+          {!isLoading && !error && brandKits.length === 0 && (
+            <p>No brand kits found. Create one from the Brand Kit page.</p>
+          )}
+          {!isLoading && !error && brandKits.length > 0 && (
+            <div className="grid grid-cols-1 gap-4">
+              {brandKits.map((kit) => (
+                <div
+                  key={kit.id}
+                  className="flex items-center gap-2 p-2 border rounded-md hover:bg-muted cursor-pointer"
+                  onClick={() => handleSelect(kit)}
+                >
+                  {kit.logo_primary && (
+                    <Image
+                      src={kit.logo_primary}
+                      alt={`${kit.kit_name} Logo`}
+                      width={40}
+                      height={40}
+                      objectFit="contain"
+                    />
+                  )}
+                  <span>{kit.kit_name}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

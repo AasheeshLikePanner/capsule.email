@@ -28,6 +28,7 @@ export function RootLayoutClient({
           )}
         >
           <div className="flex-1 h-full "> 
+             <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
             {children}
           </div>
         </main>

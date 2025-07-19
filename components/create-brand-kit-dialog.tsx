@@ -9,23 +9,25 @@ import {
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { FaPlus, FaSpinner } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import { FiLink } from "react-icons/fi";
 import { cn } from "@/lib/utils";
 import axios from "axios";
 import Link from "next/link";
+import Image from "next/image";
+
+import { useBrandKitStore } from "@/lib/store/brandKitStore";
 
 export function CreateBrandKitDialog({
   open,
   onOpenChange,
   onProcessingStart,
-  onBrandKitComplete,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onProcessingStart: () => void;
-  onBrandKitComplete: (brandKit: any) => void;
 }) {
+  const { addBrandKit } = useBrandKitStore();
   const [step, setStep] = useState("options"); // "options" | "match"
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
@@ -37,7 +39,7 @@ export function CreateBrandKitDialog({
       const response = await axios.post("/api/brand-kit", { url });
       console.log(response);
 
-      onBrandKitComplete(response.data); // Pass the complete brand kit data
+      addBrandKit(response.data); // Pass the complete brand kit data
       onOpenChange(false); // Close dialog on success
     } catch (error) {
       console.error("Error matching brand:", error);
@@ -113,7 +115,13 @@ export function CreateBrandKitDialog({
               >
                 {loading ? (
                   <div className="w-8 h-8 flex items-center justify-center">
-                    <FaSpinner className="animate-spin" />
+                    <Image
+                      src="/icon.svg"
+                      alt="Loading"
+                      width={32}
+                      height={32}
+                      className="animate-spin-slow"
+                    />
                   </div>
                 ) : (
                   "Match Brand"

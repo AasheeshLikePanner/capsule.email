@@ -17,7 +17,19 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  /* config options here */
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com; object-src 'none';"
+          }
+        ]
+      }
+    ]
+  }
 };
 
 export default nextConfig;

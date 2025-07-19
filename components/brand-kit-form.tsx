@@ -2,13 +2,18 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-import { BadgeInfo, Building, Palette, FileText, Users, Plus, Trash2, XCircle } from 'lucide-react';
+import { BadgeInfo, Building, Palette, FileText, Users, Trash2, XCircle } from 'lucide-react';
 import ColorPickerInput from "@/components/color-picker-input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import React, { useRef } from 'react';
+import Image from "next/image";
 
-export default function BrandKitForm({ brandKit, setBrandKit }: any) {
+interface BrandKitFormProps {
+  brandKit: any;
+  setBrandKit: React.Dispatch<React.SetStateAction<any>>;
+}
+
+export default function BrandKitForm({ brandKit, setBrandKit }: BrandKitFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInputChange = (e: any) => {

@@ -4,46 +4,26 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { CreateBrandKitDialog } from "@/components/create-brand-kit-dialog";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
+import { useBrandKitStore } from "@/lib/store/brandKitStore";
 
 export default function BrandKitPage() {
-  const [brandKits, setBrandKits] = useState<any[]>([]);
+  const { brandKits, isLoading, error, fetchBrandKits } = useBrandKitStore();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isProcessingBrandKit, setIsProcessingBrandKit] = useState(false);
-  const [isLoadingBrandKits, setIsLoadingBrandKits] = useState(true);
-  const [errorFetchingBrandKits, setErrorFetchingBrandKits] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchBrandKits = async () => {
-      try {
-        const response = await fetch('/api/brand-kit');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setBrandKits(data);
-      } catch (error: any) {
-        console.error("Error fetching brand kits:", error);
-        setErrorFetchingBrandKits(error.message);
-      } finally {
-        setIsLoadingBrandKits(false);
-      }
-    };
-
     fetchBrandKits();
-  }, []);
+  }, [fetchBrandKits]);
 
   const handleBrandKitProcessingStart = () => {
     setIsProcessingBrandKit(true);
     setIsDialogOpen(false); // Close the dialog immediately
   };
 
-  const handleBrandKitComplete = (newBrandKit: any) => {
-    setBrandKits((prev) => [...prev, newBrandKit]);
-    setIsProcessingBrandKit(false);
-  };
+  
 
   return (
     <div className="p-10 py-5 min-h-screen">
@@ -57,7 +37,7 @@ export default function BrandKitPage() {
         </Button>
       </div>
 
-      {isLoadingBrandKits ? (
+      {isLoading ? (
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-8rem)]">
           <Image
             src="/icon.svg"
@@ -68,9 +48,9 @@ export default function BrandKitPage() {
           />
           <p className="mt-4 text-lg font-semibold text-foreground">Loading brand kits...</p>
         </div>
-      ) : errorFetchingBrandKits ? (
+      ) : error ? (
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-8rem)] text-red-500">
-          <p className="text-lg font-semibold">Error: {errorFetchingBrandKits}</p>
+          <p className="text-lg font-semibold">Error: {error}</p>
           <p>Please try again later.</p>
         </div>
       ) : (
@@ -131,7 +111,7 @@ export default function BrandKitPage() {
           )}
         </div>
       )}
-      <CreateBrandKitDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onProcessingStart={handleBrandKitProcessingStart} onBrandKitComplete={handleBrandKitComplete} />
+      <CreateBrandKitDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onProcessingStart={handleBrandKitProcessingStart} />
     </div>
   );
 }

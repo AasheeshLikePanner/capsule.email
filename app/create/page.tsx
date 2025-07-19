@@ -1,16 +1,27 @@
 "use client"
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowUp, Palette, Smile, ShoppingCart, Mail, Newspaper, Receipt } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { ArrowUp, Palette, Smile, ShoppingCart, Mail, Newspaper, Receipt, X } from "lucide-react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { BrandKitDialog } from "@/components/brand-kit-dialog";
 import { useRouter } from "next/navigation";
+
+
+interface BrandKit {
+  id: string;
+  kit_name: string;
+  logo_primary: string | null;
+  // Add other brand kit properties as needed
+}
+
 
 export default function CreatePage() {
   const [emailContent, setEmailContent] = useState(""); 
   const [animatedContent, setAnimatedContent] = useState(""); 
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null); 
   const [isBrandKitDialogOpen, setIsBrandKitDialogOpen] = useState(false);
+  const [selectedBrandKit, setSelectedBrandKit] = useState<BrandKit | null>(null);
   const router = useRouter();
 
   const [placeholderSuffix, setPlaceholderSuffix] = useState("");
@@ -18,7 +29,7 @@ export default function CreatePage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [charIndex, setCharIndex] = useState(0); 
 
-  const placeholderSuffixes = [
+  const placeholderSuffixes = useMemo(() => [
     "welcome user...",
     "announce...",
     "showcase...",
@@ -26,7 +37,7 @@ export default function CreatePage() {
     "offer...",
     "remind...",
     "gathering feedback on user..."
-  ];
+  ], []);
   const TYPING_SPEED = 100; 
   const DELETING_SPEED = 50; 
   const PAUSE_BEFORE_NEXT = 1500; 
@@ -126,7 +137,11 @@ export default function CreatePage() {
   const handleSendMessage = () => {
     if (emailContent.trim()) {
       const chatId = Date.now().toString();
-      router.push(`/chats/${chatId}?prompt=${encodeURIComponent(emailContent)}`);
+      const promptData = {
+        emailContent,
+        brandKit: selectedBrandKit,
+      };
+      router.push(`/chats/${chatId}?prompt=${encodeURIComponent(JSON.stringify(promptData))}`);
     }
   };
 
@@ -139,7 +154,7 @@ export default function CreatePage() {
       
       <div className="w-full max-w-2xl relative rounded-2xl border border-input bg-muted/20 flex flex-col p-4">
         <Textarea
-          placeholder={`Write an email to ${placeholderSuffix}`}
+          placeholder={`Write an email to ${selectedBrandKit ? selectedBrandKit.kit_name : placeholderSuffix}`}
           className="w-full h-40 text-base p-3 pr-20 rounded-lg resize-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
           value={emailContent}
           onChange={(e) => {
@@ -158,14 +173,34 @@ export default function CreatePage() {
           }}
         />
         <div className="absolute bottom-4 left-4">
-          <Button
-            variant="ghost"
-            className="flex items-center gap-1 h-9 rounded-lg px-3 text-sm"
-            onClick={() => setIsBrandKitDialogOpen(true)}
-          >
-            <Palette className="h-4 w-4" />
-            Brand Kit
-          </Button>
+          {selectedBrandKit ? (
+            <Button
+              variant="ghost"
+              className="flex items-center gap-1 h-9 rounded-lg px-3 text-sm"
+              onClick={() => setSelectedBrandKit(null)}
+            >
+              <X className="h-4 w-4" />
+              {selectedBrandKit.logo_primary && (
+                <Image
+                  src={selectedBrandKit.logo_primary}
+                  alt={`${selectedBrandKit.kit_name} Logo`}
+                  width={16}
+                  height={16}
+                  className="object-contain"
+                />
+              )}
+              {selectedBrandKit.kit_name}
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              className="flex items-center gap-1 h-9 rounded-lg px-3 text-sm"
+              onClick={() => setIsBrandKitDialogOpen(true)}
+            >
+              <Palette className="h-4 w-4" />
+              Brand Kit
+            </Button>
+          )}
         </div>
         <div className="absolute bottom-4 right-4">
           <Button
@@ -181,7 +216,9 @@ export default function CreatePage() {
       <BrandKitDialog
         isOpen={isBrandKitDialogOpen}
         onOpenChange={setIsBrandKitDialogOpen}
+        onSelectBrandKit={setSelectedBrandKit}
       />
+          
       <div className="w-full max-w-3xl flex flex-nowrap justify-center gap-2 mt-4 overflow-x-auto pb-2">
           <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("welcome")}>
             <Smile className="h-4 w-4" />

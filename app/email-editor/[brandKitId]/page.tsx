@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import BrandKitForm from "@/components/brand-kit-form";
 import EmailPreview from "@/components/email-preview";
 import Image from "next/image";
-const MemoizedEmailPreview = memo(EmailPreview);
+const MemoizedEmailPreview :any= memo(EmailPreview);
 import { cn } from "@/lib/utils";
 import { Building, FileText, Palette, Users, BadgeInfo } from 'lucide-react';
 import { Suspense } from 'react';
@@ -60,8 +60,12 @@ export default function EmailEditorContent() {
         console.log(data);
         
         setBrandKit(data);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unknown error occurred.");
+        }
       } finally {
         setIsLoading(false);
       }
@@ -79,7 +83,7 @@ export default function EmailEditorContent() {
       if (!mainContent) return;
 
       const scrollPosition = mainContent.scrollTop;
-      let currentActiveId:any = "";
+      let currentActiveId: string = "";
 
       const allSectionIds = navItems.flatMap((item:any) =>
         item.isHeader ? item.subItems.map((sub:any) => sub.id) : [item.id]

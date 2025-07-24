@@ -8,6 +8,8 @@ import Editor from 'react-simple-code-editor';
 import { highlight, languages } from 'prismjs';
 import 'prismjs/components/prism-markup'; // For HTML/JSX highlighting
 import 'prismjs/themes/prism-tomorrow.css'; // Colorful theme
+import prettier from 'prettier/standalone';
+import parserHtml from 'prettier/parser-html';
 import 'prismjs/plugins/line-numbers/prism-line-numbers.js';
 import 'prismjs/plugins/line-numbers/prism-line-numbers.css';
 
@@ -22,13 +24,31 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading }: EmailDispl
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(emailMarkup);
+    navigator.clipboard.writeText(code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }, [emailMarkup]);
+  }, [code]);
 
   useEffect(() => {
-    setCode(emailMarkup);
+    const formatCode = async () => {
+      const safeEmailMarkup = typeof emailMarkup === 'string' ? emailMarkup : '';
+      if (safeEmailMarkup) {
+        try {
+          const formattedCode = await prettier.format(safeEmailMarkup, {
+            parser: 'html',
+            plugins: [parserHtml],
+            htmlWhitespaceSensitivity: 'ignore',
+          });
+          setCode(formattedCode);
+        } catch (error) {
+          console.error("Error formatting code:", error);
+          setCode(safeEmailMarkup); // Fallback to unformatted if error
+        }
+      } else {
+        setCode('');
+      }
+    };
+    formatCode();
   }, [emailMarkup]);
 
   if (isLoading) {
@@ -48,15 +68,15 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading }: EmailDispl
   }
 
   return (
-    <div className="flex flex-col w-full h-full bg-muted/30">
-      <div className="flex-1 overflow-auto p-4">
+    <div className="flex flex-col w-full h-full bg-muted/30 rounded-2xl">
+      <div className="flex-1 overflow-auto p-4 rounded-xl">
         {view === 'preview' ? (
-          <EmailRenderer jsxString={code} />
+          <EmailRenderer jsxString={code} className="rounded-xl overflow-hidden" />
         ) : (
           <Editor
             value={code}
             onValueChange={code => setCode(code)}
-            highlight={code => highlight(code, languages.markup, 'markup')}
+            highlight={code => highlight(String(code), languages.markup, 'markup')}
             padding={10}
             className="line-numbers"
             style={{

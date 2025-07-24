@@ -32,6 +32,7 @@ export default function ChatPage() {
   const { brandKits } = useBrandKitStore();
   const [selectedBrandKit, setSelectedBrandKit] = useState<any>(null);
   const selectedBrandKitRef = useRef<any>(null);
+  const hasSetInitialBrandKit = useRef(false);
 
   
 
@@ -107,8 +108,9 @@ export default function ChatPage() {
     if (promptFromUrl) {
       try {
         const { emailContent, brandKit } = JSON.parse(promptFromUrl);
-        if (brandKit) {
+        if (brandKit && !hasSetInitialBrandKit.current) {
           setSelectedBrandKit(brandKit);
+          hasSetInitialBrandKit.current = true;
         }
         if (emailContent && !hasHandledInitialPrompt.current) {
           hasHandledInitialPrompt.current = true;
@@ -249,7 +251,7 @@ export default function ChatPage() {
           </form>
         </footer>
       </div>
-      <div className="w-1/2 h-full bg-muted/30 overflow-hidden flex items-center justify-center"> 
+      <div className="w-1/2 h-full bg-muted/30 overflow-hidden flex items-center justify-center rounedd-2xl"> 
         <EmailDisplayPanel emailMarkup={emailMarkup} isLoading={isLoading} />
       </div>
     </div>

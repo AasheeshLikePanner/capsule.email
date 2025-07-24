@@ -111,19 +111,19 @@ export default function CreatePage() {
     let content = "";
     switch (type) {
       case "welcome":
-        content = "Write a welcome email for new users.";
+        content = "Welcome email for greeting a new user. Personalize with their name and thank them for joining. Include a CTA to complete setup.";
         break;
       case "e-commerce":
-        content = "Draft an e-commerce promotional email for a new product.";
+        content = "Recommendation email featuring four premium coffee products. Highlight one product with a badge and include descriptions, and a CTA to shop now. High-end, luxury, and exclusive style.";
         break;
       case "invite":
-        content = "Create an invitation email for an event.";
+        content = "Invitation email for joining a team. Mention the inviter, invitee, and team name. Include both a button and a link to accept the invite. Use black and white colors, Apple UI style, minimal, rounded corners, super modern.";
         break;
       case "newsletter":
-        content = "Generate content for a weekly newsletter.";
+        content = "Newsletter email with five movie recommendations. Highlight one movie with a badge and include brief descriptions for each. Cyberpunk style.";
         break;
       case "invoice":
-        content = "Prepare an email for sending an invoice.";
+        content = "Invoice email confirming a recent purchase. Include the order number, itemized breakdown, total cost, and a button to download the invoice. Scandinavian Design style.";
         break;
       case "cart":
         content = "Write a reminder email for an abandoned cart.";

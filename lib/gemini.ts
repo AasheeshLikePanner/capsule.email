@@ -75,7 +75,7 @@ ${JSON.stringify(data)}
   return text;
 }
 
-export async function createEmailTemplate(prompt: string, code?: string) {
+export async function createEmailTemplate(prompt: string, brandKit: any, context: string) {
 
   const promptTemplate = `
   
@@ -87,10 +87,9 @@ Transform user requests into **visually breathtaking minimalist emails** with mo
 ---
 
 ## 📥 INPUTS
-- **context**: Project background and email purpose
-- **userPrompt**: Specific design request or modifications needed
-- **lastReactCode**: Previous JSX code to build upon (ALWAYS use as foundation)
-- **brandKit** (optional):
+- **userPrompt**: Specific design request or modifications needed: ${prompt}
+- **lastReactCode**: Previous JSX code to build upon (ALWAYS use as foundation): ${context}
+- **brandKit** (optional): ${JSON.stringify(brandKit)}
   - logo: Brand logo URL
   - theme: { background, foreground, container, accent, buttonText }
   - brandSummary: Company description
@@ -150,29 +149,29 @@ html
     .email-card { border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
   </style>
 </head>
-<body style="background-color: [brandKit.color_background]; margin: 0; padding: 40px 20px;">
+<body style="background-color: ${brandKit?.theme?.background || '#ffffff'}; margin: 0; padding: 40px 20px;">
   
   <div class="email-container">
-    <div class="email-card" style="background-color: [brandKit.color_container]; padding: 48px; text-align: center;">
+    <div class="email-card" style="background-color: ${brandKit?.theme?.container || '#f9f9f9'}; padding: 48px; text-align: center;">
       
       <!-- LOGO -->
       <div style="margin-bottom: 32px;">
-        <img src="[brandKit.logo_primary]" alt="[brandKit.kit_name]" 
+        <img src="${brandKit?.logo_primary || ''}" alt="${brandKit?.kit_name || ''}" 
              style="width: 64px; height: 64px; border-radius: 16px; margin: 0 auto; display: block;">
       </div>
       
       <!-- CONTENT -->
-      <h1 style="color: [brandKit.color_foreground]; font-size: 28px; font-weight: 700; margin: 0 0 24px 0; line-height: 1.3;">
+      <h1 style="color: ${brandKit?.theme?.foreground || '#000000'}; font-size: 28px; font-weight: 700; margin: 0 0 24px 0; line-height: 1.3;">
         [HEADLINE]
       </h1>
       
-      <p style="color: [brandKit.color_foreground]; font-size: 16px; line-height: 1.6; margin: 0 0 32px 0; opacity: 0.8;">
+      <p style="color: ${brandKit?.theme?.foreground || '#000000'}; font-size: 16px; line-height: 1.6; margin: 0 0 32px 0; opacity: 0.8;">
         [DESCRIPTION]
       </p>
       
       <!-- CTA BUTTON -->
-      <a href="[brandKit.website]" 
-         style="background-color: [brandKit.color_accent]; color: [brandKit.color_button_text]; 
+      <a href="${brandKit?.website || '#'}" 
+         style="background-color: ${brandKit?.theme?.accent || '#000000'}; color: ${brandKit?.theme?.buttonText || '#ffffff'}; 
                 padding: 16px 32px; border-radius: 12px; text-decoration: none; 
                 font-weight: 600; font-size: 16px; display: inline-block; margin: 16px 0;">
         [CTA_TEXT]
@@ -229,12 +228,12 @@ html
 - **Figma**: Contemporary gradients, clean button design
 
 **Core Minimalist Principles:**
-1. **Exceptional Whitespace**: Never cramped, always spacious and breathable
-2. **Modern Rounded Cards**: Contemporary corner radius for card feel
-3. **Subtle Visual Depth**: Soft shadows and borders, nothing heavy
-4. **Clean Typography**: Let text breathe with perfect spacing
-5. **Minimal Color Palette**: Focus on content, not decoration
-6. **Spacious Interactions**: Generous button padding and hover states
+- **Exceptional Whitespace**: Never cramped, always spacious and breathable
+- **Modern Rounded Cards**: Contemporary corner radius for card feel
+- **Subtle Visual Depth**: Soft shadows and borders, nothing heavy
+- **Clean Typography**: Let text breathe with perfect spacing
+- **Minimal Color Palette**: Focus on content, not decoration
+- **Spacious Interactions**: Generous button padding and hover states
 
 ---
 
@@ -289,7 +288,7 @@ Generate **ultra-minimalist emails** with modern card aesthetics that feel spaci
 - **Modern rounded cards**: Contemporary corner radius and shadows
 - **Clean typography**: Perfect hierarchy through spacing and size
 - **Minimal visual noise**: Focus on content, not decoration
-- **Spacious interactions**: Generous button and element padding
+- **Spacious Interactions**: Generous button and element padding
 
 ### AI Design Decisions:
 - Choose optimal container widths for different email types
@@ -329,7 +328,10 @@ Generate **ultra-minimalist emails** with modern card aesthetics that feel spaci
 
 ---
 
-Input: ${JSON.stringify(prompt)}`
+Input: ${prompt}
+BrandKit: ${JSON.stringify(brandKit)}
+Context: ${context}
+`
 
   // console.log(prompt);
   
@@ -339,20 +341,20 @@ Input: ${JSON.stringify(prompt)}`
 
 
 
-  // const result = await model.generateContent(promptTemplate);
-  // const response = await result.response;
-  // const text = await response.text();
-  // console.log(text);
+  const result = await model.generateContent(promptTemplate);
+  const response = await result.response;
+  const text = await response.text();
+  console.log(text);
 
 
   // // The response may be wrapped in a markdown code block, so we extract the JSON from it.
-  // const cleanedJson = extractJsonFromMarkdown(text);
-  // const parsed = JSON.parse(cleanedJson);
-  // await fs.writeFile('gemini_sample_response.txt', JSON.stringify(parsed, null, 2), 'utf-8');
-  const raw = await fs.readFile('gemini_sample_response.txt', 'utf-8');
-  const data = JSON.parse(raw);
+  const cleanedJson = extractJsonFromMarkdown(text);
+  const parsed = JSON.parse(cleanedJson);
+  await fs.writeFile('gemini_sample_response.txt', JSON.stringify(parsed, null, 2), 'utf-8');
+  // const raw = await fs.readFile('gemini_sample_response.txt', 'utf-8');
+  // const data = JSON.parse(raw);
 
-  return data;
+  return parsed;
 }
 
 function extractJsonFromMarkdown(text: string): string {

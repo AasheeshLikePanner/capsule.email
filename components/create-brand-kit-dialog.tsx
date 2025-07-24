@@ -22,10 +22,12 @@ export function CreateBrandKitDialog({
   open,
   onOpenChange,
   onProcessingStart,
+  onProcessingComplete,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onProcessingStart: () => void;
+  onProcessingComplete: (success: boolean, message: string) => void;
 }) {
   const { addBrandKit } = useBrandKitStore();
   const [step, setStep] = useState("options"); // "options" | "match"
@@ -41,8 +43,10 @@ export function CreateBrandKitDialog({
 
       addBrandKit(response.data); // Pass the complete brand kit data
       onOpenChange(false); // Close dialog on success
-    } catch (error) {
+      onProcessingComplete(true, "Brand kit created successfully!");
+    } catch (error: any) {
       console.error("Error matching brand:", error);
+      onProcessingComplete(false, error.response?.data?.error || "Failed to create brand kit.");
     } finally {
       setLoading(false);
     }

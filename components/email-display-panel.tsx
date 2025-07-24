@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { EmailRenderer } from '@/components/email-render';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,13 @@ interface EmailDisplayPanelProps {
 export default function EmailDisplayPanel({ emailMarkup, isLoading }: EmailDisplayPanelProps) {
   const [view, setView] = useState<'preview' | 'code'>('preview');
   const [code, setCode] = useState(emailMarkup);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(emailMarkup);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [emailMarkup]);
 
   useEffect(() => {
     setCode(emailMarkup);
@@ -63,6 +70,13 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading }: EmailDispl
         )}
       </div>
       <div className="flex justify-end p-2 border-t">
+        <Button
+          variant="outline"
+          onClick={handleCopy}
+          className="mr-2"
+        >
+          {copied ? 'Copied!' : 'Copy to Clipboard'}
+        </Button>
         <Button
           variant={view === 'preview' ? 'default' : 'outline'}
           onClick={() => setView('preview')}

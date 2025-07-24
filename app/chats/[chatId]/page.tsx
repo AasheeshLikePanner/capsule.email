@@ -3,6 +3,8 @@
 import { useState, useEffect, memo, useRef, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+import axios from 'axios';
+import { useBrandKitStore } from '@/lib/store/brandKitStore';
 
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -12,7 +14,8 @@ import EmailDisplayPanel from '@/components/email-display-panel';
 
 interface BotMessageContent {
   title?: string;
-  text: string;
+  text?: string;
+  description?: string;
 }
 
 export default function ChatPage() {
@@ -23,72 +26,113 @@ export default function ChatPage() {
   const [prompt, setPrompt] = useState('');
   const [messages, setMessages] = useState<{ type: 'user' | 'bot', content: string | BotMessageContent }[]>([]);
   const [emailMarkup, setEmailMarkup] = useState('');
+  const emailMarkupRef = useRef('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
+  const { brandKits } = useBrandKitStore();
+  const [selectedBrandKit, setSelectedBrandKit] = useState<any>(null);
+  const selectedBrandKitRef = useRef<any>(null);
+
+  
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSendMessage = useCallback(async (messageToSend: string, isInitial = false) => {
-    if (!messageToSend.trim()) return;
+  useEffect(() => {
+    emailMarkupRef.current = emailMarkup;
+  }, [emailMarkup]);
+
+  const handleSendMessage = useCallback(async (messageToSend: string | { emailContent: string; brandKit?: any }, isInitial = false) => {
+    let actualMessageToSend: string;
+    let initialBrandKit: any | undefined;
+
+    if (typeof messageToSend === 'object') {
+      actualMessageToSend = messageToSend.emailContent;
+      initialBrandKit = messageToSend.brandKit;
+    } else {
+      actualMessageToSend = messageToSend;
+    }
+
+    if (!actualMessageToSend.trim()) return;
 
     setIsLoading(true);
-    const newMessages: any = isInitial
-      ? [{ type: 'user', content: messageToSend }]
-      : [...messages, { type: 'user', content: messageToSend }];
 
-    setMessages(newMessages);
+    // Use functional update for setMessages to avoid 'messages' in useCallback dependency
+    setMessages(prevMessages => {
+      const userMessageContent = (isInitial && initialBrandKit)
+        ? JSON.stringify({ emailContent: actualMessageToSend, brandKit: initialBrandKit })
+        : (selectedBrandKit && !isInitial)
+          ? JSON.stringify({ emailContent: actualMessageToSend, brandKit: selectedBrandKit })
+          : actualMessageToSend;
+
+      return isInitial
+        ? [{ type: 'user', content: userMessageContent }]
+        : [...prevMessages, { type: 'user', content: userMessageContent }];
+    });
+
     setPrompt('');
 
     try {
-      const response = await fetch('/api/generate-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: messageToSend }),
+      const response:any = await axios.post('/api/generate-email', {
+        prompt: actualMessageToSend,
+        brandKit: initialBrandKit || selectedBrandKit,
+        context: emailMarkupRef.current,
       });
 
       setIsLoading(false);
 
-      if (response.ok) {
-        const raw = await response.text();
+      const data = response.data;
 
-
-        let data;
-        try {
-          data = JSON.parse(raw);
-        } catch (e) {
-          console.error("JSON parse error:", e);
-        }
-
-
-
-        let botMessage: { type: 'bot'; content: string | BotMessageContent };
-        
-        if (data.code) {
-          setEmailMarkup(data.code);
-          botMessage = { type: 'bot', content: { title: data.title, text: data.text } };
-        } else {
-          setEmailMarkup(''); // Clear email markup if no code is returned
-          botMessage = { type: 'bot', content: data.text || 'Sorry, I could not generate a response.' };
-        }
-        setMessages(prev => [...prev, botMessage]);
+      let botMessage: { type: 'bot'; content: string | BotMessageContent };
+      console.log(data);
+      
+      if (data.code) {
+        setEmailMarkup(data.code);
+        botMessage = { type: 'bot', content: { title: data.title, text: data.text, description: data.description } };
       } else {
-        throw new Error('The response body is empty.');
+        setEmailMarkup(''); // Clear email markup if no code is returned
+        botMessage = { type: 'bot', content: data.text || 'Sorry, I could not generate a response.' };
       }
+      setMessages(prev => [...prev, botMessage]);
     } catch (error) {
       setIsLoading(false);
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
       setMessages(prev => [...prev, { type: 'bot', content: `Sorry, something went wrong: ${errorMessage}` }]);
     }
-  }, [messages]);
+  }, [selectedBrandKit]);
 
   useEffect(() => {
-    if (initialPromptFromUrl && !hasHandledInitialPrompt.current) {
-      hasHandledInitialPrompt.current = true;
-      handleSendMessage(initialPromptFromUrl, true);
+    const promptFromUrl = searchParams.get('prompt');
+    if (promptFromUrl) {
+      try {
+        const { emailContent, brandKit } = JSON.parse(promptFromUrl);
+        if (brandKit) {
+          setSelectedBrandKit(brandKit);
+        }
+        if (emailContent && !hasHandledInitialPrompt.current) {
+          hasHandledInitialPrompt.current = true;
+          handleSendMessage({ emailContent, brandKit }, true);
+        }
+      } catch (error) {
+        console.error("Failed to parse prompt from URL", error);
+        if (initialPromptFromUrl && !hasHandledInitialPrompt.current) {
+          hasHandledInitialPrompt.current = true;
+          handleSendMessage(initialPromptFromUrl, true);
+        }
+      }
+    } else if (initialPromptFromUrl && !hasHandledInitialPrompt.current) {
+      try {
+        const { emailContent, brandKit } = JSON.parse(initialPromptFromUrl);
+        hasHandledInitialPrompt.current = true;
+        handleSendMessage({ emailContent, brandKit }, true);
+      } catch (error) {
+        console.error("Failed to parse initialPromptFromUrl as JSON", error);
+        hasHandledInitialPrompt.current = true;
+        handleSendMessage(initialPromptFromUrl, true);
+      }
     }
-  }, [initialPromptFromUrl, handleSendMessage]);
+  }, [searchParams, handleSendMessage, initialPromptFromUrl]);
 
   const handleSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
@@ -129,7 +173,7 @@ export default function ChatPage() {
                           const parsedContent = JSON.parse(msg.content);
                           if (parsedContent.brandKit) {
                             return (
-                              <div className="mt-2 p-2 rounded-lg bg-card text-card-foreground border shadow-sm flex items-center space-x-2 max-w-xs ml-auto">
+                              <div className="mt-2 p-2 rounded-2xl bg-muted text-card-foreground border shadow-sm flex items-center space-x-2 max-w-40 ml-auto">
                                 {parsedContent.brandKit.logo_icon && (
                                   <Image src={parsedContent.brandKit.logo_icon} alt="Brand Logo" width={24} height={24} className="rounded-full" />
                                 )}
@@ -151,11 +195,14 @@ export default function ChatPage() {
                     ) : (
                       <div className="max-w-lg">
                         {msg.content.title && (
-                          <div className="rounded-lg px-4 py-2 bg-secondary text-secondary-foreground shadow-sm mb-2">
+                          <div className="rounded-lg w-80 p-3 border text-secondary-foreground shadow-sm mb-2">
                             <p className="text-sm font-semibold">{msg.content.title}</p>
                           </div>
                         )}
-                        <p className="text-sm">{msg.content.text}</p>
+                        <p className="text-sm mt-5">{msg.content.text}</p>
+                        {msg.content.description && (
+                          <p className="text-sm mt-2 text-muted-foreground">{msg.content.description}</p>
+                        )}
                       </div>
                     )
                   )}

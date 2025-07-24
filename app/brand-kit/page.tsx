@@ -8,6 +8,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
 import { useBrandKitStore } from "@/lib/store/brandKitStore";
+import { toast } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function BrandKitPage() {
   const { brandKits, isLoading, error, fetchBrandKits } = useBrandKitStore();
@@ -23,10 +25,19 @@ export default function BrandKitPage() {
     setIsDialogOpen(false); // Close the dialog immediately
   };
 
-  
+  const handleBrandKitProcessingComplete = (success: boolean, message: string) => {
+    setIsProcessingBrandKit(false);
+    if (success) {
+      toast.success(message);
+      fetchBrandKits(); // Re-fetch brand kits to show the new one
+    } else {
+      toast.error(message);
+    }
+  };
 
   return (
     <div className="p-10 py-5 min-h-screen">
+      <Toaster />
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl font-medium text-foreground">Brand Kit</h1>
         <Button
@@ -54,9 +65,9 @@ export default function BrandKitPage() {
           <p>Please try again later.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-24">
           {isProcessingBrandKit && (
-            <Card className="bg-muted/20 text-white p-6 rounded-xl h-80 shadow-lg relative flex items-center justify-center">
+            <Card className="bg-muted/20 text-white p-6 rounded-xl h-80 w-96 shadow-lg relative flex items-center justify-center">
               <div className="flex flex-col items-center">
                 <Image
                   src="/icon.svg"
@@ -111,7 +122,7 @@ export default function BrandKitPage() {
           )}
         </div>
       )}
-      <CreateBrandKitDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onProcessingStart={handleBrandKitProcessingStart} />
+      <CreateBrandKitDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onProcessingStart={handleBrandKitProcessingStart} onProcessingComplete={handleBrandKitProcessingComplete} />
     </div>
   );
 }

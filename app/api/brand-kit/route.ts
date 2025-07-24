@@ -13,12 +13,20 @@ export async function POST(request: Request) {
   try {
     const browser = await puppeteer.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: [
+        '--no-sandbox', 
+        '--disable-setuid-sandbox',
+        '--disable-blink-features=AutomationControlled',
+        '--disable-web-security',
+        '--disable-features=VizDisplayCompositor',
+        '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      ]
     });
 
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
-
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+    await page.setViewport({ width: 1366, height: 768 });
     const result = await page.evaluate(() => {
       const get = (selector: string, attr = 'content') =>
         document.querySelector(selector)?.getAttribute(attr) || '';
@@ -28,6 +36,145 @@ export async function POST(request: Request) {
         return el ? window.getComputedStyle(el)[prop as any] : null;
       };
 
+      // Enhanced logo extraction function
+      const extractHighResLogo = () => {
+        const logoSources = [];
+
+        // 1. Look for structured data (JSON-LD)
+        const jsonLdScripts = Array.from(document.querySelectorAll('script[type="application/ld+json"]'));
+        for (const script of jsonLdScripts) {
+          try {
+            const data = JSON.parse(script.textContent || '');
+            if (data.logo) {
+              logoSources.push({
+                url: typeof data.logo === 'string' ? data.logo : data.logo.url,
+                source: 'json-ld',
+                priority: 10
+              });
+            }
+            if (data.image) {
+              logoSources.push({
+                url: typeof data.image === 'string' ? data.image : data.image.url,
+                source: 'json-ld-image',
+                priority: 8
+              });
+            }
+          } catch (e) {
+            // Skip invalid JSON-LD
+          }
+        }
+
+        // 2. Look for common logo selectors with high priority
+        const logoSelectors = [
+          'img[alt*="logo" i]',
+          'img[class*="logo" i]',
+          'img[id*="logo" i]',
+          '.logo img',
+          '#logo img',
+          'header img[src*="logo" i]',
+          'nav img[src*="logo" i]',
+          '.navbar img',
+          '.header img',
+          '.brand img',
+          '.site-logo img',
+          '[class*="brand"] img'
+        ];
+
+        logoSelectors.forEach((selector, index) => {
+          const elements = document.querySelectorAll(selector);
+          elements.forEach((img:any) => {
+            if (img.src && img.src !== '') {
+              logoSources.push({
+                url: img.src,
+                source: `css-selector-${selector}`,
+                priority: 9 - index * 0.1,
+                width: img.naturalWidth || img.width,
+                height: img.naturalHeight || img.height
+              });
+            }
+          });
+        });
+
+        // 3. Look for SVG logos (vector graphics - best quality)
+        const svgLogos = document.querySelectorAll('svg[class*="logo" i], svg[id*="logo" i], .logo svg, #logo svg');
+        svgLogos.forEach(svg => {
+          // Try to convert SVG to data URL or find if it has xlink:href
+          const svgData = new XMLSerializer().serializeToString(svg);
+          logoSources.push({
+            url: `data:image/svg+xml;base64,${btoa(svgData)}`,
+            source: 'svg-inline',
+            priority: 11,
+            width: svg.getAttribute('width') || 200,
+            height: svg.getAttribute('height') || 200
+          });
+        });
+
+        // 4. Look for high-res favicons and touch icons
+        const iconSelectors = [
+          'link[rel="apple-touch-icon-precomposed"]',
+          'link[rel="apple-touch-icon"]',
+          'link[rel="icon"][sizes]',
+          'link[rel="shortcut icon"][sizes]',
+          'meta[property="og:image"]',
+          'meta[name="twitter:image"]'
+        ];
+
+        iconSelectors.forEach((selector, index) => {
+          const elements = document.querySelectorAll(selector);
+          elements.forEach(element => {
+            const href = element.getAttribute('href') || element.getAttribute('content');
+            if (href) {
+              const sizes = element.getAttribute('sizes');
+              let priority = 5 - index * 0.1;
+              let dimensions = { width: 0, height: 0 };
+
+              if (sizes && sizes !== 'any') {
+                const [width, height] = sizes.split('x').map(Number);
+                dimensions = { width, height };
+                // Higher priority for larger icons
+                if (width >= 192) priority += 2;
+                else if (width >= 96) priority += 1;
+              }
+
+              logoSources.push({
+                url: href,
+                source: `meta-${element.getAttribute('rel') || element.getAttribute('property')}`,
+                priority,
+                ...dimensions
+              });
+            }
+          });
+        });
+
+        // 5. Look for common logo file patterns in the first few images
+        const allImages = Array.from(document.querySelectorAll('img')).slice(0, 20);
+        allImages.forEach(img => {
+          if (img.src && (
+            img.src.includes('logo') ||
+            img.src.includes('brand') ||
+            img.src.includes('header') ||
+            (img.alt && img.alt.toLowerCase().includes('logo'))
+          )) {
+            logoSources.push({
+              url: img.src,
+              source: 'pattern-match',
+              priority: 6,
+              width: img.naturalWidth || img.width,
+              height: img.naturalHeight || img.height
+            });
+          }
+        });
+
+        // Sort by priority and filter duplicates
+        const uniqueLogos = logoSources
+          .filter((logo, index, self) => 
+            index === self.findIndex(l => l.url === logo.url)
+          )
+          .sort((a, b) => b.priority - a.priority);
+
+        return uniqueLogos;
+      };
+
       const extractFooterText = () => {
         const footer = document.querySelector('footer');
         if (!footer) return '';
@@ -35,10 +182,8 @@ export async function POST(request: Request) {
       };
 
       const extractSocials = () => {
-
         const links = Array.from(document.querySelectorAll('footer a[href]')) as HTMLAnchorElement[];
         links.push(...Array.from(document.querySelectorAll('header a[href]')) as HTMLAnchorElement[]);
-        const s = Array.from(document.querySelectorAll('header a[href]')) as HTMLAnchorElement[];
 
         const socials: Record<string, string> = {};
         links.forEach(link => {
@@ -48,7 +193,6 @@ export async function POST(request: Request) {
           else if (href.includes('instagram.com')) socials.instagram = href;
           else if (href.includes('linkedin.com')) socials.linkedin = href;
           else if (href.includes('github.com')) socials.github = href;
-
         });
         return socials;
       };
@@ -57,15 +201,13 @@ export async function POST(request: Request) {
       const description =
         get('meta[name="description"]') || get('meta[property="og:description"]') || '';
 
-      const logo =
-        get('link[rel="icon"]', 'href') ||
-        get('meta[property="og:image"]', 'content') ||
-        get('link[rel="apple-touch-icon"]', 'href') ||
-        '';
+      // Get multiple logo candidates
+      const logoSources = extractHighResLogo();
+
       return {
         title,
         description,
-        logo,
+        logoSources, // Return all logo sources instead of just one
         theme: {
           background: getColor('body', 'background-color'),
           container: getColor('main') || getColor('.container'),
@@ -82,12 +224,63 @@ export async function POST(request: Request) {
 
     await browser.close();
 
-    const fullLogo = result.logo?.startsWith('http') ? result.logo : new URL(result.logo, url).href;
+    // Process logo sources and select the best one
+    const processedLogos = await Promise.all(
+      result.logoSources.slice(0, 5).map(async (logoSource:any) => {
+        try {
+          let fullUrl = logoSource.url;
+          
+          // Convert relative URLs to absolute
+          if (!fullUrl.startsWith('http') && !fullUrl.startsWith('data:')) {
+            fullUrl = new URL(fullUrl, url).href;
+          }
+
+          // For data URLs (SVG), return as is
+          if (fullUrl.startsWith('data:')) {
+            return {
+              ...logoSource,
+              url: fullUrl,
+              isHighRes: true
+            };
+          }
+
+          // Check if the image is accessible and get its dimensions
+          const response = await fetch(fullUrl, { 
+            method: 'HEAD',
+            // timeout: 5000 
+          }).catch(() => null);
+
+          if (response && response.ok) {
+            const contentType = response.headers.get('content-type');
+            const isVector = contentType?.includes('svg');
+            const contentLength = parseInt(response.headers.get('content-length') || '0');
+            
+            return {
+              ...logoSource,
+              url: fullUrl,
+              isHighRes: isVector || (logoSource.width || 0) >= 100 || contentLength > 10000,
+              contentType,
+              fileSize: contentLength
+            };
+          }
+          
+          return null;
+        } catch (error) {
+          console.error('Error processing logo:', error);
+          return null;
+        }
+      })
+    );
+
+    // Select the best logo
+    const validLogos = processedLogos.filter(Boolean);
+    const bestLogo = validLogos.find(logo => logo.isHighRes) || validLogos[0];
 
     const brandKitData = {
       name: result.title.trim(),
       description: result.description.trim(),
-      logo: fullLogo,
+      logo: bestLogo?.url || '',
+      logoSources: validLogos, // Include all valid logos for reference
       theme: result.theme,
       tone: 'professional',
       footer: {
@@ -97,17 +290,14 @@ export async function POST(request: Request) {
         disclaimers: result.footer.text.match(/(terms|disclaimer|rights|reserved).{0,100}/i)?.[0] || ''
       }
     };
-    // await sleep(10000); // Pause for 2 seconds (2000 milliseconds)
-    console.log(brandKitData);
 
+    console.log('Brand kit data with logo sources:', brandKitData);
 
     const rawFixedBrandKitString: any = await improvteBrandKit(brandKitData);
     console.log(rawFixedBrandKitString);
 
-
     const cleanedString = cleanJSONBlock(rawFixedBrandKitString);
     const parsedFixedBrandKit = JSON.parse(cleanedString);
-
     const fixedBrandKit = parsedFixedBrandKit.fixedData;
 
     const supabase = await createClient();
@@ -132,7 +322,7 @@ export async function POST(request: Request) {
           disclaimers: fixedBrandKit.footer.disclaimers,
           socials: Object.values(fixedBrandKit.footer.socials),
           logo_primary: fixedBrandKit.logo,
-          logo_icon: fixedBrandKit.logo, // Assuming logo_icon is same as logo_primary
+          logo_icon: fixedBrandKit.logo,
           color_background: fixedBrandKit.theme.background,
           color_container: fixedBrandKit.theme.container,
           color_accent: fixedBrandKit.theme.accent,
@@ -155,10 +345,11 @@ export async function POST(request: Request) {
 }
 
 function cleanJSONBlock(raw: string): string {
-  return raw
-    .replace(/```json\s*/, "")
-    .replace(/```$/, "")
-    .trim();
+  const match = raw.match(/\{[\s\S]*\}/);
+  if (match) {
+    return match[0];
+  }
+  return raw;
 }
 
 export async function GET(request: Request) {
@@ -181,5 +372,3 @@ export async function GET(request: Request) {
 
   return NextResponse.json(brandKits, { status: 200 });
 }
-
-

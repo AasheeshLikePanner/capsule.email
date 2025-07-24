@@ -26,8 +26,11 @@ export default function ChatPage() {
   const [prompt, setPrompt] = useState('');
   const [messages, setMessages] = useState<{ type: 'user' | 'bot', content: string | BotMessageContent }[]>([]);
   const [emailMarkup, setEmailMarkup] = useState('');
+  const [emailTitle, setEmailTitle] = useState('');
+  const [emailId, setEmailId] = useState<string | null>(null);
   const emailMarkupRef = useRef('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   const { brandKits } = useBrandKitStore();
   const [selectedBrandKit, setSelectedBrandKit] = useState<any>(null);
@@ -90,6 +93,7 @@ export default function ChatPage() {
       
       if (data.code) {
         setEmailMarkup(data.code);
+        setEmailTitle(data.title || '');
         botMessage = { type: 'bot', content: { title: data.title, text: data.text, description: data.description } };
       } else {
         setEmailMarkup(''); // Clear email markup if no code is returned
@@ -139,6 +143,46 @@ export default function ChatPage() {
   const handleSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
     handleSendMessage(prompt);
+  };
+
+  const handleSaveEmail = async (htmlContent: string, title: string) => {
+    setIsSaving(true);
+    try {
+      const response = await axios.post('/api/emails', {
+        html_content: htmlContent,
+        name: title,
+      });
+      console.log("Email saved successfully:", response.data);
+      if (response.data.data && response.data.data.length > 0) {
+        setEmailId(response.data.data[0].id);
+      }
+    } catch (error) {
+      console.error("Error saving email:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleShareEmail = (id: string) => {
+    if (id) {
+      const shareableLink = `${window.location.origin}/emails/${id}`;
+      navigator.clipboard.writeText(shareableLink);
+      console.log("Shareable link copied:", shareableLink);
+    }
+  };
+
+  const handleSendEmail = async (htmlContent: string, title: string) => {
+    try {
+      // TODO: Replace 'recipient@example.com' with a dynamic recipient email
+      const response = await axios.post('/api/send-email', {
+        to: 'recipient@example.com',
+        subject: title || 'Generated Email',
+        html: htmlContent,
+      });
+      console.log("Email sent successfully:", response.data);
+    } catch (error) {
+      console.error("Error sending email:", error);
+    }
   };
 
   return (
@@ -252,7 +296,7 @@ export default function ChatPage() {
         </footer>
       </div>
       <div className="w-1/2 h-full bg-muted/30 overflow-hidden flex items-center justify-center rounedd-2xl"> 
-        <EmailDisplayPanel emailMarkup={emailMarkup} isLoading={isLoading} />
+        <EmailDisplayPanel emailMarkup={emailMarkup} isLoading={isLoading} emailTitle={emailTitle} onSave={handleSaveEmail} emailId={emailId} onShare={handleShareEmail} onSend={handleSendEmail} isSaving={isSaving} />
       </div>
     </div>
   );

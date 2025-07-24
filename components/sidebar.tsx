@@ -9,6 +9,7 @@ import {
   HelpCircle,
   PanelLeft,
   PanelRight,
+  Mail,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
   const navItems = [
     { href: "/", icon: Home, label: "Home" },
     { href: "/brand-kit", icon: Palette, label: "RenderPart Kit" },
+    { href: "/emails", icon: Mail, label: "Emails" },
   ];
 
   const bottomNavItems = [

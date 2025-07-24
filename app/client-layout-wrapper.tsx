@@ -20,7 +20,7 @@ export function RootLayoutClient({
       enableSystem
       disableTransitionOnChange
     >
-      <div className="flex h-screen w-full "> 
+      <div className="flex h-full w-full "> 
         <Sidebar isExpanded={isSidebarExpanded} setExpanded={setSidebarExpanded} />
         <main
           className={cn(

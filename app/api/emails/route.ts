@@ -1,8 +1,29 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
+export async function GET() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const { data: emails, error } = await supabase
+    .from('emails')
+    .select('*')
+    .eq('user_id', user.id);
+
+  if (error) {
+    console.error("Error fetching emails:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json(emails);
+}
+
 export async function POST(request: Request) {
-  const { html_content, name } = await request.json();
+  const { html_content, name, kit_name } = await request.json();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -13,7 +34,7 @@ export async function POST(request: Request) {
   const { data, error } = await supabase
     .from('emails')
     .insert([
-      { user_id: user.id, name, html_content }
+      { user_id: user.id, name, html_content, kit_name }
     ])
     .select();
 

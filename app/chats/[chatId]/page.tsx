@@ -11,6 +11,16 @@ import { Button } from '@/components/ui/button';
 import { ArrowUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import EmailDisplayPanel from '@/components/email-display-panel';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from '@/components/ui/input';
 
 interface BotMessageContent {
   title?: string;
@@ -31,6 +41,11 @@ export default function ChatPage() {
   const emailMarkupRef = useRef('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [showKitNameDialog, setShowKitNameDialog] = useState(false);
+  const [tempKitName, setTempKitName] = useState('');
+  const emailToSaveRef = useRef<{ htmlContent: string; title: string } | null>(null);
+
+  
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   const { brandKits } = useBrandKitStore();
   const [selectedBrandKit, setSelectedBrandKit] = useState<any>(null);
@@ -145,19 +160,28 @@ export default function ChatPage() {
     handleSendMessage(prompt);
   };
 
-  const handleSaveEmail = async (htmlContent: string, title: string) => {
+  const handleSaveEmail = async (htmlContent: string, title: string): Promise<boolean> => {
+    if (!selectedBrandKit?.kit_name) {
+      emailToSaveRef.current = { htmlContent, title };
+      setShowKitNameDialog(true);
+      return false; // Indicate that save is pending user input
+    }
+
     setIsSaving(true);
     try {
       const response = await axios.post('/api/emails', {
         html_content: htmlContent,
         name: title,
+        kit_name: selectedBrandKit.kit_name,
       });
       console.log("Email saved successfully:", response.data);
       if (response.data.data && response.data.data.length > 0) {
         setEmailId(response.data.data[0].id);
       }
+      return true; // Indicate success
     } catch (error) {
       console.error("Error saving email:", error);
+      return false; // Indicate failure
     } finally {
       setIsSaving(false);
     }
@@ -182,6 +206,25 @@ export default function ChatPage() {
       console.log("Email sent successfully:", response.data);
     } catch (error) {
       console.error("Error sending email:", error);
+    }
+  };
+
+  const handleConfirmKitName = async () => {
+    if (!tempKitName.trim()) return; // Don't proceed if kit name is empty
+
+    // Update the selectedBrandKit with the new kit_name
+    setSelectedBrandKit((prev: any) => ({
+      ...prev,
+      kit_name: tempKitName.trim(),
+    }));
+
+    setShowKitNameDialog(false);
+    setTempKitName('');
+
+    // Re-attempt to save the email with the new kit name
+    if (emailToSaveRef.current) {
+      await handleSaveEmail(emailToSaveRef.current.htmlContent, emailToSaveRef.current.title);
+      emailToSaveRef.current = null;
     }
   };
 
@@ -298,6 +341,34 @@ export default function ChatPage() {
       <div className="w-1/2 h-full bg-muted/30 overflow-hidden flex items-center justify-center rounedd-2xl"> 
         <EmailDisplayPanel emailMarkup={emailMarkup} isLoading={isLoading} emailTitle={emailTitle} onSave={handleSaveEmail} emailId={emailId} onShare={handleShareEmail} onSend={handleSendEmail} isSaving={isSaving} />
       </div>
+
+      <Dialog open={showKitNameDialog} onOpenChange={setShowKitNameDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Enter Brand/Website Name</DialogTitle>
+            <DialogDescription>
+              Please provide a name for your brand or website. This will be used to categorize your saved emails.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <Input
+              id="kit-name"
+              placeholder="e.g., My Awesome Brand"
+              value={tempKitName}
+              onChange={(e) => setTempKitName(e.target.value)}
+              className="col-span-3"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowKitNameDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleConfirmKitName} disabled={!tempKitName.trim()}>
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

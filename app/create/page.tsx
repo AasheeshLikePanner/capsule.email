@@ -2,10 +2,11 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowUp, Palette, Smile, ShoppingCart, Mail, Newspaper, Receipt, X } from "lucide-react";
+import { ArrowUp, Briefcase, Smile, ShoppingCart, Mail, Newspaper, Receipt, X } from "lucide-react";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { BrandKitDialog } from "@/components/brand-kit-dialog";
 import { useRouter } from "next/navigation";
+import { Globe } from "@/components/magicui/globe";
 
 
 interface BrandKit {
@@ -146,105 +147,110 @@ export default function CreatePage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-theme(spacing.16))] p-4">
-      <h1 className="text-4xl font-bold text-center mb-3 tracking-tight">Build your dream email</h1>
-      <p className="text-lg text-center text-muted-foreground mb-8 max-w-xl">
-        Create beautiful email templates using natural language.
-      </p>
-      
-      <div className="w-full max-w-2xl relative rounded-2xl border border-input bg-muted/20 flex flex-col p-4">
-        <Textarea
-          placeholder={`Write an email to ${selectedBrandKit ? selectedBrandKit.kit_name : placeholderSuffix}`}
-          className="w-full h-40 text-base p-3 pr-20 rounded-lg resize-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
-          value={emailContent}
-          onChange={(e) => {
-            if (typingTimeoutRef.current) {
-              clearInterval(typingTimeoutRef.current);
-              typingTimeoutRef.current = null;
-            }
-            setAnimatedContent(""); 
-            setEmailContent(e.target.value);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              handleSendMessage();
-            }
-          }}
+    <div className="relative w-full h-full flex items-center justify-center">
+      <div className="relative flex flex-col items-center justify-center p-4 z-10">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-medium text-center mb-3 text-white tracking-normal">Build your dream email</h1>
+        <p className="text-lg text-center text-muted-foreground mb-8 max-w-xl">
+          Create beautiful email templates using natural language.
+        </p>
+        
+        <div className="w-full max-w-2xl relative rounded-2xl border border-input bg-muted/20 flex flex-col p-4">
+          <Textarea
+            placeholder={`Write an email to ${selectedBrandKit ? selectedBrandKit.kit_name : placeholderSuffix}`}
+            className="w-full h-40 text-base p-3 pr-20 rounded-lg resize-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
+            value={emailContent}
+            onChange={(e) => {
+              if (typingTimeoutRef.current) {
+                clearInterval(typingTimeoutRef.current);
+                typingTimeoutRef.current = null;
+              }
+              setAnimatedContent(""); 
+              setEmailContent(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
+          />
+          <div className="absolute bottom-4 left-4">
+            {selectedBrandKit ? (
+              <Button
+                variant="ghost"
+                className="flex items-center gap-1 h-9 rounded-lg px-3 text-sm"
+                onClick={() => setSelectedBrandKit(null)}
+              >
+                <X className="h-4 w-4" />
+                {selectedBrandKit.logo_primary && (
+                  <Image
+                    src={selectedBrandKit.logo_primary}
+                    alt={`${selectedBrandKit.kit_name} Logo`}
+                    width={16}
+                    height={16}
+                    className="object-contain"
+                  />
+                )}
+                {selectedBrandKit.kit_name}
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                className="flex items-center gap-1 h-9 rounded-lg px-3 text-sm"
+                onClick={() => setIsBrandKitDialogOpen(true)}
+              >
+                <Briefcase className="h-4 w-4" />
+                Brand Kit
+              </Button>
+            )}
+          </div>
+          <div className="absolute bottom-4 right-4">
+            <Button
+              type="submit"
+              size="icon"
+              className="h-9 w-9 rounded-lg"
+              onClick={handleSendMessage}
+            >
+              <ArrowUp className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        <BrandKitDialog
+          isOpen={isBrandKitDialogOpen}
+          onOpenChange={setIsBrandKitDialogOpen}
+          onSelectBrandKit={setSelectedBrandKit}
         />
-        <div className="absolute bottom-4 left-4">
-          {selectedBrandKit ? (
-            <Button
-              variant="ghost"
-              className="flex items-center gap-1 h-9 rounded-lg px-3 text-sm"
-              onClick={() => setSelectedBrandKit(null)}
-            >
-              <X className="h-4 w-4" />
-              {selectedBrandKit.logo_primary && (
-                <Image
-                  src={selectedBrandKit.logo_primary}
-                  alt={`${selectedBrandKit.kit_name} Logo`}
-                  width={16}
-                  height={16}
-                  className="object-contain"
-                />
-              )}
-              {selectedBrandKit.kit_name}
+            
+        <div className="w-full max-w-3xl flex flex-nowrap justify-center gap-2 mt-4 overflow-x-auto pb-2">
+            <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("welcome")}>
+              <Smile className="h-4 w-4" />
+              Welcome
             </Button>
-          ) : (
-            <Button
-              variant="ghost"
-              className="flex items-center gap-1 h-9 rounded-lg px-3 text-sm"
-              onClick={() => setIsBrandKitDialogOpen(true)}
-            >
-              <Palette className="h-4 w-4" />
-              Brand Kit
+            <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("e-commerce")}>
+              <ShoppingCart className="h-4 w-4" />
+              E-commerce
             </Button>
-          )}
-        </div>
-        <div className="absolute bottom-4 right-4">
-          <Button
-            type="submit"
-            size="icon"
-            className="h-9 w-9 rounded-lg"
-            onClick={handleSendMessage}
-          >
-            <ArrowUp className="h-4 w-4" />
-          </Button>
-        </div>
+            <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("invite")}>
+              <Mail className="h-4 w-4" />
+              Invite
+            </Button>
+            <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("newsletter")}>
+              <Newspaper className="h-4 w-4" />
+              Newsletter
+            </Button>
+            <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("invoice")}>
+              <Receipt className="h-4 w-4" />
+              Invoice
+            </Button>
+            <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("cart")}>
+              <ShoppingCart className="h-4 w-4" />
+              Cart
+            </Button>
+          </div>
       </div>
-      <BrandKitDialog
-        isOpen={isBrandKitDialogOpen}
-        onOpenChange={setIsBrandKitDialogOpen}
-        onSelectBrandKit={setSelectedBrandKit}
-      />
-          
-      <div className="w-full max-w-3xl flex flex-nowrap justify-center gap-2 mt-4 overflow-x-auto pb-2">
-          <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("welcome")}>
-            <Smile className="h-4 w-4" />
-            Welcome
-          </Button>
-          <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("e-commerce")}>
-            <ShoppingCart className="h-4 w-4" />
-            E-commerce
-          </Button>
-          <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("invite")}>
-            <Mail className="h-4 w-4" />
-            Invite
-          </Button>
-          <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("newsletter")}>
-            <Newspaper className="h-4 w-4" />
-            Newsletter
-          </Button>
-          <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("invoice")}>
-            <Receipt className="h-4 w-4" />
-            Invoice
-          </Button>
-          <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("cart")}>
-            <ShoppingCart className="h-4 w-4" />
-            Cart
-          </Button>
-        </div>
+      <div className="absolute bottom-0 left-0 right-0 h-[100vh] overflow-hidden -z-0 opacity-50">
+        <Globe className="w-full h-[150vh] absolute bottom-0" />
+      </div>
     </div>
   );
 }

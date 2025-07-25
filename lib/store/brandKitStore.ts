@@ -13,6 +13,7 @@ interface BrandKitState {
   error: string | null;
   fetchBrandKits: () => Promise<void>;
   addBrandKit: (newBrandKit: BrandKit) => void;
+  deleteBrandKit: (id: string) => Promise<void>;
 }
 
 export const useBrandKitStore = create<BrandKitState>((set) => ({
@@ -37,5 +38,24 @@ export const useBrandKitStore = create<BrandKitState>((set) => ({
     set((state) => ({
       brandKits: [...state.brandKits, newBrandKit],
     }));
+  },
+  deleteBrandKit: async (id: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch(`/api/brand-kit/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      set((state) => ({
+        brandKits: state.brandKits.filter((kit) => kit.id !== id),
+        isLoading: false,
+      }));
+    } catch (error: any) {
+      console.error("Error deleting brand kit:", error);
+      set({ error: error.message, isLoading: false });
+      throw error; // Re-throw to allow component to catch and show toast
+    }
   },
 }));

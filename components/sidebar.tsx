@@ -4,7 +4,7 @@ import Link from "next/link";
 import {
   Home,
   PlusCircle,
-  Palette,
+  Briefcase,
   CircleUser,
   HelpCircle,
   PanelLeft,
@@ -25,8 +25,8 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
   const pathname = usePathname();
 
   const navItems = [
-    { href: "/", icon: Home, label: "Home" },
-    { href: "/brand-kit", icon: Palette, label: "RenderPart Kit" },
+    { href: "/create", icon: Home, label: "Home" },
+    { href: "/brand-kit", icon: Briefcase, label: "Brand Kit" },
     { href: "/emails", icon: Mail, label: "Emails" },
   ];
 
@@ -68,40 +68,20 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
         </Link>
       </div>
       <nav className="flex flex-col gap-2 p-2">
-        <Link
-          href="/create"
-          className={cn(
-            "flex items-center rounded-lg text-muted-foreground transition-colors hover:text-primary",
-            isExpanded && "gap-3",
+        <Button asChild variant="ghost" className={cn(
+            "w-full rounded-lg",
             pathname === "/create" && "bg-muted text-foreground",
             !isExpanded ? "justify-center" : "justify-start",
-            isExpanded && "bg-muted text-foreground rounded-full px-4 py-2 hover:bg-accent/80"
-          )}
-        >
-          <PlusCircle className="h-5 w-5 shrink-0" />
-          <span
-            className={cn(
-              `whitespace-nowrap transition-opacity ease-in-out duration-200`,
-              isExpanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
-            )}
-            aria-hidden={!isExpanded}
-          >
-            New Email
-          </span>
-        </Link>
-        <div className="my-2 border-t" />
-        {navItems.map((item) => (
+            isExpanded && "hover:bg-accent/80"
+          )}>
           <Link
-            key={item.href}
-            href={item.href}
+            href="/create"
             className={cn(
-              "flex items-center rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:text-primary hover:bg-accent",
+              "flex items-center",
               isExpanded && "gap-3",
-              pathname === item.href && "bg-muted text-foreground",
-              !isExpanded ? "justify-center" : "justify-start"
             )}
           >
-            <item.icon className="h-5 w-5 shrink-0" />
+            <PlusCircle className="h-5 w-5 shrink-0" />
             <span
               className={cn(
                 `whitespace-nowrap transition-opacity ease-in-out duration-200`,
@@ -109,9 +89,42 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
               )}
               aria-hidden={!isExpanded}
             >
-              {item.label}
+              New Email
             </span>
           </Link>
+        </Button>
+        <div className="my-2 border-t" />
+        {navItems.map((item) => (
+          <Button
+            key={item.href}
+            asChild
+            variant="ghost"
+            className={cn(
+              "w-full rounded-lg",
+              isExpanded && "gap-3",
+              pathname === item.href && "bg-muted text-foreground",
+              !isExpanded ? "justify-center" : "justify-start"
+            )}
+          >
+            <Link
+              href={item.href}
+              className={cn(
+                "flex items-center",
+                isExpanded && "gap-3",
+              )}
+            >
+              <item.icon className="h-5 w-5 shrink-0" />
+              <span
+                className={cn(
+                  `whitespace-nowrap transition-opacity ease-in-out duration-200`,
+                  isExpanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+                )}
+                aria-hidden={!isExpanded}
+              >
+                {item.label}
+              </span>
+            </Link>
+          </Button>
         ))}
       </nav>
       <nav className="mt-auto flex flex-col gap-2 p-2">
@@ -140,25 +153,34 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
           </span>
         </Button>
         {bottomNavItems.map((item) => (
-          <Link
+          <Button
             key={item.href}
-            href={item.href}
+            asChild
+            variant="ghost"
             className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:text-primary hover:bg-accent",
-              !isExpanded && "justify-center"
+              "w-full rounded-lg",
+              !isExpanded ? "justify-center" : "justify-start"
             )}
           >
-            <item.icon className="h-5 w-5 shrink-0" />
-            <span
+            <Link
+              href={item.href}
               className={cn(
-                `whitespace-nowrap transition-opacity ease-in-out duration-200`,
-                isExpanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+                "flex items-center",
+                isExpanded && "gap-3",
               )}
-              aria-hidden={!isExpanded}
             >
-              {item.label}
-            </span>
-          </Link>
+              <item.icon className="h-5 w-5 shrink-0" />
+              <span
+                className={cn(
+                  `whitespace-nowrap transition-opacity ease-in-out duration-200`,
+                  isExpanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+                )}
+                aria-hidden={!isExpanded}
+              >
+                {item.label}
+              </span>
+            </Link>
+          </Button>
         ))}
       </nav>
     </aside>

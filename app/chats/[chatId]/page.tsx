@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
 
+
 interface BotMessageContent {
   title?: string;
   text?: string;
@@ -195,19 +196,19 @@ export default function ChatPage() {
     }
   };
 
-  const handleSendEmail = async (htmlContent: string, title: string) => {
+  const handleSendEmail = async (recipient: string, subject: string) => {
     try {
-      // TODO: Replace 'recipient@example.com' with a dynamic recipient email
       const response = await axios.post('/api/send-email', {
-        to: 'recipient@example.com',
-        subject: title || 'Generated Email',
-        html: htmlContent,
+        to: recipient,
+        subject: subject,
+        html: emailMarkup,
       });
       console.log("Email sent successfully:", response.data);
     } catch (error) {
       console.error("Error sending email:", error);
     }
   };
+
 
   const handleConfirmKitName = async () => {
     if (!tempKitName.trim()) return; // Don't proceed if kit name is empty

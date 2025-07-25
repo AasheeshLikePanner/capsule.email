@@ -11,6 +11,7 @@ import { EditorView } from '@codemirror/view';
 import prettier from 'prettier/standalone';
 import parserHtml from 'prettier/parser-html';
 import { Smartphone, Laptop, Save, Share2, Send, Check, X } from 'lucide-react';
+import SendEmailCard from '@/components/send-email-dialog';
 
 interface EmailDisplayPanelProps {
   emailMarkup: string;
@@ -19,7 +20,7 @@ interface EmailDisplayPanelProps {
   onSave: (htmlContent: string, title: string) => Promise<boolean>;
   emailId: string | null;
   onShare: (id: string) => void;
-  onSend: (htmlContent: string, title: string) => void;
+  onSend: (recipient: string, subject: string) => void;
   isSaving: boolean;
 }
 
@@ -30,6 +31,7 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, 
   const [copied, setCopied] = useState(false);
   const [copiedShareLink, setCopiedShareLink] = useState(false);
   const [localSaveStatus, setLocalSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [showSendEmailCard, setShowSendEmailCard] = useState(false);
   
   const [saveProgress, setSaveProgress] = useState(0);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -112,9 +114,10 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, 
     }
   }, [emailId, onShare]);
 
-  const handleSend = useCallback(() => {
-    onSend(code, emailTitle);
-  }, [code, emailTitle, onSend]);
+  const handleSend = (recipient: string, subject: string) => {
+    onSend(recipient, subject);
+    setShowSendEmailCard(false);
+  };
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(code);
@@ -192,10 +195,22 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, 
           <Share2 className="w-4 h-4 mr-2" />
           {copiedShareLink ? 'Link Copied!' : 'Share'}
         </Button>
-        <Button variant="outline" onClick={handleSend}>
-          <Send className="w-4 h-4 mr-2" />
-          Send
-        </Button>
+        <div className="relative w-max">
+          <Button variant="outline" onClick={() => setShowSendEmailCard(!showSendEmailCard)}>
+            <Send className="w-4 h-4 mr-2" />
+            Send
+          </Button>
+          {showSendEmailCard && (
+            <div className="absolute bg-muted/20 top-full right-0 mt-2 z-10">
+              <SendEmailCard
+                isOpen={showSendEmailCard}
+                onClose={() => setShowSendEmailCard(false)}
+                onSend={handleSend}
+                defaultSubject={emailTitle}
+              />
+            </div>
+          )}
+        </div>
       </div>
       <div className={`flex-1 overflow-auto p-4 rounded-xl ${mobileView ? 'flex items-center justify-center' : ''}`}>
         {view === 'preview' ? (

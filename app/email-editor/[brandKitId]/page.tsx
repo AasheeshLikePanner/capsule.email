@@ -75,11 +75,11 @@ export default function EmailEditorContent() {
   }, [brandKitId]);
 
   const [activeSection, setActiveSection] = useState("brand-details");
-  const mainContentRef = useRef(null);
+  const mainContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
-      const mainContent: any = mainContentRef.current;
+      const mainContent = mainContentRef.current;
       if (!mainContent) return;
 
       const scrollPosition = mainContent.scrollTop;
@@ -89,22 +89,34 @@ export default function EmailEditorContent() {
         item.isHeader ? item.subItems.map((sub:any) => sub.id) : [item.id]
       );
 
-      for (const sectionId of allSectionIds) {
+      // Iterate in reverse to find the section closest to the top of the viewport
+      for (let i = allSectionIds.length - 1; i >= 0; i--) {
+        const sectionId = allSectionIds[i];
         const element = document.getElementById(sectionId);
-        if (
-          element &&
-          element.offsetTop <= scrollPosition + mainContent.clientHeight / 2
-        ) {
-          currentActiveId = sectionId;
+        if (element) {
+          const elementOffsetTop = element.offsetTop;
+
+          // If the section is visible and its top is at or above the scroll container's top
+          // Add a small buffer (e.g., 10px) to make the highlighting feel more natural
+          if (elementOffsetTop <= scrollPosition + 10) {
+            currentActiveId = sectionId;
+            
+            break; // Found the highest visible section, so break
+          }
+          
         }
       }
 
-      setActiveSection(currentActiveId);
+      if (currentActiveId && activeSection !== currentActiveId) {
+        console.log(`Setting active section to: ${currentActiveId}`);
+        setActiveSection(currentActiveId);
+      }
     };
 
-    const mainContent: any = mainContentRef.current;
+    const mainContent = mainContentRef.current;
     if (mainContent) {
       mainContent.addEventListener("scroll", handleScroll);
+      handleScroll(); // Call handleScroll once on mount to set initial active section
     }
 
     return () => {
@@ -112,7 +124,7 @@ export default function EmailEditorContent() {
         mainContent.removeEventListener("scroll", handleScroll);
       }
     };
-  }, []);
+  }, [navItems, activeSection]);
 
   if (isLoading) {
     return (
@@ -165,7 +177,7 @@ export default function EmailEditorContent() {
                         key={subItem.id}
                         href={`#${subItem.id}`}
                         className={cn(
-                          "flex items-center gap-3 font-medium text-sm whitespace-nowrap rounded-md px-3 py-2",
+                          "flex items-center gap-3 font-medium text-sm whitespace-nowrap rounded-md px-3 py-2 transition-colors duration-200 ease-in-out",
                           activeSection === subItem.id
                             ? "bg-accent text-primary font-semibold"
                             : "text-muted-foreground hover:bg-accent hover:text-primary"
@@ -181,7 +193,7 @@ export default function EmailEditorContent() {
                 <a
                   href={`#${item.id}`}
                   className={cn(
-                    "flex items-center gap-3 font-medium text-sm whitespace-nowrap rounded-md px-3 py-2",
+                    "flex items-center gap-3 font-medium text-sm whitespace-nowrap rounded-md px-3 py-2 transition-colors duration-200 ease-in-out",
                     activeSection === item.id
                       ? "bg-accent text-primary font-semibold"
                       : "text-muted-foreground hover:bg-accent hover:text-primary"
@@ -199,7 +211,7 @@ export default function EmailEditorContent() {
         ref={mainContentRef}
         className="flex-grow-[2] overflow-y-auto h-full rounded-lg shadow-sm border-l border-border"
       >
-        <h1 className="text-lg font-medium mb-4 ml-5">Brand Name</h1>
+        <h1 className="text-lg font-medium mb-4 ml-5">{brandKit.kit_name}</h1>
         <BrandKitForm brandKit={brandKit} setBrandKit={setBrandKit} />
       </div>
       <div className="w-full lg:w-5/12 rounded-xl shadow-sm border-l border-border">

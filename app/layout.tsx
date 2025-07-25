@@ -9,9 +9,12 @@ const defaultUrl = process.env.VERCEL_URL
   : "http://localhost:3000";
 
 export const metadata: Metadata = {
+  icons: {
+    icon: {url:'/icon.svg'}
+  },
   metadataBase: new URL(defaultUrl),
-  title: "Render",
-  description: "The fastest way to build apps with Next.js and Supabase",
+  title: "capsule.email",
+  description: "Build beautiful AI powered emails to stand out in the market.",
 };
 
 const geistSans = Geist({

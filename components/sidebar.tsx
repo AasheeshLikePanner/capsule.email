@@ -49,9 +49,9 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
         )}
       >
         <Link
-          href="#"
+          href="/create"
           className={cn(
-            "group flex items-center gap-2 font-semibold text-foreground hover:bg-accent hover:text-primary",
+            "group flex items-center gap-2 font-semibold text-foreground ",
             isExpanded ? "rounded-md px-3 py-2" : "h-9 w-9 shrink-0 justify-center rounded-full md:h-8 md:w-8"
           )}
         >
@@ -63,7 +63,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
             )}
             aria-hidden={!isExpanded}
           >
-            RenderPart
+            Capsule.Email
           </span>
         </Link>
       </div>

@@ -10,11 +10,17 @@ import Link from "next/link";
 import { useBrandKitStore } from "@/lib/store/brandKitStore";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { Trash2 } from "lucide-react";
+import { useRef, useCallback } from "react";
 
 export default function BrandKitPage() {
-  const { brandKits, isLoading, error, fetchBrandKits } = useBrandKitStore();
+  const { brandKits, isLoading, error, fetchBrandKits, deleteBrandKit } = useBrandKitStore();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isProcessingBrandKit, setIsProcessingBrandKit] = useState(false);
+  const [deleteProgress, setDeleteProgress] = useState(0);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const hasTriggeredDelete = useRef(false);
+  const DELETE_DURATION = 1500; // milliseconds to hold the button for delete
 
   useEffect(() => {
     fetchBrandKits();
@@ -34,6 +40,47 @@ export default function BrandKitPage() {
       toast.error(message);
     }
   };
+
+  const handleDelete = async (kitId: string) => {
+    try {
+      await deleteBrandKit(kitId);
+      toast.success("Brand kit deleted successfully");
+    } catch (error) {
+      toast.error("Failed to delete brand kit");
+    }
+  };
+
+  const handleMouseDownDelete = useCallback((kitId: string) => {
+    setDeleteProgress(0);
+    hasTriggeredDelete.current = false;
+
+    progressIntervalRef.current = setInterval(() => {
+      setDeleteProgress((prevProgress) => {
+        const newProgress = prevProgress + (1000 / DELETE_DURATION);
+        if (newProgress >= 100) {
+          if (progressIntervalRef.current) {
+            clearInterval(progressIntervalRef.current);
+            progressIntervalRef.current = null;
+          }
+          if (!hasTriggeredDelete.current) {
+            hasTriggeredDelete.current = true;
+            handleDelete(kitId);
+          }
+          return 100;
+        }
+        return newProgress;
+      });
+    }, 10);
+  }, [handleDelete]);
+
+  const handleMouseUpDelete = useCallback(() => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
+    setDeleteProgress(0);
+    hasTriggeredDelete.current = false;
+  }, []);
 
   return (
     <div className="p-10 py-5 min-h-screen">
@@ -64,8 +111,26 @@ export default function BrandKitPage() {
           <p className="text-lg font-semibold">Error: {error}</p>
           <p>Please try again later.</p>
         </div>
+      ) : brandKits.length === 0 && !isProcessingBrandKit ? (
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-8rem)]">
+          <div className="text-center">
+            <h2 className="text-3xl font-semibold text-foreground">
+              No Brand Kits Yet
+            </h2>
+            <p className="text-muted-foreground mt-3 max-w-md mx-auto">
+              Set your logo, colors, and type once to reuse them across all your
+              email templates and stay on-brand every time.
+            </p>
+            <Button
+              className="mt-8 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold py-3 px-6 rounded-xl"
+              onClick={() => setIsDialogOpen(true)}
+            >
+              Create
+            </Button>
+          </div>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 p-24">
           {isProcessingBrandKit && (
             <Card className="bg-muted/20 text-white p-6 rounded-xl h-80 w-96 shadow-lg relative flex items-center justify-center">
               <div className="flex flex-col items-center">
@@ -80,11 +145,11 @@ export default function BrandKitPage() {
               </div>
             </Card>
           )}
-          {brandKits.length > 0 ? (
-            brandKits.map((kit) => (
-              <Link href={`/email-editor/${kit.id}`} key={kit.id} className="group">
-                <Card className="bg-muted/20 text-white p-6 rounded-xl w-96 h-80 shadow-lg relative overflow-hidden">
-                  <CardContent className="flex items-center justify-center h-full">
+          {brandKits.map((kit) => (
+            <div key={kit.id} className="group relative">
+              <Card className="bg-muted/20 text-white p-6 rounded-xl w-96 h-80 shadow-lg relative overflow-hidden">
+                <Link href={`/email-editor/${kit.id}`}>
+                  <CardContent className="flex items-center justify-center h-full cursor-pointer">
                     {kit.logo_primary && (
                       <Image
                         src={kit.logo_primary}
@@ -96,30 +161,29 @@ export default function BrandKitPage() {
                       />
                     )}
                   </CardContent>
-                </Card>
-              </Link>
-            ))
-          ) : (
-            !isProcessingBrandKit && (
-              <div className="flex flex-col items-center justify-center min-h-[calc(100vh-8rem)] col-span-full">
-                <div className="text-center">
-                  <h2 className="text-3xl font-semibold text-foreground">
-                    No Brand Kits Yet
-                  </h2>
-                  <p className="text-muted-foreground mt-3 max-w-md mx-auto">
-                    Set your logo, colors, and type once to reuse them across all your
-                    email templates and stay on-brand every time.
-                  </p>
-                  <Button
-                    className="mt-8 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold py-3 px-6 rounded-xl"
-                    onClick={() => setIsDialogOpen(true)}
-                  >
-                    Create
-                  </Button>
-                </div>
-              </div>
-            )
-          )}
+                </Link>
+                <Button
+                  variant="ghost"
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-600"
+                  onMouseDown={(e) => {
+                    e.stopPropagation();
+                    handleMouseDownDelete(kit.id);
+                  }}
+                  onMouseUp={handleMouseUpDelete}
+                  onMouseLeave={handleMouseUpDelete}
+                >
+                  <div
+                    className="absolute inset-0 bg-red-500/20 transition-all duration-100 ease-linear rounded-md"
+                    style={{ width: `${deleteProgress}%` }}
+                  />
+                  <span className="relative z-10 flex items-center">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </span>
+                </Button>
+              </Card>
+            </div>
+          ))}
         </div>
       )}
       <CreateBrandKitDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onProcessingStart={handleBrandKitProcessingStart} onProcessingComplete={handleBrandKitProcessingComplete} />

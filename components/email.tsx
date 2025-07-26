@@ -267,7 +267,12 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
           {brandKit.socials && brandKit.socials.length > 0 && (
             <div style={styles.socialSection}>
               {brandKit.socials.map((socialUrl, index) => {
-                const url = new URL(socialUrl);
+                let url;
+                try {
+                  url = new URL(socialUrl);
+                } catch (e) {
+                  return null; // Skip invalid URLs
+                }
                 const hostname = url.hostname;
                 const domainParts = hostname.split('.');
                 const platform = domainParts.length > 1 ? domainParts[domainParts.length - 2] : domainParts[0];

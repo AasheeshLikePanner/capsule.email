@@ -9,6 +9,9 @@ import { cn } from "@/lib/utils";
 import { Building, FileText, Palette, Users, BadgeInfo } from 'lucide-react';
 import { Suspense } from 'react';
 import { Button  } from "@/components/ui/button";
+import { toast } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
+import axios from "axios";
 
 const navItems = [
   {
@@ -53,20 +56,10 @@ export default function EmailEditorContent() {
 
     const fetchBrandKit = async () => {
       try {
-        const response = await fetch(`/api/brand-kit/${brandKitId}`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch brand kit: ${response.statusText}`);
-        }
-        const data = await response.json();
-        console.log(data);
-        
-        setBrandKit(data);
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError("An unknown error occurred.");
-        }
+        const response = await axios.get(`/api/brand-kit/${brandKitId}`);
+        setBrandKit(response.data);
+      } catch (err: any) {
+        setError(err.message || "An unknown error occurred.");
       } finally {
         setIsLoading(false);
       }
@@ -74,6 +67,43 @@ export default function EmailEditorContent() {
 
     fetchBrandKit();
   }, [brandKitId]);
+
+  const handleUpdateBrandKit = async () => {
+    if (!brandKit || !brandKit.id) {
+      toast.error("No brand kit selected for update.");
+      console.error("No brand kit or brand kit ID found.");
+      return;
+    }
+
+    const formData = new FormData();
+
+    for (const key in brandKit) {
+      if (brandKit.hasOwnProperty(key)) {
+        if (key === "logo_primary" && brandKit[key] instanceof File) {
+          formData.append(key, brandKit[key]);
+        } else if (Array.isArray(brandKit[key])) {
+          formData.append(key, JSON.stringify(brandKit[key]));
+        } else if (typeof brandKit[key] === "object" && brandKit[key] !== null) {
+          formData.append(key, JSON.stringify(brandKit[key]));
+        } else {
+          formData.append(key, brandKit[key]);
+        }
+      }
+    }
+
+    try {
+      const response = await axios.put(`/api/brand-kit/${brandKit.id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      toast.success("Brand kit updated successfully!");
+    } catch (err: any) {
+      console.error("Error updating brand kit:", err.response?.data || err.message || err);
+      toast.error(err.response?.data?.error || err.message || "An unexpected error occurred during update.");
+    }
+  };
 
   const [activeSection, setActiveSection] = useState("brand-details");
   const mainContentRef = useRef<HTMLDivElement>(null);
@@ -109,7 +139,7 @@ export default function EmailEditorContent() {
       }
 
       if (currentActiveId && activeSection !== currentActiveId) {
-        console.log(`Setting active section to: ${currentActiveId}`);
+        
         setActiveSection(currentActiveId);
       }
     };
@@ -162,6 +192,7 @@ export default function EmailEditorContent() {
 
   return (
     <div className="flex flex-col lg:flex-row h-screen p-4 lg:p-8 gap-4 relative">
+      <Toaster />
       <div className="flex flex-grow-[1] flex-shrink-0">
         <div className="w-1/6 lg:w-64 p-4 rounded-lg shadow-sm">
         <h1 className="text-lg font-semibold mb-4">Email Editor</h1>
@@ -220,7 +251,7 @@ export default function EmailEditorContent() {
       <div className="h-full lg:w-5/12 flex flex-col relative">
         <div className="flex flex-col flex-grow">
           <div className="flex justify-end mb-4">
-            <Button>Save</Button>
+            <Button onClick={handleUpdateBrandKit}>Save</Button>
           </div>
           <div className="h-full relative">
             <MemoizedEmailPreview brandKit={brandKit} />

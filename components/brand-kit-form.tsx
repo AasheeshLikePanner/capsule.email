@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { BadgeInfo, Building, Palette, FileText, Users, Trash2, XCircle } from 'lucide-react';
 import ColorPickerInput from "@/components/color-picker-input";
 import { Button } from "@/components/ui/button";
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Image from "next/image";
 
 interface BrandKitFormProps {
@@ -15,18 +15,29 @@ interface BrandKitFormProps {
 
 export default function BrandKitForm({ brandKit, setBrandKit }: BrandKitFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (brandKit.logo_primary instanceof File) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogoPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(brandKit.logo_primary);
+    } else if (typeof brandKit.logo_primary === 'string') {
+      setLogoPreviewUrl(brandKit.logo_primary);
+    } else {
+      setLogoPreviewUrl(null);
+    }
+  }, [brandKit.logo_primary]);
 
   const handleInputChange = (e: any) => {
     const { name, value, files } = e.target;
     if (name === "logo_primary" && files && files[0]) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setBrandKit({
-          ...brandKit,
-          logo_primary: reader.result,
-        });
-      };
-      reader.readAsDataURL(files[0]);
+      setBrandKit({
+        ...brandKit,
+        logo_primary: files[0],
+      });
     } else {
       setBrandKit({ ...brandKit, [name]: value });
     }
@@ -37,6 +48,7 @@ export default function BrandKitForm({ brandKit, setBrandKit }: BrandKitFormProp
       ...brandKit,
       logo_primary: null,
     });
+    setLogoPreviewUrl(null);
   };
 
   const handleLogoClick = () => {
@@ -189,9 +201,9 @@ export default function BrandKitForm({ brandKit, setBrandKit }: BrandKitFormProp
           </div>
         <div className="space-y-4 flex justify-center items-center">
             <div className="relative h-60 w-60 rounded-3xl border border-dashed flex items-center justify-center cursor-pointer bg-muted/40" onClick={handleLogoClick}>
-              {brandKit.logo_primary ? (
+              {logoPreviewUrl ? (
                 <>
-                  <img src={brandKit.logo_primary} alt="Brand Logo" className="h-full w-full object-contain rounded-3xl" />
+                  <img src={logoPreviewUrl} alt="Brand Logo" className="h-full w-full object-contain rounded-3xl" />
                   <Button
                     variant="ghost"
                     size="icon"

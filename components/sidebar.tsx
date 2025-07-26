@@ -1,5 +1,4 @@
-'use client';
-
+import { useState, useEffect } from 'react';
 import Link from "next/link";
 import {
   Home,
@@ -10,19 +9,39 @@ import {
   PanelLeft,
   PanelRight,
   Mail,
+  MessageSquare,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import Image from "next/image";
+import axios from 'axios';
 
 interface SidebarProps {
   isExpanded: boolean;
   setExpanded: (expanded: boolean) => void;
 }
 
+interface ChatSession {
+  id: string;
+  title: string;
+}
+
 export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
   const pathname = usePathname();
+  const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
+
+  useEffect(() => {
+    const fetchChatSessions = async () => {
+      try {
+        const response = await axios.get<ChatSession[]>('/api/chats');
+        setChatSessions(response.data);
+      } catch (error) {
+        console.error("Error fetching chat sessions:", error);
+      }
+    };
+    fetchChatSessions();
+  }, []);
 
   const navItems = [
     { href: "/create", icon: Home, label: "Home" },
@@ -51,8 +70,8 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
         <Link
           href="/create"
           className={cn(
-            "group flex items-center gap-2 font-semibold text-foreground ",
-            isExpanded ? "rounded-md px-3 py-2" : "h-9 w-9 shrink-0 justify-center rounded-full md:h-8 md:w-8"
+            "group flex items-center gap-2 font-semibold text-foreground select-none outline-none",
+            isExpanded ? "rounded-md px-3 py-2" : "h-9 w-9 shrink-0 justify-center rounded-full md:h-8 md:w-8 select-none outline-none"
           )}
         >
           <Image src="/icon.svg" alt="RenderPart Logo" width={40} height={40}/>
@@ -126,6 +145,51 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
             </Link>
           </Button>
         ))}
+        {chatSessions.length > 0 && (
+          <>
+            <div className="my-2 border-t" />
+            <h3
+              className={cn(
+                "text-xs font-semibold text-muted-foreground px-3 mb-1",
+                isExpanded ? "block" : "hidden"
+              )}
+            >
+              Chat Sessions
+            </h3>
+            {chatSessions.map((session) => (
+              <Button
+                key={session.id}
+                asChild
+                variant="ghost"
+                className={cn(
+                  "w-full rounded-lg",
+                  isExpanded && "gap-3",
+                  // Apply selected styles only when expanded
+                  isExpanded && pathname === `/chats/${session.id}` && "bg-muted text-foreground",
+                  !isExpanded ? "justify-center" : "justify-start"
+                )}
+              >
+                <Link
+                  href={`/chats/${session.id}`}
+                  className={cn(
+                    "flex items-center",
+                    isExpanded ? "gap-3" : "justify-center",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      `whitespace-nowrap transition-opacity ease-in-out duration-200 text-ellipsis overflow-hidden text-muted-foreground`, // Always use text-muted-foreground
+                      isExpanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+                    )}
+                    aria-hidden={!isExpanded}
+                  >
+                    {session.title}
+                  </span>
+                </Link>
+              </Button>
+            ))}
+          </>
+        )}
       </nav>
       <nav className="mt-auto flex flex-col gap-2 p-2">
         <Button

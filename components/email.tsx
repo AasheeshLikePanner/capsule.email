@@ -1,16 +1,4 @@
-import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Html,
-  Img,
-  Preview,
-  Section,
-  Text,
-  Link,
-  Hr,
-} from "@react-email/components";
+import React from "react";
 
 interface BrandKit {
   id: string;
@@ -35,7 +23,7 @@ interface BrandKit {
 }
 
 export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
-  const styles = {
+  const styles: { [key: string]: React.CSSProperties } = {
     body: {
       backgroundColor: brandKit.color_background || "#fafafa",
       fontFamily: '"Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
@@ -46,7 +34,7 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
       fontWeight: "400",
       WebkitFontSmoothing: "antialiased",
       MozOsxFontSmoothing: "grayscale",
-      textRendering: "optimizeLegibility" as const,
+      textRendering: "optimizeLegibility",
     },
 
     container: {
@@ -58,7 +46,7 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
       backgroundColor: brandKit.color_container || "#ffffff",
       borderRadius: "24px",
       padding: "56px 40px",
-      textAlign: "center" as const,
+      textAlign: "center",
       boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
       border: "1px solid rgba(0, 0, 0, 0.02)",
     },
@@ -93,7 +81,6 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
       fontFamily: '"Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
     },
 
-    // Heading styles - Image 1 specifications
     heading: {
       fontSize: "24px",
       fontWeight: "700",
@@ -105,10 +92,9 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
       fontFamily: '"Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
       fontStyle: "normal",
       letterSpacing: "-0.02em",
-      textAlign: "center" as const,
+      textAlign: "center",
     },
 
-    // Paragraph styles - Image 2 specifications
     paragraph: {
       fontSize: "14px",
       fontStyle: "normal",
@@ -124,7 +110,7 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
       width: "408px",
       height: "40px",
       maxWidth: "408px",
-      textAlign: "center" as const,
+      textAlign: "center",
     },
 
     button: {
@@ -146,7 +132,7 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
 
     supportText: {
       fontSize: "13px",
-      color: brandKit.color_foreground || "#666666", // Using foreground for support text as muted is not in schema
+      color: brandKit.color_foreground || "#666666",
       margin: "36px 0 32px 0",
       lineHeight: "1.4",
       fontFamily: '"Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
@@ -163,7 +149,7 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
 
     signatureText: {
       fontSize: "14px",
-      color: brandKit.color_foreground || "#666666", // Using foreground for signature text
+      color: brandKit.color_foreground || "#666666",
       margin: "0 0 6px 0",
       fontFamily: '"Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
       fontWeight: "400",
@@ -180,7 +166,7 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
 
     divider: {
       height: "1px",
-      backgroundColor: brandKit.color_foreground || "#e0e0e0", // Using foreground for divider
+      backgroundColor: brandKit.color_foreground || "#e0e0e0",
       border: "none",
       margin: "40px 0",
       opacity: 0.3,
@@ -204,15 +190,14 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
       borderRadius: "3px",
     },
 
-    // Footer styles - Image 3 specifications
     footer: {
       margin: "24px 0 0 0",
-      textAlign: "center" as const,
+      textAlign: "center",
     },
 
     footerText: {
       fontSize: "12px",
-      color: brandKit.color_foreground || "#999999", // Using foreground for footer text
+      color: brandKit.color_foreground || "#999999",
       margin: "6px auto 0 auto",
       padding: "0",
       border: "0px solid rgb(39, 39, 42)",
@@ -225,180 +210,104 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
       width: "auto",
       maxWidth: "400px",
       height: "auto",
-      textAlign: "center" as const,
-    },
-
-    // Mobile styles
-    mobileCard: {
-      padding: "40px 24px",
-      borderRadius: "20px",
-    },
-
-    mobileHeading: {
-      fontSize: "20px",
-      width: "auto",
-      height: "auto",
-    },
-
-    mobileParagraph: {
-      fontSize: "14px",
-      width: "auto",
-      height: "auto",
-    },
-
-    mobileButton: {
-      padding: "14px 24px",
-      fontSize: "15px",
-    },
-
-    mobileFooterText: {
-      width: "auto",
-      height: "auto",
+      textAlign: "center",
     },
   };
 
   return (
-    <Html>
-      <Head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-        <style>{`
-          @media (max-width: 600px) {
-            .card { 
-              padding: 40px 24px !important; 
-              border-radius: 20px !important;
-            }
-            .heading { 
-              font-size: 20px !important; 
-              margin-bottom: 24px !important;
-              width: auto !important;
-              height: auto !important;
-            }
-            .paragraph { 
-              font-size: 14px !important; 
-              max-width: 100% !important;
-              width: auto !important;
-              height: auto !important;
-            }
-            .button { 
-              padding: 14px 24px !important; 
-              font-size: 15px !important; 
-            }
-            .supportText {
-              max-width: 100% !important;
-            }
-            .footerText {
-              width: auto !important;
-              height: auto !important;
-            }
-          }
-        `}</style>
-      </Head>
-      <Preview>Hey there, welcome to {brandKit.kit_name}!</Preview>
-      <Body style={styles.body}>
-        <Container style={styles.container}>
+    <div style={styles.body} className="rounded-3xl w-full h-full">
+      <div style={styles.container}>
+        <div style={styles.card}>
+          <div style={styles.logosSection}>
+            {brandKit.logo_primary ? (
+              <img
+                src={brandKit.logo_primary}
+                alt={`${brandKit.kit_name} logos`}
+                style={styles.logos}
+              />
+            ) : (
+              <div style={styles.logosFallback}>
+                <span style={styles.logosText}>
+                  {brandKit.kit_name.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <p style={styles.heading}>
+            Hey there, welcome!
+          </p>
           
-          {/* Single Card */}
-          <Section style={styles.card} className="card">
-            
-            {/* logos */}
-            <Section style={styles.logosSection}>
-              {brandKit.logo_primary ? (
-                <Img
-                  src={brandKit.logo_primary}
-                  alt={`${brandKit.kit_name} logos`}
-                  style={styles.logos}
-                />
-              ) : (
-                <div style={styles.logosFallback}>
-                  <Text style={styles.logosText}>
-                    {brandKit.kit_name.charAt(0).toUpperCase()}
-                  </Text>
-                </div>
-              )}
-            </Section>
+          <p style={styles.paragraph}>
+            Thanks so much for joining us! We're absolutely thrilled to have you as part of our amazing community.
+          </p>
+          <p style={styles.paragraph}>
+            We'd love for you to get the full experience, so when you have a moment, please finish setting up your account.
+          </p>
 
-            {/* Content */}
-            <Text style={styles.heading} className="heading">
-              Hey there, welcome!
-            </Text>
-            
-            <Text style={styles.paragraph} className="paragraph">
-              Thanks so much for joining us! We're absolutely thrilled to have you as part of our amazing community.
-            </Text>
-             {/* At {brandKit.kit_name}, we believe in delivering exceptional experiences. */}
-            <Text style={styles.paragraph} className="paragraph">
-              We'd love for you to get the full experience, so when you have a moment, please finish setting up your account.
-            </Text>
+          {brandKit.website && (
+            <a href={brandKit.website} style={styles.button}>
+              Visit our Website!
+            </a>
+          )}
 
-            {brandKit.website && (
-              <Button href={brandKit.website} style={styles.button} className="button">
-                Visit our Website!
-              </Button>
+          <p style={styles.supportText}>
+            If you ever have questions or just want to chat, our friendly support team is always here to help.
+          </p>
+
+          <div style={styles.signature}>
+            <p style={styles.signatureText}>Cheers,</p>
+            <p style={styles.companyName}>
+              Your friends at {brandKit.kit_name}
+            </p>
+          </div>
+
+          <hr style={styles.divider} />
+
+          {brandKit.socials && brandKit.socials.length > 0 && (
+            <div style={styles.socialSection}>
+              {brandKit.socials.map((socialUrl, index) => {
+                const url = new URL(socialUrl);
+                const hostname = url.hostname;
+                const domainParts = hostname.split('.');
+                const platform = domainParts.length > 1 ? domainParts[domainParts.length - 2] : domainParts[0];
+
+                return (
+                  <a
+                    key={index}
+                    href={socialUrl}
+                    style={styles.socialLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <img
+                      src={`https://www.google.com/s2/favicons?domain=${platform}.com&sz=32`}
+                      alt={platform}
+                      style={styles.socialIcon}
+                    />
+                  </a>
+                );
+              })}
+            </div>
+          )}
+
+          <div style={styles.footer}>
+            {brandKit.copyright && (
+              <p style={styles.footerText}>{brandKit.copyright}</p>
             )}
-
-            <Text style={styles.supportText}>
-              If you ever have questions or just want to chat, our friendly support team is always here to help.
-            </Text>
-
-            <Section style={styles.signature}>
-              <Text style={styles.signatureText}>Cheers,</Text>
-              <Text style={styles.companyName}>
-                Your friends at {brandKit.kit_name}
-              </Text>
-            </Section>
-
-            {/* Divider */}
-            <Hr style={styles.divider} />
-
-            {/* Social Links */}
-            {brandKit.socials && brandKit.socials.length > 0 && (
-              <Section style={styles.socialSection}>
-                {brandKit.socials.map((socialUrl, index) => {
-                  const url = new URL(socialUrl);
-                  const hostname = url.hostname;
-                  const domainParts = hostname.split('.');
-                  const platform = domainParts.length > 1 ? domainParts[domainParts.length - 2] : domainParts[0];
-
-                  return (
-                    <Link
-                      key={index}
-                      href={socialUrl}
-                      style={styles.socialLink}
-                      target="_blank"
-                    >
-                      <Img
-                        src={`https://www.google.com/s2/favicons?domain=${platform}.com&sz=32`}
-                        alt={platform}
-                        style={styles.socialIcon}
-                      />
-                    </Link>
-                  );
-                })}
-              </Section>
+            {brandKit.address && (
+              <p style={styles.footerText}>{brandKit.address}</p>
             )}
-
-            {/* Footer */}
-            <Section style={styles.footer}>
-              {brandKit.copyright && (
-                <Text style={styles.footerText} className="footerText">{brandKit.copyright}</Text>
-              )}
-              {brandKit.address && (
-                <Text style={styles.footerText} className="footerText">{brandKit.address}</Text>
-              )}
-              {brandKit.footer && (
-                <Text style={styles.footerText} className="footerText">{brandKit.footer}</Text>
-              )}
-              {brandKit.disclaimers && (
-                <Text style={styles.footerText} className="footerText">{brandKit.disclaimers}</Text>
-              )}
-            </Section>
-
-          </Section>
-
-        </Container>
-      </Body>
-    </Html>
+            {brandKit.footer && (
+              <p style={styles.footerText}>{brandKit.footer}</p>
+            )}
+            {brandKit.disclaimers && (
+              <p style={styles.footerText}>{brandKit.disclaimers}</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -8,6 +8,7 @@ const MemoizedEmailPreview :any= memo(EmailPreview);
 import { cn } from "@/lib/utils";
 import { Building, FileText, Palette, Users, BadgeInfo } from 'lucide-react';
 import { Suspense } from 'react';
+import { Button  } from "@/components/ui/button";
 
 const navItems = [
   {
@@ -160,8 +161,9 @@ export default function EmailEditorContent() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen p-4 lg:p-8 gap-4">
-      <div className="w-1/6 lg:w-64 p-4 rounded-lg shadow-sm">
+    <div className="flex flex-col lg:flex-row h-screen p-4 lg:p-8 gap-4 relative">
+      <div className="flex flex-grow-[1] flex-shrink-0">
+        <div className="w-1/6 lg:w-64 p-4 rounded-lg shadow-sm">
         <h1 className="text-lg font-semibold mb-4">Email Editor</h1>
         <nav className="space-y-1">
           {navItems.map((item:any) => (
@@ -209,13 +211,21 @@ export default function EmailEditorContent() {
       </div>
       <div
         ref={mainContentRef}
-        className="flex-grow-[2] overflow-y-auto h-full rounded-lg shadow-sm border-l border-border"
+        className="overflow-y-auto h-full border-r shadow-sm border-l border-border relative flex-grow-[3] flex-shrink-0"
       >
         <h1 className="text-lg font-medium mb-4 ml-5">{brandKit.kit_name}</h1>
         <BrandKitForm brandKit={brandKit} setBrandKit={setBrandKit} />
       </div>
-      <div className="w-full lg:w-5/12 rounded-xl shadow-sm border-l border-border">
-        <MemoizedEmailPreview brandKit={brandKit} />
+      </div>
+      <div className="h-full lg:w-5/12 flex flex-col relative">
+        <div className="flex flex-col flex-grow">
+          <div className="flex justify-end mb-4">
+            <Button>Save</Button>
+          </div>
+          <div className="h-full relative">
+            <MemoizedEmailPreview brandKit={brandKit} />
+          </div>
+        </div>
       </div>
     </div>
   );

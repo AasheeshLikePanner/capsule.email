@@ -1,10 +1,12 @@
 "use client";
 
+import { PageTransition } from "@/components/page-transition";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Sidebar } from "@/components/sidebar";
+import { AnimatePresence } from "framer-motion";
 
 export function RootLayoutClient({
   children,
@@ -28,8 +30,9 @@ export function RootLayoutClient({
           )}
         >
           <div className="flex-1 h-full "> 
-             <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-            {children}
+            <AnimatePresence mode="wait">
+              <PageTransition>{children}</PageTransition>
+            </AnimatePresence>
           </div>
         </main>
       </div>

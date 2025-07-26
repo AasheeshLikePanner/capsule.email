@@ -1,6 +1,8 @@
+import dynamic from 'next/dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { EmailRenderer } from '@/components/email-render';
 import { notFound } from 'next/navigation';
+
+const EmailRenderer = dynamic(() => import('@/components/email-render'), { ssr: false });
 
 interface EmailPageProps {
   params: {

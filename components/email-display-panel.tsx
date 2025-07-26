@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { EmailRenderer } from '@/components/email-render';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import CodeMirror from '@uiw/react-codemirror';
@@ -12,6 +11,9 @@ import prettier from 'prettier/standalone';
 import parserHtml from 'prettier/parser-html';
 import { Smartphone, Laptop, Save, Share2, Send, Check, X } from 'lucide-react';
 import SendEmailCard from '@/components/send-email-dialog';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+const EmailRenderer = dynamic(() => import('@/components/email-render'), { ssr: false });
 
 interface EmailDisplayPanelProps {
   emailMarkup: string;

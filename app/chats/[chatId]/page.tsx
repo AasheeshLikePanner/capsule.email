@@ -8,7 +8,7 @@ import { useBrandKitStore } from '@/lib/store/brandKitStore';
 
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { ArrowUp } from 'lucide-react';
+import { ArrowUp, Terminal } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import EmailDisplayPanel from '@/components/email-display-panel';
 import {
@@ -27,6 +27,7 @@ interface BotMessageContent {
   title?: string;
   text?: string;
   description?: string;
+  code?: string; // Add code property
 }
 
 export default function ChatPage() {
@@ -45,9 +46,12 @@ export default function ChatPage() {
   const [showKitNameDialog, setShowKitNameDialog] = useState(false);
   const [tempKitName, setTempKitName] = useState('');
   const emailToSaveRef = useRef<{ htmlContent: string; title: string } | null>(null);
+  const currentRecipientIndex = useRef(0); // Manages the index for dynamic recipient names
 
-  
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
+
+  // Define recipient names for dynamic replacement
+  const recipientNames = ["Aasheesh", "Aniket", "Priya", "Rahul", "Sneha"];
   const { brandKits } = useBrandKitStore();
   const [selectedBrandKit, setSelectedBrandKit] = useState<any>(null);
   const selectedBrandKitRef = useRef<any>(null);
@@ -108,9 +112,17 @@ export default function ChatPage() {
       console.log(data);
       
       if (data.code) {
-        setEmailMarkup(data.code);
+        // Get the current recipient name and update the index for the next message
+        const name = recipientNames[currentRecipientIndex.current];
+        currentRecipientIndex.current = (currentRecipientIndex.current + 1) % recipientNames.length;
+
+        // Replace [Recipient Name] in the generated code
+        const replacedCode = data.code.replace(/\[Recipient Name\]/g, name);
+
+        setEmailMarkup(replacedCode);
         setEmailTitle(data.title || '');
-        botMessage = { type: 'bot', content: { title: data.title, text: data.text, description: data.description } };
+        // Store the *modified* code in the bot message content
+        botMessage = { type: 'bot', content: { title: data.title, text: data.text, description: data.description, code: replacedCode } };
       } else {
         setEmailMarkup(''); // Clear email markup if no code is returned
         botMessage = { type: 'bot', content: data.text || 'Sorry, I could not generate a response.' };
@@ -285,8 +297,17 @@ export default function ChatPage() {
                     ) : (
                       <div className="max-w-lg">
                         {msg.content.title && (
-                          <div className="rounded-lg w-80 p-3 border text-secondary-foreground shadow-sm mb-2">
+                          <div
+                            className="rounded-lg w-80 p-3 border text-secondary-foreground shadow-sm mb-2 cursor-pointer hover:bg-accent flex items-center justify-between"
+                            onClick={() => {
+                              if (msg.content.code) {
+                                setEmailMarkup(msg.content.code);
+                                setEmailTitle(msg.content.title || '');
+                              }
+                            }}
+                          >
                             <p className="text-sm font-semibold">{msg.content.title}</p>
+                            {msg.content.code && <Terminal className="w-4 h-4 text-muted-foreground" />}
                           </div>
                         )}
                         <p className="text-sm mt-5">{msg.content.text}</p>

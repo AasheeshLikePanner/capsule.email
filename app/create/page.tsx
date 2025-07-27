@@ -148,11 +148,9 @@ export default function CreatePage() {
           router.push(`/chats/${response.data.chatId}`);
         } else {
           console.error("No chatId received from API");
-          // Handle error or show a message to the user
         }
       } catch (error) {
         console.error("Error sending message:", error);
-        // Handle error or show a message to the user
       }
     }
   };

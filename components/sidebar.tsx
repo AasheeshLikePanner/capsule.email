@@ -30,18 +30,25 @@ interface ChatSession {
 export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
   const pathname = usePathname();
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchChatSessions = async () => {
+
       try {
+        setIsLoading(true);
         const response = await axios.get<ChatSession[]>('/api/chats');
         setChatSessions(response.data);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching chat sessions:", error);
       }
+      setIsLoading(false);
     };
-    fetchChatSessions();
-  }, []);
+    if (isExpanded === true) {
+      fetchChatSessions();
+    }
+  }, [isExpanded]);
 
   const navItems = [
     { href: "/create", icon: Home, label: "Home" },
@@ -74,7 +81,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
             isExpanded ? "rounded-md px-3 py-2" : "h-9 w-9 shrink-0 justify-center rounded-full md:h-8 md:w-8 select-none outline-none"
           )}
         >
-          <Image src="/icon.svg" alt="RenderPart Logo" width={40} height={40}/>
+          <Image src="/icon.svg" alt="RenderPart Logo" width={40} height={40} />
           <span
             className={cn(
               `whitespace-nowrap transition-opacity ease-in-out duration-200`,
@@ -88,11 +95,11 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
       </div>
       <nav className="flex flex-col gap-2 p-2">
         <Button asChild variant="ghost" className={cn(
-            "w-full rounded-lg",
-            pathname === "/create" && "bg-muted text-foreground",
-            !isExpanded ? "justify-center" : "justify-start",
-            isExpanded && "hover:bg-accent/80"
-          )}>
+          "w-full rounded-lg",
+          pathname === "/create" && "bg-muted text-foreground",
+          !isExpanded ? "justify-center" : "justify-start",
+          isExpanded && "hover:bg-accent/80"
+        )}>
           <Link
             href="/create"
             className={cn(
@@ -156,45 +163,49 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
             >
               Chat Sessions
             </h3>
-            {chatSessions.map((session) => (
-              <Button
-                key={session.id}
-                asChild
-                variant="ghost"
-                className={cn(
-                  "w-full rounded-lg",
-                  isExpanded && "gap-3",
-                  // Apply selected styles only when expanded
-                  isExpanded && pathname === `/chats/${session.id}` && "bg-muted text-foreground",
-                  !isExpanded ? "justify-center" : "justify-start"
-                )}
-              >
-                <Link
-                  href={`/chats/${session.id}`}
+            {isLoading ? 
+              <div className={`flex items-center justify-center w-full h-full ${isExpanded ? 'block': 'hiddne'}`}>
+                <Image src="/icon.svg" alt="Loading..." width={30} height={30} className="animate-spin-slow" />
+              </div>
+              : chatSessions.map((session: ChatSession) => (
+                <Button
+                  key={session.id}
+                  asChild
+                  variant="ghost"
                   className={cn(
-                    "flex items-center",
-                    isExpanded ? "gap-3" : "justify-center",
+                    "w-full rounded-lg",
+                    isExpanded && "gap-3",
+                    // Apply selected styles only when expanded
+                    isExpanded && pathname === `/chats/${session.id}` && "bg-muted text-foreground",
+                    !isExpanded ? "justify-center" : "justify-start"
                   )}
                 >
-                  <span
+                  <Link
+                    href={`/chats/${session.id}`}
                     className={cn(
-                      `whitespace-nowrap transition-opacity ease-in-out duration-200 text-ellipsis overflow-hidden text-muted-foreground`, // Always use text-muted-foreground
-                      isExpanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+                      "flex items-center",
+                      isExpanded ? "gap-3" : "justify-center",
                     )}
-                    aria-hidden={!isExpanded}
                   >
-                    {session.title}
-                  </span>
-                </Link>
-              </Button>
-            ))}
+                    <span
+                      className={cn(
+                        `whitespace-nowrap transition-opacity ease-in-out duration-200 text-ellipsis overflow-hidden text-muted-foreground`, // Always use text-muted-foreground
+                        isExpanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+                      )}
+                      aria-hidden={!isExpanded}
+                    >
+                      {session.title}
+                    </span>
+                  </Link>
+                </Button>
+              ))}
           </>
         )}
       </nav>
       <nav className="mt-auto flex flex-col gap-2 p-2">
         <Button
           variant="ghost"
-            className={cn(
+          className={cn(
             "flex items-center rounded-lg text-muted-foreground transition-colors hover:text-primary hover:bg-accent",
             isExpanded && "gap-3",
             !isExpanded ? "justify-center" : "justify-start"

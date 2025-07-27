@@ -19,6 +19,7 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/componen
 import EmailDisplayPanel from '@/components/email-display-panel';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from '@/components/ui/input';
+import axios from 'axios';
 
 interface Email {
   id: string;
@@ -108,11 +109,9 @@ export default function EmailsPage() {
   useEffect(() => {
     async function fetchEmails() {
       try {
-        const response = await fetch('/api/emails');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
+        const response = await axios.get('/api/emails');
+        
+        const data = await response.data;
         setEmails(data);
       } catch (e:any) {
         setError(e.message);

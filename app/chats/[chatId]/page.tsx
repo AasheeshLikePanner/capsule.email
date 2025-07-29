@@ -3,7 +3,6 @@
 import { useState, useEffect, memo, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation'; // Changed from useSearchParams
 import Image from 'next/image';
-import axios from 'axios';
 import { useBrandKitStore } from '@/lib/store/brandKitStore';
 
 import { Textarea } from '@/components/ui/textarea';
@@ -20,7 +19,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Input } from '@/components/ui/input';
+import axios from 'axios';
+import { useMediaQuery } from '@/lib/hooks/use-media-query';
+
 
 
 interface BotMessageContent {
@@ -62,6 +65,9 @@ export default function ChatPage() {
   const currentRecipientIndex = useRef(0); // Manages the index for dynamic recipient names
 
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const [showMobileEmailPreview, setShowMobileEmailPreview] = useState(false);
+
 
   // Define recipient names for dynamic replacement
   const recipientNames = ["Aasheesh", "Aniket", "Priya", "Rahul", "Sneha"];
@@ -253,109 +259,146 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex h-full bg-background ">
-      <div className="flex flex-col w-1/2 min-h-0 ">
-        {/* This main content area is the only part that scrolls */}
-        <div className="flex-1 overflow-y-auto p-6 ">
-          <div className="flex flex-col space-y-5">
-            {messages.map((msg: ChatMessage, index) => {
-              const isUser = msg.type === 'user';
+    <>
+      <ResizablePanelGroup direction={isDesktop ? "horizontal" : "vertical"} onLayout={(sizes: number[]) => {
+        document.cookie = `react-resizable-panels:chat-layout=${JSON.stringify(sizes)}`;
+      }} className="min-h-[calc(100vh-64px)] w-full p-4 sm:p-6 md:p-8">
+        <ResizablePanel defaultSize={isDesktop ? 50 : 100} minSize={20} className="flex flex-col h-full">
+          {/* This main content area is the only part that scrolls */}
+          <div className="flex-1 overflow-y-auto p-6 ">
+            <div className="flex flex-col space-y-5">
+              {messages.map((msg: ChatMessage, index) => {
+                const isUser = msg.type === 'user';
 
-              return (
-                <div
-                  key={msg.id} // Use msg.id for key
-                  className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} items-start`}>
-                  {!isUser && (
-                    <Image src="/icon.svg" alt="Bot Icon" width={32} height={32} className="mr-2" />
-                  )}
-                  {isUser ? (
-                    <div className="max-w-lg">
-                      <div className="rounded-2xl px-4 py-3 bg-muted text-muted-foreground shadow-sm">
-                        <p className="text-sm">{(msg.content as UserMessageContent).emailContent}</p>
-                      </div>
-                      {(msg.content as UserMessageContent).brandKit && (
-                        <div className="mt-2 p-2 rounded-2xl bg-muted text-card-foreground border shadow-sm flex items-center space-x-2 max-w-40 ml-auto">
-                          {(msg.content as UserMessageContent).brandKit.logo_icon && (
-                            <Image src={(msg.content as UserMessageContent).brandKit.logo_icon} alt="Brand Logo" width={24} height={24} className="rounded-full" />
-                          )}
-                          <span className="text-sm font-medium">{(msg.content as UserMessageContent).brandKit.kit_name}</span>
+                return (
+                  <div
+                    key={msg.id} // Use msg.id for key
+                    className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} items-start`}>
+                    {!isUser && (
+                      <Image src="/icon.svg" alt="Bot Icon" width={32} height={32} className="mr-2" />
+                    )}
+                    {isUser ? (
+                      <div className="max-w-lg">
+                        <div className="rounded-2xl px-4 py-3 bg-muted text-muted-foreground shadow-sm">
+                          <p className="text-sm">{(msg.content as UserMessageContent).emailContent}</p>
                         </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="max-w-lg">
-                      {typeof msg.content === 'string' ? (
-                        <pre className="whitespace-pre-wrap font-sans text-sm text-foreground break-words"><code>{msg.content}</code></pre>
-                      ) : (
-                        <>
-                          {(msg.content as BotMessageContent).title && (
-                            <div
-                              className="rounded-lg w-80 p-3 border text-secondary-foreground shadow-sm mb-2 cursor-pointer hover:bg-accent flex items-center justify-between"
-                              onClick={() => {
-                                if ((msg.content as BotMessageContent).code) {
-                                  setEmailMarkup((msg.content as BotMessageContent).code || '');
-                                  setEmailTitle((msg.content as BotMessageContent).title || '');
-                                }
-                              }}
-                            >
-                              <p className="text-sm font-semibold">{(msg.content as BotMessageContent).title}</p>
-                              {(msg.content as BotMessageContent).code && <Terminal className="w-4 h-4 text-muted-foreground" />}
-                            </div>
-                          )}
-                          {(msg.content as BotMessageContent).text && <p className="text-sm mt-5">{(msg.content as BotMessageContent).text}</p>}
-                          {(msg.content as BotMessageContent).description && (
-                            <p className="text-sm mt-2 text-muted-foreground">{(msg.content as BotMessageContent).description}</p>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                        {(msg.content as UserMessageContent).brandKit && (
+                          <div className="mt-2 p-2 rounded-2xl bg-muted text-card-foreground border shadow-sm flex items-center space-x-2 max-w-40 ml-auto">
+                            {(msg.content as UserMessageContent).brandKit.logo_icon && (
+                              <Image src={(msg.content as UserMessageContent).brandKit.logo_icon} alt="Brand Logo" width={24} height={24} className="rounded-full" />
+                            )}
+                            <span className="text-sm font-medium">{(msg.content as UserMessageContent).brandKit.kit_name}</span>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="max-w-lg">
+                        {typeof msg.content === 'string' ? (
+                          <pre className="whitespace-pre-wrap font-sans text-sm text-foreground break-words"><code>{msg.content}</code></pre>
+                        ) : (
+                          <>
+                            {(msg.content as BotMessageContent).title && (
+                              <div
+                                className="rounded-lg w-80 p-3 border text-secondary-foreground shadow-sm mb-2 cursor-pointer hover:bg-accent flex items-center justify-between"
+                                onClick={() => {
+                                  if ((msg.content as BotMessageContent).code) {
+                                    setEmailMarkup((msg.content as BotMessageContent).code || '');
+                                    setEmailTitle((msg.content as BotMessageContent).title || '');
+                                    if (!isDesktop) {
+                                      setShowMobileEmailPreview(true);
+                                    }
+                                  }
+                                }}
+                              >
+                                <p className="text-sm font-semibold">{(msg.content as BotMessageContent).title}</p>
+                                {(msg.content as BotMessageContent).code && <Terminal className="w-4 h-4 text-muted-foreground" />}
+                              </div>
+                            )}
+                            {(msg.content as BotMessageContent).text && <p className="text-sm mt-5">{(msg.content as BotMessageContent).text}</p>}
+                            {(msg.content as BotMessageContent).description && (
+                              <p className="text-sm mt-2 text-muted-foreground">{(msg.content as BotMessageContent).description}</p>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
 
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="max-w-lg">
-                  <div className="flex items-center justify-center p-2">
-                    <Image src="/icon.svg" alt="Loading..." width={24} height={24} className="animate-spin-slow" />
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="max-w-lg">
+                    <div className="flex items-center justify-center p-2">
+                      <Image src="/icon.svg" alt="Loading..." width={24} height={24} className="animate-spin-slow" />
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-        </div>
-        {/* This footer with the form is fixed at the bottom */}
-        <footer className="p-4 border-t flex-shrink-0">
-          <form onSubmit={handleSubmit} className="relative">
-            <Textarea
-              placeholder="Tell the AI what to change..."
-              className="w-full text-base p-4 pr-14 rounded-xl resize-none border-input bg-card  focus-visible:ring-1 focus-visible:ring-offset-0"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSubmit();
-                }
-              }}
-            />
-            <div className="absolute bottom-3.5 right-3.5">
-              <Button
-                type="submit"
-                size="icon"
-                className="h-9 w-9 rounded-lg"
-                disabled={isLoading || !prompt.trim()}>
-                <ArrowUp className="h-4 w-4" />
-              </Button>
+              )}
+              <div ref={messagesEndRef} />
             </div>
-          </form>
-        </footer>
-      </div>
-      <div className="w-1/2 h-full bg-muted/30 overflow-hidden flex items-center justify-center rounedd-2xl"> 
-        <EmailDisplayPanel emailMarkup={emailMarkup} isLoading={isLoading} emailTitle={emailTitle} onSave={handleSaveEmail} emailId={emailId} onShare={handleShareEmail} onSend={handleSendEmail} isSaving={isSaving} />
-      </div>
+          </div>
+          {/* This footer with the form is fixed at the bottom */}
+          <footer className="p-4 border-t flex-shrink-0">
+            <form onSubmit={handleSubmit} className="relative">
+              <Textarea
+                placeholder="Tell the AI what to change..."
+                className="w-full text-base p-4 pr-14 rounded-xl resize-none border-input bg-card  focus-visible:ring-1 focus-visible:ring-offset-0"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit();
+                  }
+                }}
+              />
+              <div className="absolute bottom-3.5 right-3.5">
+                <Button
+                  type="submit"
+                  size="icon"
+                  className="h-9 w-9 rounded-lg"
+                  disabled={isLoading || !prompt.trim()}>
+                  <ArrowUp className="h-4 w-4" />
+                </Button>
+              </div>
+            </form>
+          </footer>
+        </ResizablePanel>
+        {isDesktop && (
+          <>
+            <ResizableHandle withHandle className='bg-justworking'/>
+            <ResizablePanel defaultSize={50} minSize={30}>
+              <div className="w-full h-full bg-muted/30 overflow-hidden flex items-center justify-center rounded-2xl"> 
+                <EmailDisplayPanel emailMarkup={emailMarkup} isLoading={isLoading} emailTitle={emailTitle} onSave={handleSaveEmail} emailId={emailId} onShare={handleShareEmail} onSend={handleSendEmail} isSaving={isSaving} />
+              </div>
+            </ResizablePanel>
+          </>
+        )}
+      </ResizablePanelGroup>
+
+      {/* Mobile Email Preview Dialog */}
+      {!isDesktop && (
+        <Dialog open={showMobileEmailPreview} onOpenChange={setShowMobileEmailPreview}>
+          <DialogContent className="sm:max-w-[800px] h-[90vh] flex flex-col">
+            <DialogHeader>
+              <DialogTitle>{emailTitle || "Email Preview"}</DialogTitle>
+            </DialogHeader>
+            <div className="flex-1 overflow-hidden">
+              <EmailDisplayPanel
+                emailMarkup={emailMarkup}
+                isLoading={isLoading}
+                emailTitle={emailTitle}
+                onSave={handleSaveEmail}
+                emailId={emailId}
+                onShare={handleShareEmail}
+                onSend={handleSendEmail}
+                isSaving={isSaving}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
       <Dialog open={showKitNameDialog} onOpenChange={setShowKitNameDialog}>
         <DialogContent>
@@ -384,6 +427,6 @@ export default function ChatPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

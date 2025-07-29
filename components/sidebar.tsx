@@ -41,7 +41,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
       try {
         setIsLoading(true);
         const response = await axios.get<ChatSession[]>('/api/chats');
-        setChatSessions(response.data);
+        setChatSessions(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.error("Error fetching chat sessions:", error);
       } finally {
@@ -162,7 +162,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
               Chat Sessions
             </h3>
             {isLoading ?
-              <div className={cn("flex items-center justify-center w-full", (isExpanded || isMobile) ? 'block': 'hidden')}>
+              <div className={cn("flex items-center justify-center self-center", (isExpanded || isMobile) ? 'block': 'hidden')}>
                 <Image src="/icon.svg" alt="Loading..." width={30} height={30} className="animate-spin-slow" />
               </div>
               : chatSessions.map((session: ChatSession) => (

@@ -216,7 +216,7 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, 
       </div>
       <div className={`flex-1 overflow-auto p-4 rounded-xl ${mobileView ? 'flex items-center justify-center' : ''}`}>
         {view === 'preview' ? (
-          <div className={mobileView ? 'w-[375px] h-[667px] mx-auto border-4 border-gray-700 rounded-3xl overflow-hidden' : 'w-full h-full'}>
+          <div className={mobileView ? 'w-full max-w-md h-full mx-auto border-4 border-gray-700 rounded-3xl overflow-hidden aspect-[9/16]' : 'w-full h-full'}>
             <EmailRenderer jsxString={code} className="rounded-xl overflow-hidden" />
           </div>
         ) : (

@@ -41,7 +41,7 @@ export default function EmailsPage() {
   const [emailTitle, setEmailTitle] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const isDesktop = useMediaQuery("(min-width: 1024px)"); 
 
   const handleUpdateEmail = async (htmlContent: string, title: string): Promise<boolean> => {
     if (!selectedEmail?.id) return false; // Cannot update without an email ID

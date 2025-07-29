@@ -264,35 +264,35 @@ Return a single, valid JSON object with no additional commentary or text outside
 
 
   try {
-    const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-      model: 'tngtech/deepseek-r1t-chimera:free',
-      messages: [
-        { role: 'system', content: 'You are an expert email designer. You will receive instructions and return a valid JSON object containing a complete HTML email.' },
-        { role: 'user', content: promptTemplate }
-      ],
-      response_format: { type: "json_object" } // Request JSON output
-    }, {
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    // const raw = await fs.readFile('gemini_sample_response.txt', 'utf-8');
-    // const data = JSON.parse(raw);
-    // console.log(data);
+    // const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
+    //   model: 'tngtech/deepseek-r1t-chimera:free',
+    //   messages: [
+    //     { role: 'system', content: 'You are an expert email designer. You will receive instructions and return a valid JSON object containing a complete HTML email.' },
+    //     { role: 'user', content: promptTemplate }
+    //   ],
+    //   response_format: { type: "json_object" } // Request JSON output
+    // }, {
+    //   headers: {
+    //     'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+    //     'Content-Type': 'application/json'
+    //   }
+    // });
+    const raw = await fs.readFile('gemini_sample_response.txt', 'utf-8');
+    const data = JSON.parse(raw);
+    console.log(data);
     
-    // return data;
+    return data;
 
-    if (response.data && response.data.choices && response.data.choices.length > 0) {
-      const content = response.data.choices[0].message.content;
-      // The model should return a JSON string, so we parse it.
-      // await fs.writeFile('gemini_sample_response.txt', content, 'utf-8');
+    // if (response.data && response.data.choices && response.data.choices.length > 0) {
+    //   const content = response.data.choices[0].message.content;
+    //   // The model should return a JSON string, so we parse it.
+    //   // await fs.writeFile('gemini_sample_response.txt', content, 'utf-8');
 
       
-      return JSON.parse(content);
-    } else {
-      throw new Error('No response from OpenRouter model');
-    }
+    //   return JSON.parse(content);
+    // } else {
+    //   throw new Error('No response from OpenRouter model');
+    // }
 
   } catch (error: any) {
     console.error("Error calling OpenRouter:", error.response ? error.response.data : error.message);

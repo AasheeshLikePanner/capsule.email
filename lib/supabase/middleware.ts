@@ -45,6 +45,12 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (user && request.nextUrl.pathname === "/") {
+    const url = new URL(request.url);
+    url.pathname = "/create";
+    return NextResponse.redirect(url);
+  }
+
   if (
     request.nextUrl.pathname !== "/" &&
     !user &&

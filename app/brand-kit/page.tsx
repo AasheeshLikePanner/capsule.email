@@ -83,7 +83,7 @@ export default function BrandKitPage() {
   }, []);
 
   return (
-    <div className="p-10 py-5 min-h-screen">
+    <div className="p-4 sm:p-6 md:p-10">
       <Toaster />
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl font-medium text-foreground">Brand Kit</h1>
@@ -130,9 +130,9 @@ export default function BrandKitPage() {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 p-24">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 p-2 sm:p-4 lg:p-6">
           {isProcessingBrandKit && (
-            <Card className="bg-muted/20 text-white p-6 rounded-xl h-80 w-96 shadow-lg relative flex items-center justify-center">
+            <Card className="bg-muted/20 text-white p-6 rounded-xl h-80 w-full shadow-lg relative flex items-center justify-center">
               <div className="flex flex-col items-center">
                 <Image
                   src="/icon.svg"
@@ -147,7 +147,7 @@ export default function BrandKitPage() {
           )}
           {brandKits.map((kit) => (
             <div key={kit.id} className="group relative">
-              <Card className="bg-muted/20 text-white p-6 rounded-xl w-96 h-80 shadow-lg relative overflow-hidden">
+              <Card className="bg-muted/20 text-white p-6 rounded-xl w-full h-80 shadow-lg relative overflow-hidden">
                 <Link href={`/email-editor/${kit.id}`}>
                   <CardContent className="flex items-center justify-center h-full cursor-pointer">
                     {kit.logo_primary && (

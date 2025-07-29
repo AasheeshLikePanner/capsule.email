@@ -26,10 +26,10 @@ export function RootLayoutClient({
         <Sidebar isExpanded={isSidebarExpanded} setExpanded={setSidebarExpanded} />
         <main
           className={cn(
-            "flex flex-col flex-1 h-full overflow-hidden w-0",
+            "flex flex-col flex-1 h-full w-0 overflow-y-auto",
           )}
         >
-          <div className="flex-1 h-full "> 
+          <div className="flex-1"> 
             <AnimatePresence mode="wait">
               <PageTransition>{children}</PageTransition>
             </AnimatePresence>

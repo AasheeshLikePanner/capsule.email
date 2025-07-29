@@ -67,7 +67,8 @@
     @apply bg-background text-foreground;
     margin: 0;
     height: 100%;
-    overflow: hidden; /* Force no scrolling on the body */
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
   }
 }
 

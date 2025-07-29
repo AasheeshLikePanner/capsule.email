@@ -157,7 +157,7 @@ export default function CreatePage() {
 
   return (
     <div className="relative w-full h-full flex items-center justify-center">
-      <div className="relative flex flex-col items-center justify-center p-4 z-10">
+      <div className="relative flex flex-col items-center justify-center p-4 z-10 w-full">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-medium text-center mb-3 text-white tracking-normal">Build your dream email</h1>
         <p className="text-lg text-center text-muted-foreground mb-8 max-w-xl">
           Create beautiful email templates using natural language.
@@ -230,7 +230,7 @@ export default function CreatePage() {
           onSelectBrandKit={setSelectedBrandKit}
         />
             
-        <div className="w-full max-w-3xl flex flex-nowrap justify-center gap-2 mt-4 overflow-x-auto pb-2">
+        <div className="w-full max-w-3xl flex flex-wrap justify-center gap-2 mt-4 pb-2">
             <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("welcome")}>
               <Smile className="h-4 w-4" />
               Welcome
@@ -258,7 +258,7 @@ export default function CreatePage() {
           </div>
       </div>
       <div className="absolute bottom-0 left-0 right-0 h-[100vh] overflow-hidden -z-0 opacity-50">
-        <Globe className="w-full h-[150vh] absolute bottom-0" />
+        <Globe className="w-full top-auto bottom-0 translate-y-[50%]" />
       </div>
     </div>
   );

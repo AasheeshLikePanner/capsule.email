@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react';
+"use client";
+
+import { useMediaQuery } from "@/lib/hooks/use-media-query";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Link from "next/link";
 import {
   Home,
@@ -9,13 +12,13 @@ import {
   PanelLeft,
   PanelRight,
   Mail,
-  MessageSquare,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import Image from "next/image";
 import axios from 'axios';
+import { useEffect, useState } from "react";
 
 interface SidebarProps {
   isExpanded: boolean;
@@ -31,24 +34,25 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
   const pathname = usePathname();
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   useEffect(() => {
     const fetchChatSessions = async () => {
-
       try {
         setIsLoading(true);
         const response = await axios.get<ChatSession[]>('/api/chats');
         setChatSessions(response.data);
-        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching chat sessions:", error);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
-    if (isExpanded === true) {
+    // Fetch sessions if the sidebar is expanded or if it's the mobile view (always expanded)
+    if (isExpanded || !isDesktop) {
       fetchChatSessions();
     }
-  }, [isExpanded]);
+  }, [isExpanded, isDesktop]);
 
   const navItems = [
     { href: "/create", icon: Home, label: "Home" },
@@ -61,59 +65,54 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
     { href: "/profile", icon: CircleUser, label: "Profile" },
   ];
 
-  return (
-    <aside
-      className={cn(
-        "hidden flex-col bg-background transition-[width] ease-in-out duration-300 sm:flex",
-        isExpanded ? "w-56" : "w-16"
-      )}
-    >
+  const sidebarContent = (isMobile = false) => (
+    <div className="flex flex-col h-full">
       <div
         className={cn(
           "flex items-center",
-          isExpanded ? "h-[60px] justify-start px-3" : "h-[60px] justify-center"
+          (isExpanded || isMobile) ? "h-[60px] justify-start px-3" : "h-[60px] justify-center"
         )}
       >
         <Link
           href="/create"
           className={cn(
             "group flex items-center gap-2 font-semibold text-foreground select-none outline-none",
-            isExpanded ? "rounded-md px-3 py-2" : "h-9 w-9 shrink-0 justify-center rounded-full md:h-8 md:w-8 select-none outline-none"
+            (isExpanded || isMobile) ? "rounded-md px-3 py-2" : "h-9 w-9 shrink-0 justify-center rounded-full md:h-8 md:w-8"
           )}
         >
           <Image src="/icon.svg" alt="RenderPart Logo" width={40} height={40} />
           <span
             className={cn(
-              `whitespace-nowrap transition-opacity ease-in-out duration-200`,
-              isExpanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+              "whitespace-nowrap transition-opacity ease-in-out duration-200",
+              (isExpanded || isMobile) ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
             )}
-            aria-hidden={!isExpanded}
+            aria-hidden={!(isExpanded || isMobile)}
           >
             Capsule.Email
           </span>
         </Link>
       </div>
-      <nav className="flex flex-col gap-2 p-2">
+      <nav className="flex flex-col gap-2 p-2 flex-1">
         <Button asChild variant="ghost" className={cn(
           "w-full rounded-lg",
           pathname === "/create" && "bg-muted text-foreground",
-          !isExpanded ? "justify-center" : "justify-start",
-          isExpanded && "hover:bg-accent/80"
+          !(isExpanded || isMobile) ? "justify-center" : "justify-start",
+          (isExpanded || isMobile) && "hover:bg-accent/80"
         )}>
           <Link
             href="/create"
             className={cn(
               "flex items-center",
-              isExpanded && "gap-3",
+              (isExpanded || isMobile) && "gap-3",
             )}
           >
             <PlusCircle className="h-5 w-5 shrink-0" />
             <span
               className={cn(
-                `whitespace-nowrap transition-opacity ease-in-out duration-200`,
-                isExpanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+                "whitespace-nowrap transition-opacity ease-in-out duration-200",
+                (isExpanded || isMobile) ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
               )}
-              aria-hidden={!isExpanded}
+              aria-hidden={!(isExpanded || isMobile)}
             >
               New Email
             </span>
@@ -127,25 +126,24 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
             variant="ghost"
             className={cn(
               "w-full rounded-lg",
-              isExpanded && "gap-3",
               pathname === item.href && "bg-muted text-foreground",
-              !isExpanded ? "justify-center" : "justify-start"
+              !(isExpanded || isMobile) ? "justify-center" : "justify-start"
             )}
           >
             <Link
               href={item.href}
               className={cn(
                 "flex items-center",
-                isExpanded && "gap-3",
+                (isExpanded || isMobile) && "gap-3",
               )}
             >
               <item.icon className="h-5 w-5 shrink-0" />
               <span
                 className={cn(
-                  `whitespace-nowrap transition-opacity ease-in-out duration-200`,
-                  isExpanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+                  "whitespace-nowrap transition-opacity ease-in-out duration-200",
+                  (isExpanded || isMobile) ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
                 )}
-                aria-hidden={!isExpanded}
+                aria-hidden={!(isExpanded || isMobile)}
               >
                 {item.label}
               </span>
@@ -158,13 +156,13 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
             <h3
               className={cn(
                 "text-xs font-semibold text-muted-foreground px-3 mb-1",
-                isExpanded ? "block" : "hidden"
+                (isExpanded || isMobile) ? "block" : "hidden"
               )}
             >
               Chat Sessions
             </h3>
-            {isLoading ? 
-              <div className={`flex items-center justify-center w-full h-full ${isExpanded ? 'block': 'hiddne'}`}>
+            {isLoading ?
+              <div className={cn("flex items-center justify-center w-full", (isExpanded || isMobile) ? 'block': 'hidden')}>
                 <Image src="/icon.svg" alt="Loading..." width={30} height={30} className="animate-spin-slow" />
               </div>
               : chatSessions.map((session: ChatSession) => (
@@ -174,25 +172,23 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
                   variant="ghost"
                   className={cn(
                     "w-full rounded-lg",
-                    isExpanded && "gap-3",
-                    // Apply selected styles only when expanded
-                    isExpanded && pathname === `/chats/${session.id}` && "bg-muted text-foreground",
-                    !isExpanded ? "justify-center" : "justify-start"
+                    pathname === `/chats/${session.id}` && "bg-muted text-foreground",
+                    !(isExpanded || isMobile) ? "justify-center" : "justify-start"
                   )}
                 >
                   <Link
                     href={`/chats/${session.id}`}
                     className={cn(
                       "flex items-center",
-                      isExpanded ? "gap-3" : "justify-center",
+                      (isExpanded || isMobile) ? "gap-3" : "justify-center",
                     )}
                   >
                     <span
                       className={cn(
-                        `whitespace-nowrap transition-opacity ease-in-out duration-200 text-ellipsis overflow-hidden text-muted-foreground`, // Always use text-muted-foreground
-                        isExpanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+                        "whitespace-nowrap transition-opacity ease-in-out duration-200 text-ellipsis overflow-hidden text-muted-foreground",
+                        (isExpanded || isMobile) ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
                       )}
-                      aria-hidden={!isExpanded}
+                      aria-hidden={!(isExpanded || isMobile)}
                     >
                       {session.title}
                     </span>
@@ -207,8 +203,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
           variant="ghost"
           className={cn(
             "flex items-center rounded-lg text-muted-foreground transition-colors hover:text-primary hover:bg-accent",
-            isExpanded && "gap-3",
-            !isExpanded ? "justify-center" : "justify-start"
+            !(isExpanded || isMobile) ? "justify-center" : "justify-start"
           )}
           onClick={() => setExpanded(!isExpanded)}
         >
@@ -219,10 +214,10 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
           )}
           <span
             className={cn(
-              `whitespace-nowrap transition-opacity ease-in-out duration-200`,
-              isExpanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+              "whitespace-nowrap transition-opacity ease-in-out duration-200",
+              (isExpanded || isMobile) ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
             )}
-            aria-hidden={!isExpanded}
+            aria-hidden={!(isExpanded || isMobile)}
           >
             Collapse
           </span>
@@ -234,23 +229,23 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
             variant="ghost"
             className={cn(
               "w-full rounded-lg",
-              !isExpanded ? "justify-center" : "justify-start"
+              !(isExpanded || isMobile) ? "justify-center" : "justify-start"
             )}
           >
             <Link
               href={item.href}
               className={cn(
                 "flex items-center",
-                isExpanded && "gap-3",
+                (isExpanded || isMobile) && "gap-3",
               )}
             >
               <item.icon className="h-5 w-5 shrink-0" />
               <span
                 className={cn(
-                  `whitespace-nowrap transition-opacity ease-in-out duration-200`,
-                  isExpanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+                  "whitespace-nowrap transition-opacity ease-in-out duration-200",
+                  (isExpanded || isMobile) ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
                 )}
-                aria-hidden={!isExpanded}
+                aria-hidden={!(isExpanded || isMobile)}
               >
                 {item.label}
               </span>
@@ -258,6 +253,32 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
           </Button>
         ))}
       </nav>
-    </aside>
+    </div>
+  );
+
+  if (isDesktop) {
+    return (
+      <aside
+        className={cn(
+          "hidden flex-col bg-background transition-[width] ease-in-out duration-300 sm:flex",
+          isExpanded ? "w-56" : "w-16"
+        )}
+      >
+        {sidebarContent(false)}
+      </aside>
+    );
+  }
+
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="ghost" size="icon" className="md:hidden fixed top-3 left-3 z-50 bg-background">
+          <PanelRight className="h-5 w-5" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="p-0 w-56">
+        {sidebarContent(true)}
+      </SheetContent>
+    </Sheet>
   );
 }

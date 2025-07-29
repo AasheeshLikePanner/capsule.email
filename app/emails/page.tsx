@@ -20,6 +20,7 @@ import EmailDisplayPanel from '@/components/email-display-panel';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from '@/components/ui/input';
 import axios from 'axios';
+import { useMediaQuery } from '@/lib/hooks/use-media-query';
 
 interface Email {
   id: string;
@@ -40,6 +41,7 @@ export default function EmailsPage() {
   const [emailTitle, setEmailTitle] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   const handleUpdateEmail = async (htmlContent: string, title: string): Promise<boolean> => {
     if (!selectedEmail?.id) return false; // Cannot update without an email ID
@@ -140,26 +142,28 @@ export default function EmailsPage() {
   );
 
   return (
-    <ResizablePanelGroup direction="horizontal" className="min-h-[calc(100vh-64px)] w-full p-10 py-6">
-      <ResizablePanel defaultSize={50} minSize={20}>
-        <div className="flex justify-between items-center mb-6">
-        <h1 className="text-xl font-medium text-foreground ">My Emails</h1>
-        <div className="relative mr-4">
-          <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder="Search emails..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm pl-8 rounded-3xl pr-4 focus-visible:ring-0 focus-visible:ring-offset-0"
-          />
+    <ResizablePanelGroup direction={isDesktop ? "horizontal" : "vertical"} onLayout={(sizes: number[]) => {
+      document.cookie = `react-resizable-panels:layout=${JSON.stringify(sizes)}`;
+    }} className="min-h-[calc(100vh-64px)] w-full p-4 sm:p-6 md:p-8">
+      <ResizablePanel defaultSize={50} minSize={20} className="flex flex-col h-full">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+          <h1 className="text-xl font-medium text-foreground mb-4 sm:mb-0">My Emails</h1>
+          <div className="relative w-full sm:w-auto">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search emails..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full sm:max-w-sm pl-8 rounded-3xl pr-4 focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+          </div>
         </div>
-      </div>
         <div className="flex flex-col h-full p-4">
           {filteredEmails.length === 0 ? (
-            <p className="text-center text-muted-foreground">No emails found.</p>
+            <p className="text-center text-muted-foreground flex-1 flex items-center justify-center">No emails found.</p>
           ) : (
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto overflow-x-auto">
               <Table className="mt-4">
                 <TableHeader>
                   <TableRow>

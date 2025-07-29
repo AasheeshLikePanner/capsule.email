@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
@@ -40,10 +40,11 @@ export default function EmailsPage() {
   const [emailMarkup, setEmailMarkup] = useState('');
   const [emailTitle, setEmailTitle] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeletingEmail, setIsDeletingEmail] = useState(false); // New state for delete loading
   const [searchTerm, setSearchTerm] = useState('');
   const isDesktop = useMediaQuery("(min-width: 1024px)"); 
 
-  const handleUpdateEmail = async (htmlContent: string, title: string): Promise<boolean> => {
+  const handleUpdateEmail = useCallback(async (htmlContent: string, title: string): Promise<boolean> => {
     if (!selectedEmail?.id) return false; // Cannot update without an email ID
 
     setIsSaving(true);
@@ -77,11 +78,12 @@ export default function EmailsPage() {
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [selectedEmail]);
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     if (!emailToDelete) return;
 
+    setIsDeletingEmail(true); // Set loading state
     try {
       const response = await fetch(`/api/emails/${emailToDelete.id}`, {
         method: 'DELETE',
@@ -99,14 +101,16 @@ export default function EmailsPage() {
       }
     } catch (e: any) {
       setError(e.message);
+    } finally {
+      setIsDeletingEmail(false); // Reset loading state
     }
-  };
+  }, [emailToDelete, emails, selectedEmail]);
 
-  const handleRowClick = (email: Email) => {
+  const handleRowClick = useCallback((email: Email) => {
     setSelectedEmail(email);
     setEmailMarkup(email.html_content);
     setEmailTitle(email.name);
-  };
+  }, []);
 
   useEffect(() => {
     async function fetchEmails() {
@@ -185,9 +189,7 @@ export default function EmailsPage() {
                       <TableCell className="py-2">{format(new Date(email.created_at), 'PPP')}</TableCell>
                       <TableCell className="text-right py-2">
                         
-                        <Dialog open={showDeleteDialog && emailToDelete?.id === email.id} onOpenChange={setShowDeleteDialog}>
-                          <DialogTrigger asChild>
-                            <Button
+                        <Button
                               variant="destructive"
                               size="sm"
                               onClick={(e) => {
@@ -198,25 +200,6 @@ export default function EmailsPage() {
                             >
                               <Trash2Icon className="mr-1" />Delete
                             </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Are you absolutely sure?</DialogTitle>
-                              <DialogDescription>
-                                This action cannot be undone. This will permanently delete your
-                                email and remove its data from our servers.
-                              </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter>
-                              <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
-                                Cancel
-                              </Button>
-                              <Button variant="destructive" onClick={handleDelete}>
-                                Delete
-                              </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -254,6 +237,32 @@ export default function EmailsPage() {
           )}
         </div>
       </ResizablePanel>
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Are you absolutely sure?</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. This will permanently delete your
+              email and remove its data from our servers.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={isDeletingEmail}>
+              {isDeletingEmail ? (
+                <>
+                  <Image src="/icon.svg" alt="Loading" width={20} height={20} className="animate-spin mr-2" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </ResizablePanelGroup>
   );
 }

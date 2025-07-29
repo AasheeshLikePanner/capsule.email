@@ -1,7 +1,8 @@
 import { Email } from "@/components/email";
+import { cn } from "@/lib/utils";
 import { useState, useEffect } from 'react';
 
-export default function EmailPreview({ initialMarkup, brandKit }: { initialMarkup?: string; brandKit?: any }) {
+export default function EmailPreview({ initialMarkup, brandKit, className }: { initialMarkup?: string; brandKit?: any; className?: string }) {
   const [emailContent, setEmailContent] = useState<React.ReactNode>(null);
 
   useEffect(() => {
@@ -15,7 +16,7 @@ export default function EmailPreview({ initialMarkup, brandKit }: { initialMarku
   }, [initialMarkup, brandKit]);
 
   return (
-    <div className="w-full h-full rounded-3xl overflow-auto">
+    <div className={cn("w-full h-full rounded-3xl overflow-auto", className)}>
       {emailContent}
     </div>
   );

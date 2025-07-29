@@ -28,7 +28,6 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
       backgroundColor: brandKit.color_background || "#fafafa",
       fontFamily: '"Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
       margin: "0",
-      padding: "40px 20px",
       WebkitTextSizeAdjust: "100%",
       lineHeight: "1.5",
       fontWeight: "400",
@@ -40,6 +39,7 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
     container: {
       maxWidth: "600px",
       margin: "0 auto",
+      padding: "40px 20px", // Added padding here
     },
 
     card: {
@@ -215,7 +215,7 @@ export const Email = ({ brandKit }: { brandKit: BrandKit }) => {
   };
 
   return (
-    <div style={styles.body} className="rounded-3xl w-full h-full">
+    <div style={styles.body} className="rounded-3xl w-full">
       <div style={styles.container}>
         <div style={styles.card}>
           <div style={styles.logosSection}>

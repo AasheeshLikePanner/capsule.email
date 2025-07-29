@@ -107,8 +107,24 @@ export default function EmailEditorContent() {
 
   const [activeSection, setActiveSection] = useState("brand-details");
   const mainContentRef = useRef<HTMLDivElement>(null);
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
   useEffect(() => {
+    const populateSectionRefs = () => {
+      navItems.forEach((item: any) => {
+        if (item.isHeader) {
+          item.subItems.forEach((subItem: any) => {
+            sectionRefs.current[subItem.id] = document.getElementById(subItem.id);
+          });
+        } else {
+          sectionRefs.current[item.id] = document.getElementById(item.id);
+        }
+      });
+    };
+
+    // Defer population to ensure elements are rendered
+    const timeoutId = setTimeout(populateSectionRefs, 0);
+
     const handleScroll = () => {
       const mainContent = mainContentRef.current;
       if (!mainContent) return;
@@ -123,7 +139,7 @@ export default function EmailEditorContent() {
       // Iterate in reverse to find the section closest to the top of the viewport
       for (let i = allSectionIds.length - 1; i >= 0; i--) {
         const sectionId = allSectionIds[i];
-        const element = document.getElementById(sectionId);
+        const element = sectionRefs.current[sectionId]; // Use stored ref
         if (element) {
           const elementOffsetTop = element.offsetTop;
 
@@ -151,6 +167,7 @@ export default function EmailEditorContent() {
     }
 
     return () => {
+      clearTimeout(timeoutId);
       if (mainContent) {
         mainContent.removeEventListener("scroll", handleScroll);
       }
@@ -249,13 +266,11 @@ export default function EmailEditorContent() {
       </div>
       </div>
       <div className="h-full lg:w-5/12 flex flex-col relative">
-        <div className="flex flex-col flex-grow">
-          <div className="flex justify-end mb-4">
-            <Button onClick={handleUpdateBrandKit}>Save</Button>
-          </div>
-          <div className="h-full relative">
-            <MemoizedEmailPreview brandKit={brandKit} />
-          </div>
+        <div className="flex justify-end mb-4">
+          <Button onClick={handleUpdateBrandKit}>Save</Button>
+        </div>
+        <div className="flex-grow relative overflow-y-auto">
+          <MemoizedEmailPreview brandKit={brandKit} className="h-full" />
         </div>
       </div>
     </div>

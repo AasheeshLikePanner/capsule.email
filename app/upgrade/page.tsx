@@ -88,14 +88,13 @@ export default function UpgradePage() {
               <Card
                 key={plan.name}
                 className={cn(
-                  "flex flex-col w-full border transition-all duration-300 ease-in-out transform hover:-translate-y-2",
+                  "flex flex-col w-full transition-all duration-300 ease-in-out",
                   "rounded-lg lg:rounded-none animate-fade-in-up",
                   index === 0 && "lg:rounded-l-lg",
                   index === plans.length - 1 && "lg:rounded-r-lg",
-                  index < plans.length - 1 && "lg:border-r-0",
                   plan.isFeatured 
-                    ? "border-primary/50 shadow-lg lg:mb-4 bg-card animate-glow"
-                    : "border-border bg-card",
+                    ? "bg-muted/50 lg:mb-4"
+                    : "bg-muted/20",
                 )}
                 style={{ animationDelay: `${0.4 + index * 0.1}s` }}
               >

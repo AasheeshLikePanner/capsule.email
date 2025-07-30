@@ -166,8 +166,8 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, 
   }
 
   return (
-    <div className="flex flex-col w-full h-full bg-muted/30 rounded-2xl">
-      <div className="flex justify-end p-2 border-b">
+    <div className="flex flex-col w-full h-full">
+      <div className="flex justify-end p-2 border-b h-12">
         <Button
           variant="outline"
           className={getSaveButtonClasses()}
@@ -214,27 +214,27 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, 
           )}
         </div>
       </div>
-      <div className={`flex-1 overflow-auto p-4 rounded-xl ${mobileView ? 'flex items-center justify-center' : ''}`}>
+      <div className={`flex-1 p-4 ${mobileView ? 'flex items-center justify-center' : ''} min-h-0 overflow-auto`}>
         {view === 'preview' ? (
-          <div className={mobileView ? 'w-full max-w-md h-full mx-auto border-4 border-gray-700 rounded-3xl overflow-hidden aspect-[9/16]' : 'w-full h-full'}>
+          <div className={mobileView ? 'w-full max-w-md h-full mx-auto border-4 border-gray-700 rounded-3xl overflow-hidden aspect-[9/16]' : 'w-full h-full overflow-auto'}>
             <EmailRenderer jsxString={code} className="rounded-xl overflow-hidden" />
           </div>
         ) : (
           <CodeMirror
             value={code}
-            height="100%"
             extensions={[html(), EditorView.theme({
               "&.cm-editor": {
                 fontSize: "13px",
+                height: "100%",
+                overflowY: "auto",
               },
             })]}            
             theme={vscodeDark}
             onChange={(value) => setCode(value)}
-            style={{ height: '100%' }}
           />
         )}
       </div>
-      <div className="flex justify-end p-2 border-t">
+      <div className="flex justify-end p-2 border-t h-14">
         {view === 'preview' && (
           <Button
             variant="outline"

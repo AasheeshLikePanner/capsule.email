@@ -148,11 +148,11 @@ export default function EmailsPage() {
   return (
     <ResizablePanelGroup direction={isDesktop ? "horizontal" : "vertical"} onLayout={(sizes: number[]) => {
       document.cookie = `react-resizable-panels:layout=${JSON.stringify(sizes)}`;
-    }} className="min-h-[calc(100vh-64px)] w-full p-4 sm:p-6 md:p-8">
+    }} className="flex flex-col min-h-[calc(100vh-64px)] w-full p-4 sm:p-6 md:p-8">
       <ResizablePanel defaultSize={50} minSize={20} className="flex flex-col h-full">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
           <h1 className="text-xl font-medium text-foreground mb-4 sm:mb-0">My Emails</h1>
-          <div className="relative w-full sm:w-auto">
+          <div className="relative w-full sm:w-auto mr-3">
             <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
@@ -210,7 +210,7 @@ export default function EmailsPage() {
         </div>
       </ResizablePanel>
       <ResizableHandle withHandle className='bg-justworking'/>
-      <ResizablePanel defaultSize={50} minSize={30}>
+      <ResizablePanel defaultSize={50} minSize={30} className="flex flex-col h-full min-h-0">
         <div className="flex flex-col h-full bg-muted/30 rounded-3xl p-4">
           {selectedEmail ? (
             <EmailDisplayPanel

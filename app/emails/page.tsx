@@ -42,7 +42,7 @@ export default function EmailsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isDeletingEmail, setIsDeletingEmail] = useState(false); // New state for delete loading
   const [searchTerm, setSearchTerm] = useState('');
-  const isDesktop = useMediaQuery("(min-width: 1024px)"); 
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   const handleUpdateEmail = useCallback(async (htmlContent: string, title: string): Promise<boolean> => {
     if (!selectedEmail?.id) return false; // Cannot update without an email ID
@@ -116,10 +116,10 @@ export default function EmailsPage() {
     async function fetchEmails() {
       try {
         const response = await axios.get('/api/emails');
-        
+
         const data = await response.data;
         setEmails(data);
-      } catch (e:any) {
+      } catch (e: any) {
         setError(e.message);
       } finally {
         setIsLoading(false);
@@ -130,8 +130,15 @@ export default function EmailsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center w-full h-full">
-        <Image src="/icon.svg" alt="Loading..." width={48} height={48} className="animate-spin-slow" />
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-8rem)]">
+        <Image
+          src="/icon.svg"
+          alt="Loading Spinner"
+          width={64}
+          height={64}
+          className="animate-spin"
+        />
+        <p className="mt-4 text-lg font-semibold text-foreground">Loading emails...</p>
       </div>
     );
   }
@@ -188,18 +195,18 @@ export default function EmailsPage() {
                       <TableCell className="py-2">{email.kit_name || 'N/A'}</TableCell>
                       <TableCell className="py-2">{format(new Date(email.created_at), 'PPP')}</TableCell>
                       <TableCell className="text-right py-2">
-                        
+
                         <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation(); // Prevent row click from firing
-                                setEmailToDelete(email);
-                                setShowDeleteDialog(true);
-                              }}
-                            >
-                              <Trash2Icon className="mr-1" />Delete
-                            </Button>
+                          variant="destructive"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent row click from firing
+                            setEmailToDelete(email);
+                            setShowDeleteDialog(true);
+                          }}
+                        >
+                          <Trash2Icon className="mr-1" />Delete
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -209,7 +216,7 @@ export default function EmailsPage() {
           )}
         </div>
       </ResizablePanel>
-      <ResizableHandle withHandle className='bg-justworking'/>
+      <ResizableHandle withHandle className='bg-justworking' />
       <ResizablePanel defaultSize={50} minSize={30} className="flex flex-col h-full min-h-0">
         <div className="flex flex-col h-full bg-muted/30 rounded-3xl p-4">
           {selectedEmail ? (

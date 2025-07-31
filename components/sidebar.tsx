@@ -99,13 +99,13 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
           "w-full rounded-lg",
           pathname === "/create" && "bg-muted text-foreground",
           !(isExpanded || isMobile) ? "justify-center" : "justify-start",
-          (isExpanded || isMobile) && "hover:bg-accent/80"
+          (isExpanded || isMobile) && "hover:bg-sidebar-hover"
         )}>
           <Link
             href="/create"
             className={cn(
               "flex items-center",
-              (isExpanded || isMobile) && "gap-3",
+              (isExpanded || isMobile) ? "justify-start gap-3" : "justify-center",
             )}
           >
             <PlusCircle className="h-5 w-5 shrink-0" />
@@ -262,7 +262,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
     return (
       <aside
         className={cn(
-          "hidden flex-col bg-background transition-[width] ease-in-out duration-300 sm:flex",
+          "hidden flex-col bg-sidebar transition-[width] ease-in-out duration-300 sm:flex",
           isExpanded ? "w-56" : "w-16"
         )}
       >

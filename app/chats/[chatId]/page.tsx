@@ -59,6 +59,8 @@ export default function ChatPage() {
   const emailMarkupRef = useRef('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
+  const [isPublic, setIsPublic] = useState(false);
   const [showKitNameDialog, setShowKitNameDialog] = useState(false);
   const [tempKitName, setTempKitName] = useState('');
   const emailToSaveRef = useRef<{ htmlContent: string; title: string } | null>(null);
@@ -91,17 +93,20 @@ export default function ChatPage() {
       setIsLoading(true);
       try {
         const response = await axios.get(`/api/chats/${chatId}/messages`);
-        setMessages(response.data);
+        const { messages, isOwner, isPublic } = response.data;
+        setMessages(messages);
+        setIsOwner(isOwner);
+        setIsPublic(isPublic);
 
         // Set initial email markup if the last message is a bot message with code
-        const lastBotMessage = response.data.findLast((msg: ChatMessage) => msg.type === 'bot' && (msg.content as BotMessageContent).code);
+        const lastBotMessage = messages.findLast((msg: ChatMessage) => msg.type === 'bot' && (msg.content as BotMessageContent).code);
         if (lastBotMessage) {
           setEmailMarkup((lastBotMessage.content as BotMessageContent).code || '');
           setEmailTitle((lastBotMessage.content as BotMessageContent).title || '');
         }
 
         // Try to set selectedBrandKit from the first user message if available
-        const firstUserMessage = response.data.find((msg: ChatMessage) => msg.type === 'user' && (msg.content as UserMessageContent).brandKit);
+        const firstUserMessage = messages.find((msg: ChatMessage) => msg.type === 'user' && (msg.content as UserMessageContent).brandKit);
         if (firstUserMessage && !hasSetInitialBrandKit.current) {
           setSelectedBrandKit((firstUserMessage.content as UserMessageContent).brandKit);
           hasSetInitialBrandKit.current = true;
@@ -185,6 +190,22 @@ export default function ChatPage() {
     }
   }, [chatId, selectedBrandKit]); // Added chatId to dependencies
 
+  const handleTogglePublic = async () => {
+    try {
+      const newIsPublic = !isPublic;
+      await axios.put(`/api/chats/${chatId}`, { ispublic: newIsPublic });
+      setIsPublic(newIsPublic);
+      // No clipboard action here, as it's now handled by a separate "Share Link" button
+    } catch (error) {
+      console.error("Error updating chat status:", error);
+      // Consider adding an error toast notification here
+    }
+  };
+
+  const handleCopyShareLink = useCallback(() => {
+    navigator.clipboard.writeText(window.location.href);
+  }, []);
+
   const handleSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
     handleSendMessage(prompt);
@@ -214,14 +235,6 @@ export default function ChatPage() {
       return false; // Indicate failure
     } finally {
       setIsSaving(false);
-    }
-  };
-
-  const handleShareEmail = (id: string) => {
-    if (id) {
-      const shareableLink = `${window.location.origin}/emails/${id}`;
-      navigator.clipboard.writeText(shareableLink);
-      console.log("Shareable link copied:", shareableLink);
     }
   };
 
@@ -257,6 +270,7 @@ export default function ChatPage() {
       emailToSaveRef.current = null;
     }
   };
+
 
   return (
     <>
@@ -342,7 +356,7 @@ export default function ChatPage() {
           <footer className="p-4 border-t flex-shrink-0">
             <form onSubmit={handleSubmit} className="relative">
               <Textarea
-                placeholder="Tell the AI what to change..."
+                placeholder={isOwner ? "Tell the AI what to change..." : "You are viewing a public chat. Only the owner can send messages."}
                 className="w-full text-base p-4 pr-14 rounded-xl resize-none border-input bg-card  focus-visible:ring-1 focus-visible:ring-offset-0"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
@@ -352,13 +366,14 @@ export default function ChatPage() {
                     handleSubmit();
                   }
                 }}
+                disabled={!isOwner || isLoading}
               />
               <div className="absolute bottom-3.5 right-3.5">
                 <Button
                   type="submit"
                   size="icon"
                   className="h-9 w-9 rounded-lg"
-                  disabled={isLoading || !prompt.trim()}>
+                  disabled={!isOwner || isLoading || !prompt.trim()}>
                   <ArrowUp className="h-4 w-4" />
                 </Button>
               </div>
@@ -370,7 +385,7 @@ export default function ChatPage() {
             <ResizableHandle withHandle className='bg-justworking'/>
             <ResizablePanel defaultSize={50} minSize={30}>
               <div className="w-full h-full bg-muted/30 overflow-hidden flex items-center justify-center rounded-2xl"> 
-                <EmailDisplayPanel emailMarkup={emailMarkup} isLoading={isLoading} emailTitle={emailTitle} onSave={handleSaveEmail} emailId={emailId} onShare={handleShareEmail} onSend={handleSendEmail} isSaving={isSaving} />
+                <EmailDisplayPanel emailMarkup={emailMarkup} isLoading={isLoading} emailTitle={emailTitle} onSave={handleSaveEmail} emailId={emailId} onShare={handleCopyShareLink} onTogglePublic={handleTogglePublic} onSend={handleSendEmail} isSaving={isSaving} isOwner={isOwner} isPublic={isPublic} />
               </div>
             </ResizablePanel>
           </>
@@ -391,9 +406,12 @@ export default function ChatPage() {
                 emailTitle={emailTitle}
                 onSave={handleSaveEmail}
                 emailId={emailId}
-                onShare={handleShareEmail}
+                onShare={handleCopyShareLink}
+                onTogglePublic={handleTogglePublic}
                 onSend={handleSendEmail}
                 isSaving={isSaving}
+                isOwner={isOwner}
+                isPublic={isPublic}
               />
             </div>
           </DialogContent>

@@ -25,6 +25,7 @@ export default function CreatePage() {
   const [isBrandKitDialogOpen, setIsBrandKitDialogOpen] = useState(false);
   const [selectedBrandKit, setSelectedBrandKit] = useState<BrandKit | null>(null);
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [placeholderSuffix, setPlaceholderSuffix] = useState("");
   const [currentSuffixIndex, setCurrentSuffixIndex] = useState(0);
@@ -137,7 +138,8 @@ export default function CreatePage() {
   };
 
   const handleSendMessage = async () => {
-    if (emailContent.trim()) {
+    if (emailContent.trim() && !isLoading) {
+      setIsLoading(true);
       try {
         const response = await axios.post('/api/generate-email', {
           prompt: emailContent,
@@ -148,9 +150,11 @@ export default function CreatePage() {
           router.push(`/chats/${response.data.chatId}`);
         } else {
           console.error("No chatId received from API");
+          setIsLoading(false);
         }
       } catch (error) {
         console.error("Error sending message:", error);
+        setIsLoading(false);
       }
     }
   };
@@ -182,6 +186,7 @@ export default function CreatePage() {
                 handleSendMessage();
               }
             }}
+            disabled={isLoading}
           />
           <div className="absolute bottom-4 left-4">
             {selectedBrandKit ? (
@@ -189,6 +194,7 @@ export default function CreatePage() {
                 variant="ghost"
                 className="flex items-center gap-1 h-9 rounded-lg px-3 text-sm"
                 onClick={() => setSelectedBrandKit(null)}
+                disabled={isLoading}
               >
                 <X className="h-4 w-4" />
                 {selectedBrandKit.logo_primary && (
@@ -207,6 +213,7 @@ export default function CreatePage() {
                 variant="ghost"
                 className="flex items-center gap-1 h-9 rounded-lg px-3 text-sm"
                 onClick={() => setIsBrandKitDialogOpen(true)}
+                disabled={isLoading}
               >
                 <Briefcase className="h-4 w-4" />
                 Brand Kit
@@ -219,8 +226,13 @@ export default function CreatePage() {
               size="icon"
               className="h-9 w-9 rounded-lg"
               onClick={handleSendMessage}
+              disabled={isLoading}
             >
-              <ArrowUp className="h-4 w-4" />
+              {isLoading ? (
+                <Image src="/loader.svg" alt="loading" width={16} height={16} className="h-7 w-7 animate-spin" />
+              ) : (
+                <ArrowUp className="h-4 w-4" />
+              )}
             </Button>
           </div>
         </div>
@@ -231,27 +243,27 @@ export default function CreatePage() {
         />
             
         <div className="w-full max-w-3xl flex flex-wrap justify-center gap-2 mt-4 pb-2">
-            <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("welcome")}>
+            <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("welcome")} disabled={isLoading}>
               <Smile className="h-4 w-4" />
               Welcome
             </Button>
-            <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("e-commerce")}>
+            <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("e-commerce")} disabled={isLoading}>
               <ShoppingCart className="h-4 w-4" />
               E-commerce
             </Button>
-            <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("invite")}>
+            <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("invite")} disabled={isLoading}>
               <Mail className="h-4 w-4" />
               Invite
             </Button>
-            <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("newsletter")}>
+            <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("newsletter")} disabled={isLoading}>
               <Newspaper className="h-4 w-4" />
               Newsletter
             </Button>
-            <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("invoice")}>
+            <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("invoice")} disabled={isLoading}>
               <Receipt className="h-4 w-4" />
               Invoice
             </Button>
-            <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("cart")}>
+            <Button variant="outline" className="rounded-full h-9 px-3 text-sm gap-1 flex-shrink-0 border border-input bg-muted/20 text-white" onClick={() => handleButtonClick("cart")} disabled={isLoading}>
               <ShoppingCart className="h-4 w-4" />
               Cart
             </Button>

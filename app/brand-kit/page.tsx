@@ -18,6 +18,7 @@ export default function BrandKitPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isProcessingBrandKit, setIsProcessingBrandKit] = useState(false);
   const [deleteProgress, setDeleteProgress] = useState(0);
+  const [kitToDelete, setKitToDelete] = useState<string | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const hasTriggeredDelete = useRef(false);
   const DELETE_DURATION = 1500; // milliseconds to hold the button for delete
@@ -25,6 +26,13 @@ export default function BrandKitPage() {
   useEffect(() => {
     fetchBrandKits();
   }, [fetchBrandKits]);
+
+  useEffect(() => {
+    if (kitToDelete) {
+      handleDelete(kitToDelete);
+      setKitToDelete(null);
+    }
+  }, [kitToDelete]);
 
   const handleBrandKitProcessingStart = () => {
     setIsProcessingBrandKit(true);
@@ -64,7 +72,7 @@ export default function BrandKitPage() {
           }
           if (!hasTriggeredDelete.current) {
             hasTriggeredDelete.current = true;
-            handleDelete(kitId);
+            setKitToDelete(kitId);
           }
           return 100;
         }

@@ -9,7 +9,10 @@ import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import { EditorView } from '@codemirror/view';
 import prettier from 'prettier/standalone';
 import parserHtml from 'prettier/parser-html';
-import { Smartphone, Laptop, Save, Share2, Send, Check, X } from 'lucide-react';
+import { Smartphone, Laptop, Save, Send, Check, X, Copy } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import SendEmailCard from '@/components/send-email-dialog';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -21,17 +24,22 @@ interface EmailDisplayPanelProps {
   emailTitle: string;
   onSave: (htmlContent: string, title: string) => Promise<boolean>;
   emailId: string | null;
-  onShare: (id: string) => void;
+  
+  onTogglePublic: () => void; // New prop for toggling public status
   onSend: (recipient: string, subject: string) => void;
   isSaving: boolean;
+  isOwner: boolean;
+  isPublic: boolean;
 }
 
-export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, onSave, emailId, onShare, onSend, isSaving }: EmailDisplayPanelProps) {
+export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, onSave, emailId, onTogglePublic, onSend, isSaving, isOwner, isPublic: initialIsPublic }: EmailDisplayPanelProps) {
   const [view, setView] = useState<'preview' | 'code'>('preview');
   const [mobileView, setMobileView] = useState(false);
   const [code, setCode] = useState(emailMarkup);
   const [copied, setCopied] = useState(false);
   const [copiedShareLink, setCopiedShareLink] = useState(false);
+  
+  
   const [localSaveStatus, setLocalSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [showSendEmailCard, setShowSendEmailCard] = useState(false);
   
@@ -87,7 +95,7 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, 
   }, []);
 
   const getSaveButtonClasses = useCallback(() => {
-    let classes = "mr-2 relative overflow-hidden";
+    let classes = "mr-1 relative overflow-hidden";
     if (localSaveStatus === 'success') {
       classes += " bg-green-500 hover:bg-green-600 text-white";
     } else if (localSaveStatus === 'error') {
@@ -106,15 +114,15 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, 
     } else {
       return emailId ? 'Update' : 'Save';
     }
-  }, [isSaving, localSaveStatus]);
+  }, [isSaving, localSaveStatus, emailId]);
+
+  
 
   const handleShare = useCallback(() => {
-    if (emailId) {
-      onShare(emailId);
-      setCopiedShareLink(true);
-      setTimeout(() => setCopiedShareLink(false), 2000);
-    }
-  }, [emailId, onShare]);
+    navigator.clipboard.writeText(window.location.href);
+    setCopiedShareLink(true);
+    setTimeout(() => setCopiedShareLink(false), 2000);
+  }, []);
 
   const handleSend = (recipient: string, subject: string) => {
     onSend(recipient, subject);
@@ -167,7 +175,23 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, 
 
   return (
     <div className="flex flex-col w-full h-full">
-      <div className="flex justify-end p-2 border-b h-12">
+      <div className="flex justify-end items-center p-2 border-b h-12">
+        <Button
+          variant="outline"
+          onClick={onTogglePublic}
+          disabled={!isOwner}
+          className="mr-1 flex items-center justify-between"
+        >
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="public-mode"
+              checked={initialIsPublic}
+              onCheckedChange={onTogglePublic}
+              disabled={!isOwner}
+            />
+            <Label htmlFor="public-mode" className="text-sm font-medium cursor-pointer">{initialIsPublic ? 'Public' : 'Private'}</Label>
+          </div>
+        </Button>
         <Button
           variant="outline"
           className={getSaveButtonClasses()}
@@ -182,24 +206,35 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, 
           />
           <span className="relative z-10 flex items-center">
             {isSaving ? (
-              <Image src="/icon.svg" alt="Saving..." width={20} height={20} className="animate-spin-slow mr-2" />
+              <Image src="/icon.svg" alt="Saving..." width={20} height={20} className="animate-spin-slow mr-1" />
             ) : localSaveStatus === 'success' ? (
-              <Check className="w-4 h-4 mr-2" />
+              <Check className="w-4 h-4 mr-1" />
             ) : localSaveStatus === 'error' ? (
-              <X className="w-4 h-4 mr-2" />
+              <X className="w-4 h-4 mr-1" />
             ) : (
-              <Save className="w-4 h-4 mr-2" />
+              <Save className="w-4 h-4 mr-1" />
             )}
             {getSaveButtonText()}
           </span>
         </Button>
-        <Button variant="outline" className="mr-2" onClick={handleShare} disabled={!emailId}>
-          <Share2 className="w-4 h-4 mr-2" />
-          {copiedShareLink ? 'Link Copied!' : 'Share'}
-        </Button>
+        {initialIsPublic && (
+          <div className="flex items-center space-x-1 mr-1">
+            <Input
+              type="text"
+              value={window.location.href}
+              readOnly
+              
+              className="w-64 h-9 outline-none border-none select-none focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+            <Button variant="outline" onClick={handleShare}>
+              <Copy className="w-4 h-4 mr-1" />
+              {copiedShareLink ? 'Copied!' : 'Copy'}
+            </Button>
+          </div>
+        )}
         <div className="relative w-max">
           <Button variant="outline" onClick={() => setShowSendEmailCard(!showSendEmailCard)}>
-            <Send className="w-4 h-4 mr-2" />
+            <Send className="w-4 h-4 mr-1" />
             Send
           </Button>
           {showSendEmailCard && (

@@ -68,7 +68,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
   ];
 
   const sidebarContent = (isMobile = false) => (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full border border-r">
       <div
         className={cn(
           "flex items-center",
@@ -97,9 +97,8 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
       <nav className="flex flex-col gap-2 p-2 flex-1">
         <Button asChild variant="ghost" className={cn(
           "w-full rounded-lg",
-          pathname === "/create" && "bg-muted text-foreground",
+          pathname === "/create" ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-sidebar-hover",
           !(isExpanded || isMobile) ? "justify-center" : "justify-start",
-          (isExpanded || isMobile) && "hover:bg-sidebar-hover"
         )}>
           <Link
             href="/create"
@@ -128,7 +127,9 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
             variant="ghost"
             className={cn(
               "w-full rounded-lg",
-              pathname === item.href && "bg-muted text-foreground",
+              pathname === item.href
+                ? "bg-muted text-foreground"
+                : "text-muted-foreground hover:text-foreground hover:bg-sidebar-hover",
               !(isExpanded || isMobile) ? "justify-center" : "justify-start"
             )}
           >
@@ -174,9 +175,10 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
                   variant="ghost"
                   className={cn(
                     "w-full rounded-lg",
-                    (isExpanded || isMobile) && (pathname === `/chats/${session.id}`) && "bg-muted text-foreground",
                     !(isExpanded || isMobile) ? "justify-center" : "justify-start",
-                    !(isExpanded || isMobile) && "hover:bg-transparent"
+                    pathname === `/chats/${session.id}`
+                      ? (isExpanded || isMobile ? "bg-muted text-foreground" : "text-foreground")
+                      : "text-muted-foreground hover:text-foreground hover:bg-sidebar-hover"
                   )}
                 >
                   <Link
@@ -189,7 +191,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
                   >
                     <span
                       className={cn(
-                        "whitespace-nowrap transition-opacity ease-in-out duration-200 text-ellipsis overflow-hidden text-muted-foreground",
+                        "whitespace-nowrap transition-opacity ease-in-out duration-200 text-ellipsis overflow-hidden",
                         (isExpanded || isMobile) ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
                       )}
                       aria-hidden={!(isExpanded || isMobile)}
@@ -206,7 +208,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
         <Button
           variant="ghost"
           className={cn(
-            "flex items-center rounded-lg text-muted-foreground transition-colors hover:text-primary hover:bg-accent",
+            "flex items-center rounded-lg text-muted-foreground transition-colors hover:text-foreground hover:bg-accent",
             !(isExpanded || isMobile) ? "justify-center" : "justify-start"
           )}
           onClick={() => setExpanded(!isExpanded)}
@@ -233,6 +235,9 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
             variant="ghost"
             className={cn(
               "w-full rounded-lg",
+              pathname === item.href
+                ? "bg-muted text-foreground"
+                : "text-muted-foreground hover:text-foreground hover:bg-sidebar-hover",
               !(isExpanded || isMobile) ? "justify-center" : "justify-start"
             )}
           >

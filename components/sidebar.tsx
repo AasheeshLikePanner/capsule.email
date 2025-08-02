@@ -174,8 +174,9 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
                   variant="ghost"
                   className={cn(
                     "w-full rounded-lg",
-                    pathname === `/chats/${session.id}` && "bg-muted text-foreground",
-                    !(isExpanded || isMobile) ? "justify-center" : "justify-start"
+                    (isExpanded || isMobile) && (pathname === `/chats/${session.id}`) && "bg-muted text-foreground",
+                    !(isExpanded || isMobile) ? "justify-center" : "justify-start",
+                    !(isExpanded || isMobile) && "hover:bg-transparent"
                   )}
                 >
                   <Link
@@ -183,6 +184,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
                     className={cn(
                       "flex items-center",
                       (isExpanded || isMobile) ? "gap-3" : "justify-center",
+                      !(isExpanded || isMobile) && "pointer-events-none"
                     )}
                   >
                     <span

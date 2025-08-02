@@ -80,6 +80,20 @@ export default function EmailsPage() {
     }
   }, [selectedEmail]);
 
+  const handleSendEmail = async (recipient: string, subject: string) => {
+    try {
+      const response = await axios.post('/api/send-email', {
+        to: recipient,
+        subject: subject,
+        html: emailMarkup,
+      });
+      console.log("Email sent successfully:", response.data);
+    } catch (error) {
+      console.error("Error sending email:", error);
+    }
+  };
+
+
   const handleDelete = useCallback(async () => {
     if (!emailToDelete) return;
 
@@ -226,15 +240,8 @@ export default function EmailsPage() {
               emailTitle={emailTitle}
               onSave={handleUpdateEmail}
               emailId={selectedEmail?.id || null}
-              onShare={(id) => {
-                const shareableLink = `${window.location.origin}/emails/${id}`;
-                navigator.clipboard.writeText(shareableLink);
-                console.log("Shareable link copied:", shareableLink);
-              }}
-              onSend={async () => {
-                // TODO: Implement send functionality if needed
-                console.log("Send functionality not implemented on this page.");
-              }}
+             
+              onSend={handleSendEmail}
               isSaving={isSaving}
             />
           ) : (

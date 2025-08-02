@@ -30,9 +30,10 @@ interface EmailDisplayPanelProps {
   isSaving: boolean;
   isOwner: boolean;
   isPublic: boolean;
+  isTogglingPublic: boolean;
 }
 
-export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, onSave, emailId, onTogglePublic, onSend, isSaving, isOwner, isPublic: initialIsPublic }: EmailDisplayPanelProps) {
+export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, onSave, emailId, onTogglePublic, onSend, isSaving, isOwner, isPublic: initialIsPublic, isTogglingPublic }: EmailDisplayPanelProps) {
   const [view, setView] = useState<'preview' | 'code'>('preview');
   const [mobileView, setMobileView] = useState(false);
   const [code, setCode] = useState(emailMarkup);
@@ -179,18 +180,25 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, 
         <Button
           variant="outline"
           onClick={onTogglePublic}
-          disabled={!isOwner}
-          className="mr-1 flex items-center justify-between"
+          disabled={!isOwner || isTogglingPublic}
+          className="mr-1 flex items-center justify-center"
         >
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="public-mode"
-              checked={initialIsPublic}
-              onCheckedChange={onTogglePublic}
-              disabled={!isOwner}
-            />
-            <Label htmlFor="public-mode" className="text-sm font-medium cursor-pointer">{initialIsPublic ? 'Public' : 'Private'}</Label>
-          </div>
+          {isTogglingPublic ? (
+            <div className="flex items-center">
+              <Image src="/icon.svg" alt="Loading..." width={20} height={20} className="animate-spin-slow mr-1" />
+              <span>Updating...</span>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="public-mode"
+                checked={initialIsPublic}
+                onCheckedChange={onTogglePublic}
+                disabled={!isOwner || isTogglingPublic}
+              />
+              <Label htmlFor="public-mode" className="text-sm font-medium cursor-pointer">{initialIsPublic ? 'Public' : 'Private'}</Label>
+            </div>
+          )}
         </Button>
         <Button
           variant="outline"
@@ -218,7 +226,7 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, 
           </span>
         </Button>
         {initialIsPublic && (
-          <div className="flex items-center space-x-1 mr-1">
+          <div className="flex items-center space-x-1 mr-1 transition-all duration-300 ease-in-out">
             <Input
               type="text"
               value={window.location.href}

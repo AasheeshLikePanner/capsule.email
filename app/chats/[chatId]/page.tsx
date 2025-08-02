@@ -61,6 +61,7 @@ export default function ChatPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const [isPublic, setIsPublic] = useState(false);
+  const [isTogglingPublic, setIsTogglingPublic] = useState(false);
   const [showKitNameDialog, setShowKitNameDialog] = useState(false);
   const [tempKitName, setTempKitName] = useState('');
   const emailToSaveRef = useRef<{ htmlContent: string; title: string } | null>(null);
@@ -191,14 +192,15 @@ export default function ChatPage() {
   }, [chatId, selectedBrandKit]); // Added chatId to dependencies
 
   const handleTogglePublic = async () => {
+    setIsTogglingPublic(true);
     try {
       const newIsPublic = !isPublic;
       await axios.put(`/api/chats/${chatId}`, { ispublic: newIsPublic });
       setIsPublic(newIsPublic);
-      // No clipboard action here, as it's now handled by a separate "Share Link" button
     } catch (error) {
       console.error("Error updating chat status:", error);
-      // Consider adding an error toast notification here
+    } finally {
+      setIsTogglingPublic(false);
     }
   };
 
@@ -385,7 +387,7 @@ export default function ChatPage() {
             <ResizableHandle withHandle className='bg-justworking'/>
             <ResizablePanel defaultSize={50} minSize={30}>
               <div className="w-full h-full bg-muted/30 overflow-hidden flex items-center justify-center rounded-2xl"> 
-                <EmailDisplayPanel emailMarkup={emailMarkup} isLoading={isLoading} emailTitle={emailTitle} onSave={handleSaveEmail} emailId={emailId} onShare={handleCopyShareLink} onTogglePublic={handleTogglePublic} onSend={handleSendEmail} isSaving={isSaving} isOwner={isOwner} isPublic={isPublic} />
+                <EmailDisplayPanel emailMarkup={emailMarkup} isLoading={isLoading} emailTitle={emailTitle} onSave={handleSaveEmail} emailId={emailId} onTogglePublic={handleTogglePublic} onSend={handleSendEmail} isSaving={isSaving} isOwner={isOwner} isPublic={isPublic} isTogglingPublic={isTogglingPublic} />
               </div>
             </ResizablePanel>
           </>
@@ -406,12 +408,12 @@ export default function ChatPage() {
                 emailTitle={emailTitle}
                 onSave={handleSaveEmail}
                 emailId={emailId}
-                onShare={handleCopyShareLink}
                 onTogglePublic={handleTogglePublic}
                 onSend={handleSendEmail}
                 isSaving={isSaving}
                 isOwner={isOwner}
                 isPublic={isPublic}
+                isTogglingPublic={isTogglingPublic}
               />
             </div>
           </DialogContent>

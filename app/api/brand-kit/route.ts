@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import puppeteer from 'puppeteer'
+import { getBrowser } from '@/lib/puppeteer-browser';
 import { improvteBrandKit } from '@/lib/gemini';
 import { createClient } from '@/lib/supabase/server';
 
@@ -11,17 +11,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        '--no-sandbox', 
-        '--disable-setuid-sandbox',
-        '--disable-blink-features=AutomationControlled',
-        '--disable-web-security',
-        '--disable-features=VizDisplayCompositor',
-        '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-      ]
-    });
+    const browser = await getBrowser();
 
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
@@ -222,7 +212,7 @@ export async function POST(request: Request) {
       };
     });
 
-    await browser.close();
+    
 
     // Process logo sources and select the best one
     const processedLogos = await Promise.all(
@@ -245,10 +235,15 @@ export async function POST(request: Request) {
           }
 
           // Check if the image is accessible and get its dimensions
-          const response = await fetch(fullUrl, { 
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 seconds timeout
+
+          const response = await fetch(fullUrl, {
             method: 'HEAD',
-            // timeout: 5000 
+            signal: controller.signal
           }).catch(() => null);
+
+          clearTimeout(timeoutId);
 
           if (response && response.ok) {
             const contentType = response.headers.get('content-type');

@@ -74,7 +74,7 @@ export async function PUT(
         const fileExt = logoPrimaryField.name.split(".").pop();
         const filePath = `${user.id}/${brandKitId}/logo.${fileExt}`;
 
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        const { data: _, error: uploadError } = await supabase.storage
           .from("brand-kit-logos") // Assuming you have a bucket named 'brand-kit-logos'
           .upload(filePath, logoPrimaryField, {
             contentType: logoPrimaryField.type,

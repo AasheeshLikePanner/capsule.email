@@ -27,7 +27,7 @@ interface Email {
   name: string;
   html_content: string;
   created_at: string;
-  kit_name?: string; // Add kit_name to the interface
+  kit_name?: string; 
 }
 
 export default function EmailsPage() {
@@ -40,12 +40,12 @@ export default function EmailsPage() {
   const [emailMarkup, setEmailMarkup] = useState('');
   const [emailTitle, setEmailTitle] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  const [isDeletingEmail, setIsDeletingEmail] = useState(false); // New state for delete loading
+  const [isDeletingEmail, setIsDeletingEmail] = useState(false); 
   const [searchTerm, setSearchTerm] = useState('');
   const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   const handleUpdateEmail = useCallback(async (htmlContent: string, title: string): Promise<boolean> => {
-    if (!selectedEmail?.id) return false; // Cannot update without an email ID
+    if (!selectedEmail?.id) return false; 
 
     setIsSaving(true);
     try {
@@ -61,7 +61,6 @@ export default function EmailsPage() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Update the email in the local state after successful update
       setEmails(prevEmails =>
         prevEmails.map(email =>
           email.id === selectedEmail.id ? { ...email, html_content: htmlContent, name: title } : email
@@ -97,7 +96,7 @@ export default function EmailsPage() {
   const handleDelete = useCallback(async () => {
     if (!emailToDelete) return;
 
-    setIsDeletingEmail(true); // Set loading state
+    setIsDeletingEmail(true); 
     try {
       const response = await fetch(`/api/emails/${emailToDelete.id}`, {
         method: 'DELETE',
@@ -116,7 +115,7 @@ export default function EmailsPage() {
     } catch (e: any) {
       setError(e.message);
     } finally {
-      setIsDeletingEmail(false); // Reset loading state
+      setIsDeletingEmail(false);
     }
   }, [emailToDelete, emails, selectedEmail]);
 
@@ -214,7 +213,7 @@ export default function EmailsPage() {
                           variant="destructive"
                           size="sm"
                           onClick={(e) => {
-                            e.stopPropagation(); // Prevent row click from firing
+                            e.stopPropagation(); 
                             setEmailToDelete(email);
                             setShowDeleteDialog(true);
                           }}

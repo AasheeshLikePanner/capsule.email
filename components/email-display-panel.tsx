@@ -25,7 +25,7 @@ interface EmailDisplayPanelProps {
   onSave: (htmlContent: string, title: string) => Promise<boolean>;
   emailId: string | null;
   
-  onTogglePublic: () => void; // New prop for toggling public status
+  onTogglePublic: () => void;
   onSend: (recipient: string, subject: string) => void;
   isSaving: boolean;
   isOwner: boolean;
@@ -46,25 +46,25 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, 
   
   const [saveProgress, setSaveProgress] = useState(0);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const hasTriggeredSave = useRef(false); // New ref to track if save has been triggered
-  const SAVE_DURATION = 1500; // milliseconds to hold the button for save
+  const hasTriggeredSave = useRef(false);
+  const SAVE_DURATION = 1500; 
 
   useEffect(() => {
     if (localSaveStatus === 'success' || localSaveStatus === 'error') {
       const timer = setTimeout(() => {
         setLocalSaveStatus('idle');
-      }, 2000); // Revert to idle after 3 seconds
+      }, 2000); 
       return () => clearTimeout(timer);
     }
   }, [localSaveStatus]);
 
   const handleMouseDownSave = useCallback(() => {
-    if (isSaving) return; // Don't start if already saving via prop
+    if (isSaving) return;
     setSaveProgress(0);
-    hasTriggeredSave.current = false; // Reset for new press
-    setLocalSaveStatus('idle'); // Reset local status on new press
+    hasTriggeredSave.current = false;
+    setLocalSaveStatus('idle');
 
-    progressIntervalRef.current = setInterval(async () => { // Made async
+    progressIntervalRef.current = setInterval(async () => { 
       setSaveProgress((prevProgress) => {
         const newProgress = prevProgress + (1000 / SAVE_DURATION);
         if (newProgress >= 100) {
@@ -74,7 +74,6 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, 
           }
           if (!hasTriggeredSave.current) {
             hasTriggeredSave.current = true;
-            // Await the onSave call and get the result
             onSave(code, emailTitle).then(success => {
               setLocalSaveStatus(success ? 'success' : 'error');
             });
@@ -149,7 +148,7 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, 
           setCode(formattedCode);
         } catch (error) {
           console.error("Error formatting code:", error);
-          setCode(safeEmailMarkup); // Fallback to unformatted if error
+          setCode(safeEmailMarkup);
         }
       } else {
         setCode('');
@@ -205,7 +204,7 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, 
           className={getSaveButtonClasses()}
           onMouseDown={handleMouseDownSave}
           onMouseUp={handleMouseUpSave}
-          onMouseLeave={handleMouseUpSave} // Also reset if mouse leaves button while holding
+          onMouseLeave={handleMouseUpSave}
           disabled={isSaving}
         >
           <div

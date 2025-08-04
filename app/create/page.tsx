@@ -14,7 +14,6 @@ interface BrandKit {
   id: string;
   kit_name: string;
   logo_primary: string | null;
-  // Add other brand kit properties as needed
 }
 
 

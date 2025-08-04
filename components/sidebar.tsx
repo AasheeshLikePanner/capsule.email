@@ -49,7 +49,6 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
         setIsLoading(false);
       }
     };
-    // Fetch sessions if the sidebar is expanded or if it's the mobile view (always expanded)
     if (isExpanded || !isDesktop) {
       fetchChatSessions();
     }
@@ -68,7 +67,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
   ];
 
   const sidebarContent = (isMobile = false) => (
-    <div className="flex flex-col h-full border border-r">
+    <div className="flex flex-col h-full  border-r">
       <div
         className={cn(
           "flex items-center",

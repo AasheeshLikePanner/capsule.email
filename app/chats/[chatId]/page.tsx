@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, memo, useRef, useCallback } from 'react';
-import { useParams } from 'next/navigation'; // Changed from useSearchParams
+import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { useBrandKitStore } from '@/lib/store/brandKitStore';
 
@@ -30,7 +30,7 @@ interface BotMessageContent {
   title?: string;
   text?: string;
   description?: string;
-  code?: string; // Add code property
+  code?: string;
 }
 
 interface UserMessageContent {
@@ -43,16 +43,16 @@ interface ChatMessage {
   chat_session_id: string;
   user_id: string;
   type: 'user' | 'bot';
-  content: UserMessageContent | BotMessageContent | string; // Can be string for old messages or parsed content
+  content: UserMessageContent | BotMessageContent | string;
   created_at: string;
 }
 
 export default function ChatPage() {
-  const params = useParams(); // Changed from useSearchParams
-  const chatId = params.chatId as string; // Get chatId from params
+  const params = useParams();
+  const chatId = params.chatId as string;
 
   const [prompt, setPrompt] = useState('');
-  const [messages, setMessages] = useState<ChatMessage[]>([]); // Updated type
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [emailMarkup, setEmailMarkup] = useState('');
   const [emailTitle, setEmailTitle] = useState('');
   const [emailId, setEmailId] = useState<string | null>(null);
@@ -65,14 +65,13 @@ export default function ChatPage() {
   const [showKitNameDialog, setShowKitNameDialog] = useState(false);
   const [tempKitName, setTempKitName] = useState('');
   const emailToSaveRef = useRef<{ htmlContent: string; title: string } | null>(null);
-  const currentRecipientIndex = useRef(0); // Manages the index for dynamic recipient names
+  const currentRecipientIndex = useRef(0);
 
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const [showMobileEmailPreview, setShowMobileEmailPreview] = useState(false);
 
 
-  // Define recipient names for dynamic replacement
   const recipientNames = ["Aasheesh", "Aniket", "Priya", "Rahul", "Sneha"];
   const { brandKits } = useBrandKitStore();
   const [selectedBrandKit, setSelectedBrandKit] = useState<any>(null);
@@ -87,7 +86,6 @@ export default function ChatPage() {
     emailMarkupRef.current = emailMarkup;
   }, [emailMarkup]);
 
-  // New useEffect to fetch messages
   useEffect(() => {
     const fetchMessages = async () => {
       if (!chatId) return;
@@ -99,14 +97,12 @@ export default function ChatPage() {
         setIsOwner(isOwner);
         setIsPublic(isPublic);
 
-        // Set initial email markup if the last message is a bot message with code
         const lastBotMessage = messages.findLast((msg: ChatMessage) => msg.type === 'bot' && (msg.content as BotMessageContent).code);
         if (lastBotMessage) {
           setEmailMarkup((lastBotMessage.content as BotMessageContent).code || '');
           setEmailTitle((lastBotMessage.content as BotMessageContent).title || '');
         }
 
-        // Try to set selectedBrandKit from the first user message if available
         const firstUserMessage = messages.find((msg: ChatMessage) => msg.type === 'user' && (msg.content as UserMessageContent).brandKit);
         if (firstUserMessage && !hasSetInitialBrandKit.current) {
           setSelectedBrandKit((firstUserMessage.content as UserMessageContent).brandKit);
@@ -127,11 +123,10 @@ export default function ChatPage() {
 
     setIsLoading(true);
 
-    // Optimistically add user message to UI
     const newUserMessage: ChatMessage = {
-      id: Date.now().toString(), // Temporary ID
+      id: Date.now().toString(),
       chat_session_id: chatId,
-      user_id: 'current_user_id', // Replace with actual user ID
+      user_id: 'current_user_id',
       type: 'user',
       content: { emailContent: messageToSend, brandKit: selectedBrandKit },
       created_at: new Date().toISOString(),
@@ -145,7 +140,7 @@ export default function ChatPage() {
         prompt: messageToSend,
         brandKit: selectedBrandKit,
         context: emailMarkupRef.current,
-        chatId: chatId, // Pass chatId for subsequent messages
+        chatId: chatId,
       });
 
       setIsLoading(false);
@@ -168,9 +163,9 @@ export default function ChatPage() {
       }
 
       const newBotMessage: ChatMessage = {
-        id: Date.now().toString(), // Temporary ID
+        id: Date.now().toString(),
         chat_session_id: chatId,
-        user_id: 'bot_id', // Or current_user_id if bot messages are attributed to the user's session
+        user_id: 'bot_id',
         type: 'bot',
         content: botMessageContent,
         created_at: new Date().toISOString(),
@@ -189,7 +184,7 @@ export default function ChatPage() {
         created_at: new Date().toISOString() 
       }]);
     }
-  }, [chatId, selectedBrandKit]); // Added chatId to dependencies
+  }, [chatId, selectedBrandKit]);
 
   const handleTogglePublic = async () => {
     setIsTogglingPublic(true);
@@ -217,7 +212,7 @@ export default function ChatPage() {
     if (!selectedBrandKit?.kit_name) {
       emailToSaveRef.current = { htmlContent, title };
       setShowKitNameDialog(true);
-      return false; // Indicate that save is pending user input
+      return false;
     }
 
     setIsSaving(true);
@@ -231,10 +226,10 @@ export default function ChatPage() {
       if (response.data.data && response.data.data.length > 0) {
         setEmailId(response.data.data[0].id);
       }
-      return true; // Indicate success
+      return true;
     } catch (error) {
       console.error("Error saving email:", error);
-      return false; // Indicate failure
+      return false;
     } finally {
       setIsSaving(false);
     }
@@ -255,9 +250,8 @@ export default function ChatPage() {
 
 
   const handleConfirmKitName = async () => {
-    if (!tempKitName.trim()) return; // Don't proceed if kit name is empty
+    if (!tempKitName.trim()) return;
 
-    // Update the selectedBrandKit with the new kit_name
     setSelectedBrandKit((prev: any) => ({
       ...prev,
       kit_name: tempKitName.trim(),
@@ -266,7 +260,6 @@ export default function ChatPage() {
     setShowKitNameDialog(false);
     setTempKitName('');
 
-    // Re-attempt to save the email with the new kit name
     if (emailToSaveRef.current) {
       await handleSaveEmail(emailToSaveRef.current.htmlContent, emailToSaveRef.current.title);
       emailToSaveRef.current = null;
@@ -280,7 +273,6 @@ export default function ChatPage() {
         document.cookie = `react-resizable-panels:chat-layout=${JSON.stringify(sizes)}`;
       }} className="min-h-[calc(100vh-64px)] w-full p-4 sm:p-6 md:p-8">
         <ResizablePanel defaultSize={isDesktop ? 50 : 100} minSize={20} className="flex flex-col h-full">
-          {/* This main content area is the only part that scrolls */}
           <div className="flex-1 overflow-y-auto p-6 ">
             <div className="flex flex-col space-y-5">
               {messages.map((msg: ChatMessage, index) => {
@@ -288,7 +280,7 @@ export default function ChatPage() {
 
                 return (
                   <div
-                    key={msg.id} // Use msg.id for key
+                    key={msg.id}
                     className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} items-start`}>
                     {!isUser && (
                       <Image src="/icon.svg" alt="Bot Icon" width={32} height={32} className="mr-2" />
@@ -354,7 +346,6 @@ export default function ChatPage() {
               <div ref={messagesEndRef} />
             </div>
           </div>
-          {/* This footer with the form is fixed at the bottom */}
           <footer className="p-4 border-t flex-shrink-0">
             <form onSubmit={handleSubmit} className="relative">
               <Textarea
@@ -394,7 +385,6 @@ export default function ChatPage() {
         )}
       </ResizablePanelGroup>
 
-      {/* Mobile Email Preview Dialog */}
       {!isDesktop && (
         <Dialog open={showMobileEmailPreview} onOpenChange={setShowMobileEmailPreview}>
           <DialogContent className="sm:max-w-[800px] h-[90vh] flex flex-col">

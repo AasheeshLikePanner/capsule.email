@@ -2,7 +2,6 @@
 import axios from 'axios';
 import fs from 'fs/promises'
 
-// This is the new function that will be used to generate email templates
 // It uses the OpenRouter API with the specified DeepSeek model
 export async function createEmailTemplate(prompt: string, brandKit: any, context: string) {
   
@@ -296,7 +295,6 @@ Return a single, valid JSON object with no additional commentary or text outside
 
   } catch (error: any) {
     console.error("Error calling OpenRouter:", error.response ? error.response.data : error.message);
-    // Return a structured error that the frontend can handle
     return { 
       title: "Error",
       text: "Failed to generate email using OpenRouter. Please check the console for details.",

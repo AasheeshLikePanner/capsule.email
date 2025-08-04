@@ -7,10 +7,8 @@ export default function EmailPreview({ initialMarkup, brandKit, className }: { i
 
   useEffect(() => {
     if (initialMarkup) {
-      // If initialMarkup is provided, render it directly as HTML
       setEmailContent(<div dangerouslySetInnerHTML={{ __html: initialMarkup }} />);
     } else if (brandKit) {
-      // If brandKit is provided, render the Email component
       setEmailContent(<Email brandKit={brandKit} />);
     }
   }, [initialMarkup, brandKit]);

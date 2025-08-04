@@ -122,7 +122,6 @@ export default function EmailEditorContent() {
       });
     };
 
-    // Defer population to ensure elements are rendered
     const timeoutId = setTimeout(populateSectionRefs, 0);
 
     const handleScroll = () => {
@@ -136,19 +135,17 @@ export default function EmailEditorContent() {
         item.isHeader ? item.subItems.map((sub:any) => sub.id) : [item.id]
       );
 
-      // Iterate in reverse to find the section closest to the top of the viewport
+      
       for (let i = allSectionIds.length - 1; i >= 0; i--) {
         const sectionId = allSectionIds[i];
-        const element = sectionRefs.current[sectionId]; // Use stored ref
+        const element = sectionRefs.current[sectionId]; 
         if (element) {
           const elementOffsetTop = element.offsetTop;
 
-          // If the section is visible and its top is at or above the scroll container's top
-          // Add a small buffer (e.g., 10px) to make the highlighting feel more natural
           if (elementOffsetTop <= scrollPosition + 10) {
             currentActiveId = sectionId;
             
-            break; // Found the highest visible section, so break
+            break; 
           }
           
         }
@@ -163,7 +160,7 @@ export default function EmailEditorContent() {
     const mainContent = mainContentRef.current;
     if (mainContent) {
       mainContent.addEventListener("scroll", handleScroll);
-      handleScroll(); // Call handleScroll once on mount to set initial active section
+      handleScroll();
     }
 
     return () => {

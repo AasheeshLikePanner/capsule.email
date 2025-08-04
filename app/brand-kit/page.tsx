@@ -21,7 +21,7 @@ export default function BrandKitPage() {
   const [kitToDelete, setKitToDelete] = useState<string | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const hasTriggeredDelete = useRef(false);
-  const DELETE_DURATION = 1500; // milliseconds to hold the button for delete
+  const DELETE_DURATION = 1500;
 
   useEffect(() => {
     fetchBrandKits();
@@ -36,14 +36,14 @@ export default function BrandKitPage() {
 
   const handleBrandKitProcessingStart = () => {
     setIsProcessingBrandKit(true);
-    setIsDialogOpen(false); // Close the dialog immediately
+    setIsDialogOpen(false);
   };
 
   const handleBrandKitProcessingComplete = (success: boolean, message: string) => {
     setIsProcessingBrandKit(false);
     if (success) {
       toast.success(message);
-      fetchBrandKits(); // Re-fetch brand kits to show the new one
+      fetchBrandKits(); 
     } else {
       toast.error(message);
     }

@@ -7,6 +7,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Sidebar } from "@/components/sidebar";
 import { AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 import NextNProgressClient from "@/components/next-nprogress";
 
@@ -16,6 +17,8 @@ export function RootLayoutClient({
   children: React.ReactNode;
 }>) {
   const [isSidebarExpanded, setSidebarExpanded] = useState(false);
+  const pathname = usePathname();
+  const noSidebarPaths = ["/", "/auth/login"];
 
   return (
     <ThemeProvider
@@ -26,10 +29,12 @@ export function RootLayoutClient({
     >
       <NextNProgressClient>
         <div className="flex h-full w-full ">
-          <Sidebar
-            isExpanded={isSidebarExpanded}
-            setExpanded={setSidebarExpanded}
-          />
+          {!noSidebarPaths.includes(pathname) && (
+            <Sidebar
+              isExpanded={isSidebarExpanded}
+              setExpanded={setSidebarExpanded}
+            />
+          )}
           <main className={cn("flex flex-col flex-1 h-full w-0")}>
             <div className="flex-1 h-full overflow-y-auto">{children}</div>
           </main>

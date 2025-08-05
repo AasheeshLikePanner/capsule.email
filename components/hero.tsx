@@ -1,13 +1,12 @@
 export function Hero() {
   return (
-    <div className="flex flex-col gap-16 items-center">
-      <h1 className="text-3xl lg:text-4xl !leading-tight mx-auto max-w-xl text-center">
-        Create and customize your brand assets with ease.
-      </h1>
-      <p className="text-xl text-muted-foreground max-w-xl text-center">
-        Our brand kit generator helps you create a consistent and professional
-        brand identity. Generate logos, color palettes, and more.
-      </p>
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-cover bg-center"
+      style={{ backgroundImage: `url('/background1.jpg')` }}
+    >
+      <div className="absolute inset-0 bg-black opacity-50"></div>
+      <div className="relative z-10 w-full">
+        {/* Content will go here */}
+      </div>
     </div>
   );
 }

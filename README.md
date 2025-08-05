@@ -50,7 +50,7 @@ Here’s how you can help:
 - Refactor or improve backend logic
 - Strengthen security and authentication flow
 
-Feel free to open issues, submit pull requests, or suggest ideas.
+Feel free to open issues, submit pull requests.
 
 
 ## License

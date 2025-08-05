@@ -11,7 +11,6 @@ import { usePathname } from "next/navigation";
 
 import NextNProgressClient from "@/components/next-nprogress";
 
-import { Navbar } from "@/components/navbar";
 
 export function RootLayoutClient({
   children,
@@ -30,7 +29,6 @@ export function RootLayoutClient({
       disableTransitionOnChange
     >
       <NextNProgressClient>
-        <Navbar />
         <div className="flex h-full w-full ">
           {!noSidebarPaths.includes(pathname) && (
             <Sidebar
@@ -38,7 +36,7 @@ export function RootLayoutClient({
               setExpanded={setSidebarExpanded}
             />
           )}
-          <div className="flex flex-col flex-1 h-full mx-auto w-1/2 border-l border-r">
+          <div className="flex flex-col flex-1 h-full mx-auto">
             <main className={cn("flex flex-col flex-1 h-full overflow-y-auto")}>
               {children}
             </main>

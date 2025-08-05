@@ -20,7 +20,8 @@ export function Hero() {
           height={1280}
           quality={100}
           priority
-          className="w-full"
+          draggable={false}
+          className="w-full select-none "
         />
       </div>
     </div>

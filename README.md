@@ -33,11 +33,56 @@ If you find it useful, consider contributing or spreading the word.
 - Fully open source and self-hostable
 
 
+
+
 ## How to Use
 
-Coming soon: setup guide, deployment steps, and environment variables.
+### 1. Install dependencies
 
-For now, feel free to explore the code and check out the [demo](https://vimeo.com/1107092848).
+```bash
+bun install
+````
+
+### 2. Setup environment variables
+
+Create a `.env.local` file in the root and add the following variables:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_GEMINI_API_KEY=
+OPENROUTER_API_KEY=
+RESEND_API_KEY=
+NEXT_DISABLE_ERROR_OVERLAY=true
+```
+
+### 3. Set up Supabase
+1. **Go to Supabase** → Auth → Providers → Enable **Google**.
+2. Supabase will show you the **Authorized redirect URI** — copy it.
+3. Now go to the [Google Cloud Console Auth page](https://console.cloud.google.com/auth/overview).
+4. Click “Create credentials” → **OAuth Client ID** → choose **Web application**.
+5. In “Authorized redirect URIs”, paste the URI from Supabase (e.g., `https://your-project.supabase.co/auth/v1/callback`).
+6. After creating, you'll get a **Client ID** and **Client Secret** — copy them.
+7. Add those to your `.env.local`:
+
+```env
+GOOGLE_CLIENT_ID=your-client-id
+GOOGLE_CLIENT_SECRET=your-client-secret
+```
+
+Done — now Supabase can use Google login properly.
+
+### 4. Setup Resend
+
+* Create an account at [resend.com](https://resend.com/)
+* Get your **API key** and add it to `.env.local`
+
+### 5. Setup OpenRouter
+
+* Create an account at [openrouter.ai](https://openrouter.ai/)
+* Get your **API key** and add it to `.env.local`
 
 
 ## Contributions Welcome

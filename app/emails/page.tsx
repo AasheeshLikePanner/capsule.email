@@ -231,7 +231,7 @@ export default function EmailsPage() {
       </ResizablePanel>
       <ResizableHandle withHandle className='bg-justworking' />
       <ResizablePanel defaultSize={50} minSize={30} className="flex flex-col h-full min-h-0">
-        <div className="flex flex-col h-full bg-muted/30 rounded-3xl p-4">
+        <div className="flex flex-col h-full bg-muted/20 rounded-2xl p-4">
           {selectedEmail ? (
             <EmailDisplayPanel
               emailMarkup={emailMarkup}

@@ -256,7 +256,7 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, 
           )}
         </div>
       </div>
-      <div className={`flex-1 p-4 ${mobileView ? 'flex items-center justify-center' : ''} min-h-0 overflow-auto`}>
+      <div className={`flex-1 p-4 ${mobileView ? 'flex items-center justify-center' : ''} min-h-0`}>
         {view === 'preview' ? (
           <div className={mobileView ? 'w-full max-w-md h-full mx-auto border-4 border-gray-700 rounded-3xl overflow-hidden aspect-[9/16]' : 'w-full h-full overflow-auto'}>
             <EmailRenderer jsxString={code} className="rounded-xl overflow-hidden" />
@@ -268,11 +268,11 @@ export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, 
               "&.cm-editor": {
                 fontSize: "13px",
                 height: "100%",
-                overflowY: "auto",
               },
             })]}            
             theme={vscodeDark}
             onChange={(value) => setCode(value)}
+            style={{ height: '100%', width: '100%', overflow: 'auto' }}
           />
         )}
       </div>

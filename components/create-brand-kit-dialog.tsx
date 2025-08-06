@@ -75,7 +75,7 @@ export function CreateBrandKitDialog({
           </DialogTitle>
         </DialogHeader>
         {step === "options" && (
-          <div className="grid grid-cols-2 gap-4 pt-4">
+          <div className="grid grid-cols-2 gap-2 pt-4">
             <div
               className="h-80 flex flex-col items-center justify-center p-8 bg-neutral-800 rounded-2xl cursor-pointer transition-colors hover:bg-neutral-700"
               onClick={() => setStep("match")}

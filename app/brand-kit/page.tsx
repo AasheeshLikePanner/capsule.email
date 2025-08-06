@@ -172,7 +172,7 @@ export default function BrandKitPage() {
                 </Link>
                 <Button
                   variant="ghost"
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-600"
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-600 hover:bg-muted/40"
                   onMouseDown={(e) => {
                     e.stopPropagation();
                     handleMouseDownDelete(kit.id);

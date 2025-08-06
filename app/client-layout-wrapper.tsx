@@ -36,11 +36,9 @@ export function RootLayoutClient({
               setExpanded={setSidebarExpanded}
             />
           )}
-          <div className="flex flex-col flex-1 h-full mx-auto">
-            <main className={cn("flex flex-col flex-1 h-full overflow-y-auto")}>
-              {children}
-            </main>
-          </div>
+          <main className={cn("flex flex-col flex-1 h-full w-0")}>
+            <div className="flex-1 h-full overflow-y-auto">{children}</div>
+          </main>
         </div>
       </NextNProgressClient>
     </ThemeProvider>

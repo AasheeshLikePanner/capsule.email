@@ -93,7 +93,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
           </span>
         </Link>
       </div>
-      <nav className="flex flex-col gap-2 p-2 flex-1">
+      <nav className="flex flex-col gap-2 p-2 flex-1 overflow-hidden">
         <Button asChild variant="ghost" className={cn(
           "w-full rounded-lg",
           pathname === "/create" ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-sidebar-hover",
@@ -163,6 +163,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
             >
               Chat Sessions
             </h3>
+            <div className={cn("flex-1", (isExpanded || isMobile) ? "overflow-y-auto" : "overflow-hidden")}>
             {isLoading ?
               <div className={cn("flex items-center justify-center self-center", (isExpanded || isMobile) ? 'block': 'hidden')}>
                 <Image src="/icon.svg" alt="Loading..." width={30} height={30} className="animate-spin-slow" />
@@ -200,6 +201,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
                   </Link>
                 </Button>
               ))}
+            </div>
           </>
         )}
       </nav>

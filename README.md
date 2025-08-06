@@ -1,105 +1,106 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# Capsule.email
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+**Build beautiful AI-powered emails to stand out in the market.**  
+Create stunning email templates with your brand’s style in seconds – powered by AI.
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+
+https://github.com/user-attachments/assets/80c4a169-8efb-4a9c-be1d-716d00765903
+
+
+[Higher qulaity demo](https://vimeo.com/1107092848)
+
+
+## Why I Built This
+
+I really love open source.  
+That's why I decided to make Capsule.email open for everyone to use, host, and contribute to.
+
+Right now, I don’t have the funds to buy a domain or cover AI credits – so instead of limiting access, I’m sharing everything.  
+You can self-host it and use it however you like.
+
+If you find it useful, consider contributing or spreading the word.
+
 
 ## Features
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+- AI-powered email generation
+- BrandKit support (logo, colors, tone, footer, etc.)
+- Chat-based interface to generate emails
+- Save, edit, and reuse email templates
+- Desktop & mobile previews
+- Copy raw HTML to use anywhere
+- Shareable public chat sessions
+- Fully open source and self-hostable
 
-## Demo
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
 
-## Deploy to Vercel
 
-Vercel deployment will guide you through creating a Supabase account and project.
+## How to Use
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+### 1. Install dependencies
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+```bash
+bun install
+````
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+### 2. Setup environment variables
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+Create a `.env.local` file in the root and add the following variables:
 
-## Clone and run locally
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_GEMINI_API_KEY=
+OPENROUTER_API_KEY=
+RESEND_API_KEY=
+NEXT_DISABLE_ERROR_OVERLAY=true
+```
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+### 3. Set up Supabase
+1. **Go to Supabase** → Auth → Providers → Enable **Google**.
+2. Supabase will show you the **Authorized redirect URI** — copy it.
+3. Now go to the [Google Cloud Console Auth page](https://console.cloud.google.com/auth/overview).
+4. Click “Create credentials” → **OAuth Client ID** → choose **Web application**.
+5. In “Authorized redirect URIs”, paste the URI from Supabase (e.g., `https://your-project.supabase.co/auth/v1/callback`).
+6. After creating, you'll get a **Client ID** and **Client Secret** — copy them.
+7. Add those to your `.env.local`:
 
-2. Create a Next.js app using the Supabase Starter template npx command
+```env
+GOOGLE_CLIENT_ID=your-client-id
+GOOGLE_CLIENT_SECRET=your-client-secret
+```
 
-   ```bash
-   npx create-next-app --example with-supabase with-supabase-app
-   ```
+Done — now Supabase can use Google login properly.
 
-   ```bash
-   yarn create next-app --example with-supabase with-supabase-app
-   ```
+### 4. Setup Resend
 
-   ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
-   ```
+* Create an account at [resend.com](https://resend.com/)
+* Get your **API key** and add it to `.env.local`
 
-3. Use `cd` to change into the app's directory
+### 5. Setup OpenRouter
 
-   ```bash
-   cd with-supabase-app
-   ```
+* Create an account at [openrouter.ai](https://openrouter.ai/)
+* Get your **API key** and add it to `.env.local`
 
-4. Rename `.env.example` to `.env.local` and update the following:
 
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
-   ```
+## Contributions Welcome
 
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
+Here’s how you can help:
 
-5. You can now run the Next.js local development server:
+- Improve the landing page UI
+- Enhance the Help page
+- Polish the overall design and UX
+- Refactor or improve backend logic
+- Strengthen security and authentication flow
 
-   ```bash
-   npm run dev
-   ```
+Feel free to open issues, submit pull requests.
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+## License
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)  
+Use it freely for personal or educational purposes, with attribution.  
+Commercial use is not allowed.
 
-## Feedback and issues
-
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
-
-## More Supabase examples
-
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)

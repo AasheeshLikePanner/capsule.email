@@ -14,7 +14,7 @@ export function Hero() {
         </div>
       <div className="w-[150%] mt-20 border">
         <Image
-          src="/screenshots/chat-sidebar.png"
+          src="/screenshots/chat.png"
           alt="Chat Sidebar Screenshot"
           width={1920}
           height={1280}

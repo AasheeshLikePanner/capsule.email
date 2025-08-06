@@ -3,6 +3,7 @@ import { Github, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
+import DotPattern from "@/components/dot-pattern";
 
 const Logo = () => (
   <Link href="/" className="flex flex-col items-center">
@@ -13,7 +14,15 @@ const Logo = () => (
 
 export function Navbar() {
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 border-b bg-background/80 backdrop-blur-sm shadow-sm">
+    <div className="fixed top-0 left-0 right-0 z-50 border-b bg-background/80 backdrop-blur-sm shadow-sm overflow-hidden">
+      {/* Left Dot Pattern */}
+      <div className="absolute left-0 top-0 h-full w-[25%] z-[-1]">
+        <DotPattern opacity={0.05} />
+      </div>
+      {/* Right Dot Pattern */}
+      <div className="absolute right-0 top-0 h-full w-[25%] z-[-1]">
+        <DotPattern opacity={0.05} />
+      </div>
       <nav>
         <div className="container mx-auto w-1/2 border-l border-r px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">

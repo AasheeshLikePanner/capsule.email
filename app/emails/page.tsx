@@ -19,7 +19,7 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/componen
 import EmailDisplayPanel from '@/components/email-display-panel';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from '@/components/ui/input';
-import axios from 'axios';
+import { getEmails, deleteEmail, updateEmail, sendEmail } from '@/lib/actions/email';
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
 
 interface Email {
@@ -49,17 +49,7 @@ export default function EmailsPage() {
 
     setIsSaving(true);
     try {
-      const response = await fetch(`/api/emails/${selectedEmail.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ html_content: htmlContent, name: title }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      await updateEmail(selectedEmail.id, htmlContent, title, selectedEmail.kit_name || '');
 
       setEmails(prevEmails =>
         prevEmails.map(email =>
@@ -81,11 +71,7 @@ export default function EmailsPage() {
 
   const handleSendEmail = async (recipient: string, subject: string) => {
     try {
-      const response = await axios.post('/api/send-email', {
-        to: recipient,
-        subject: subject,
-        html: emailMarkup,
-      });
+      const response = await sendEmail(recipient, subject, emailMarkup);
       console.log("Email sent successfully:", response.data);
     } catch (error) {
       console.error("Error sending email:", error);
@@ -98,13 +84,7 @@ export default function EmailsPage() {
 
     setIsDeletingEmail(true); 
     try {
-      const response = await fetch(`/api/emails/${emailToDelete.id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      await deleteEmail(emailToDelete.id);
 
       setEmails(emails.filter((email) => email.id !== emailToDelete.id));
       setShowDeleteDialog(false);
@@ -128,9 +108,7 @@ export default function EmailsPage() {
   useEffect(() => {
     async function fetchEmails() {
       try {
-        const response = await axios.get('/api/emails');
-
-        const data = await response.data;
+        const data = await getEmails();
         setEmails(data);
       } catch (e: any) {
         setError(e.message);

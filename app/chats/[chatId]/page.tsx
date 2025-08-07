@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, memo, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { useBrandKitStore } from '@/lib/store/brandKitStore';
@@ -8,7 +8,6 @@ import { useBrandKitStore } from '@/lib/store/brandKitStore';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { ArrowUp, Terminal } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import EmailDisplayPanel from '@/components/email-display-panel';
 import {
   Dialog,
@@ -17,12 +16,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Input } from '@/components/ui/input';
-import axios from 'axios';
+import { generateEmailAndCreateChat, getChatMessages, updateChatVisibility } from '@/lib/actions/chat';
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
+import { createEmail, sendEmail } from '@/lib/actions/email';
 
 
 
@@ -91,8 +90,7 @@ export default function ChatPage() {
       if (!chatId) return;
       setIsLoading(true);
       try {
-        const response = await axios.get(`/api/chats/${chatId}/messages`);
-        const { messages, isOwner, isPublic } = response.data;
+        const { messages, isOwner, isPublic } = await getChatMessages(chatId);
         setMessages(messages);
         setIsOwner(isOwner);
         setIsPublic(isPublic);
@@ -136,12 +134,7 @@ export default function ChatPage() {
     setPrompt('');
 
     try {
-      const response:any = await axios.post('/api/generate-email', {
-        prompt: messageToSend,
-        brandKit: selectedBrandKit,
-        context: emailMarkupRef.current,
-        chatId: chatId,
-      });
+      const response:any = await generateEmailAndCreateChat(messageToSend, selectedBrandKit, emailMarkupRef.current, chatId);
 
       setIsLoading(false);
 
@@ -190,7 +183,7 @@ export default function ChatPage() {
     setIsTogglingPublic(true);
     try {
       const newIsPublic = !isPublic;
-      await axios.put(`/api/chats/${chatId}`, { ispublic: newIsPublic });
+      await updateChatVisibility(chatId, newIsPublic);
       setIsPublic(newIsPublic);
     } catch (error) {
       console.error("Error updating chat status:", error);
@@ -217,11 +210,7 @@ export default function ChatPage() {
 
     setIsSaving(true);
     try {
-      const response = await axios.post('/api/emails', {
-        html_content: htmlContent,
-        name: title,
-        kit_name: selectedBrandKit.kit_name,
-      });
+      const response:any = await createEmail(htmlContent, title, selectedBrandKit.kit_name);
       console.log("Email saved successfully:", response.data);
       if (response.data.data && response.data.data.length > 0) {
         setEmailId(response.data.data[0].id);
@@ -237,12 +226,7 @@ export default function ChatPage() {
 
   const handleSendEmail = async (recipient: string, subject: string) => {
     try {
-      const response = await axios.post('/api/send-email', {
-        to: recipient,
-        subject: subject,
-        html: emailMarkup,
-      });
-      console.log("Email sent successfully:", response.data);
+      await sendEmail(recipient, subject, emailMarkup);
     } catch (error) {
       console.error("Error sending email:", error);
     }

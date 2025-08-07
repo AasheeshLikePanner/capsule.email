@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import axios from 'axios';
+import { getBrandKits } from '../actions/brand-kit';
 
 interface BrandKit {
   id: string;
@@ -23,11 +25,7 @@ export const useBrandKitStore = create<BrandKitState>((set) => ({
   fetchBrandKits: async () => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch('/api/brand-kit');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
+      const data = await getBrandKits();
       set({ brandKits: data, isLoading: false });
     } catch (error: any) {
       console.error("Error fetching brand kits:", error);
@@ -42,12 +40,7 @@ export const useBrandKitStore = create<BrandKitState>((set) => ({
   deleteBrandKit: async (id: string) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`/api/brand-kit/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      await axios.delete(`/api/brand-kit/${id}`);
       set((state) => ({
         brandKits: state.brandKits.filter((kit) => kit.id !== id),
         isLoading: false,

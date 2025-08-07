@@ -1,13 +1,29 @@
-import { NextResponse } from 'next/server';
+'use server';
+
+import { cookies } from 'next/headers';
 import { getBrowser } from '@/lib/puppeteer-browser';
 import { improvteBrandKit } from '@/lib/gemini';
 import { createClient } from '@/lib/supabase/server';
+import axios from 'axios';
 
-export async function POST(request: Request) {
-  const { url } = await request.json();
+function cleanJSONBlock(raw: string): string {
+  const match = raw.match(/\{[\s\S]*\}/);
+  if (match) {
+    return match[0];
+  }
+  return raw;
+}
 
+export async function createBrandKit(url: string) {
   if (!url || typeof url !== 'string') {
-    return NextResponse.json({ error: 'Missing or invalid URL' }, { status: 400 });
+    throw new Error('Missing or invalid URL');
+  }
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error('User not authenticated');
   }
 
   try {
@@ -238,17 +254,16 @@ export async function POST(request: Request) {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 seconds timeout
 
-          const response = await fetch(fullUrl, {
-            method: 'HEAD',
+          const response = await axios.head(fullUrl, {
             signal: controller.signal
           }).catch(() => null);
 
           clearTimeout(timeoutId);
 
-          if (response && response.ok) {
-            const contentType = response.headers.get('content-type');
+          if (response && response.status === 200) {
+            const contentType = response.headers['content-type'];
             const isVector = contentType?.includes('svg');
-            const contentLength = parseInt(response.headers.get('content-length') || '0');
+            const contentLength = parseInt(response.headers['content-length'] || '0');
             
             return {
               ...logoSource,
@@ -269,7 +284,7 @@ export async function POST(request: Request) {
 
     // Select the best logo
     const validLogos = processedLogos.filter(Boolean);
-    const bestLogo = validLogos.find(logo => logo.isHighRes) || validLogos[0];
+    const bestLogo = validLogos.find((logo:any) => logo.isHighRes) || validLogos[0];
 
     const brandKitData = {
       name: result.title.trim(),
@@ -294,13 +309,6 @@ export async function POST(request: Request) {
     const cleanedString = cleanJSONBlock(rawFixedBrandKitString);
     const parsedFixedBrandKit = JSON.parse(cleanedString);
     const fixedBrandKit = parsedFixedBrandKit.fixedData;
-
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'User not authenticated' }, { status: 401 });
-    }
 
     const { data, error } = await supabase
       .from('brandkits')
@@ -329,30 +337,22 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error('[Supabase insert error]', error);
-      return NextResponse.json({ error: 'Failed to save brand kit' }, { status: 500 });
+      throw new Error('Failed to save brand kit');
     }
 
-    return NextResponse.json(data[0], { status: 200 });
+    return data[0];
   } catch (err) {
     console.error('[Scraper error]', err);
-    return NextResponse.json({ error: 'Failed to fetch site info' }, { status: 500 });
+    throw new Error('Failed to fetch site info');
   }
 }
 
-function cleanJSONBlock(raw: string): string {
-  const match = raw.match(/\{[\s\S]*\}/);
-  if (match) {
-    return match[0];
-  }
-  return raw;
-}
-
-export async function GET(request: Request) {
+export async function getBrandKits() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: 'User not authenticated' }, { status: 401 });
+    throw new Error('User not authenticated');
   }
 
   const { data: brandKits, error } = await supabase
@@ -362,8 +362,8 @@ export async function GET(request: Request) {
 
   if (error) {
     console.error('[Supabase fetch error]', error);
-    return NextResponse.json({ error: 'Failed to fetch brand kits' }, { status: 500 });
+    throw new Error('Failed to fetch brand kits');
   }
 
-  return NextResponse.json(brandKits, { status: 200 });
+  return brandKits;
 }

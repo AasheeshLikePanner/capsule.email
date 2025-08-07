@@ -344,7 +344,6 @@ Context: ${context}
   const result = await model.generateContent(promptTemplate);
   const response = await result.response;
   const text = await response.text();
-  console.log(text);
 
 
   // // The response may be wrapped in a markdown code block, so we extract the JSON from it.

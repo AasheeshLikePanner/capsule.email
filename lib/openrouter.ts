@@ -284,11 +284,13 @@ Return a single, valid JSON object with no additional commentary or text outside
 
     if (response.data && response.data.choices && response.data.choices.length > 0) {
       const content = response.data.choices[0].message.content;
-      // The model should return a JSON string, so we parse it.
-      // await fs.writeFile('gemini_sample_response.txt', content, 'utf-8');
-
-      
-      return JSON.parse(content);
+      try {
+        return JSON.parse(content);
+      } catch (parseError: any) {
+        console.error("Error parsing OpenRouter response JSON:", parseError);
+        console.error("Raw content from OpenRouter:", content);
+        throw new Error("Failed to parse AI response. Invalid JSON received.");
+      }
     } else {
       throw new Error('No response from OpenRouter model');
     }

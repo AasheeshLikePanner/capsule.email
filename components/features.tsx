@@ -22,64 +22,58 @@ export function Features() {
             Everything you need to create professional emails that get results.
           </p>
         </div>
-        <div className="grid gap-12 items-center">
-          {/* Feature 1: Brand Kit */}
-          <div className="flex flex-col md:flex-row items-center gap-12">
-            <div className="md:w-1/2">
-              <h3 className="text-2xl font-bold mb-3">Consistent Branding, Effortlessly</h3>
-              <p className="text-muted-foreground text-lg">
-                Define your brand kit once—logos, colors, and fonts—and our AI will apply it perfectly to every email, ensuring brand consistency without the manual work.
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Feature 1: Brand Kit - Wider Card */}
+          <div className="group relative col-span-1 md:col-span-2 h-96 overflow-hidden rounded-xl shadow-lg transition-all duration-300 hover:scale-[1.02]">
+            <Image
+              src="/screenshots/brandkit.png"
+              alt="Brand Kit Feature"
+              layout="fill"
+              objectFit="cover"
+              className="transition-transform duration-300 group-hover:scale-105 cursor-pointer"
+              onClick={() => handleImageClick("/screenshots/brandkit.png")}
+            />
+            <div className="absolute inset-0 flex flex-col justify-end p-8 text-white bg-gradient-to-t from-black/80 to-transparent">
+              <h3 className="text-3xl font-bold mb-2 drop-shadow-lg">Consistent Branding, Effortlessly</h3>
+              <p className="text-lg leading-relaxed drop-shadow-md">
+                Define your brand kit once—logos, colors, and fonts—and our AI will apply it perfectly to every email.
               </p>
-            </div>
-            <div className="md:w-1/2 relative">
-              <Image
-                src="/screenshots/brandkit.png"
-                alt="Brand Kit Feature"
-                width={1200}
-                height={800}
-                className="cursor-pointer transition-transform duration-300 ease-in-out"
-                onClick={() => handleImageClick("/screenshots/brandkit.png")}
-              />
             </div>
           </div>
 
-          {/* Feature 2: AI Chat Interface */}
-          <div className="flex flex-col md:flex-row items-center gap-12">
-            <div className="md:w-1/2 md:order-2">
-              <h3 className="text-2xl font-bold mb-3">Conversational Email Creation</h3>
-              <p className="text-muted-foreground text-lg">
-                Simply chat with our AI to describe the email you want. It understands your requirements and generates stunning designs in real-time.
+          {/* Feature 2: AI Chat Interface - Standard Card */}
+          <div className="group relative col-span-1 h-96 overflow-hidden rounded-xl shadow-lg transition-all duration-300 hover:scale-[1.02]">
+            <Image
+              src="/screenshots/chat.png"
+              alt="AI Chat Interface"
+              layout="fill"
+              objectFit="cover"
+              className="transition-transform duration-300 group-hover:scale-105 cursor-pointer"
+              onClick={() => handleImageClick("/screenshots/chat.png")}
+            />
+            <div className="absolute inset-0 flex flex-col justify-end p-8 text-white bg-gradient-to-t from-black/80 to-transparent">
+              <h3 className="text-3xl font-bold mb-2 drop-shadow-lg">Conversational Email Creation</h3>
+              <p className="text-lg leading-relaxed drop-shadow-md">
+                Simply chat with our AI to describe the email you want. It generates stunning designs in real-time.
               </p>
-            </div>
-            <div className="md:w-1/2 md:order-1 relative">
-              <Image
-                src="/screenshots/chat.png"
-                alt="AI Chat Interface"
-                width={1200}
-                height={800}
-                className="cursor-pointer transition-transform duration-300 ease-in-out"
-                onClick={() => handleImageClick("/screenshots/chat.png")}
-              />
             </div>
           </div>
 
-          {/* Feature 3: Pricing */}
-          <div className="flex flex-col md:flex-row items-center gap-12">
-            <div className="md:w-1/2">
-              <h3 className="text-2xl font-bold mb-3">Flexible Plans for Everyone</h3>
-              <p className="text-muted-foreground text-lg">
-                Whether you're just starting out or a growing business, we have a pricing plan that fits your needs. Start for free and upgrade as you grow.
+          {/* Feature 3: Flexible Plans - Standard Card */}
+          <div className="group relative col-span-1 h-96 overflow-hidden rounded-xl shadow-lg transition-all duration-300 hover:scale-[1.02]">
+            <Image
+              src="/screenshots/pricing.png"
+              alt="Pricing Plans"
+              layout="fill"
+              objectFit="cover"
+              className="transition-transform duration-300 group-hover:scale-105 cursor-pointer"
+              onClick={() => handleImageClick("/screenshots/pricing.png")}
+            />
+            <div className="absolute inset-0 flex flex-col justify-end p-8 text-white bg-gradient-to-t from-black/80 to-transparent">
+              <h3 className="text-3xl font-bold mb-2 drop-shadow-lg">Flexible Plans for Everyone</h3>
+              <p className="text-lg leading-relaxed drop-shadow-md">
+                Whether you're just starting out or a growing business, we have a pricing plan that fits your needs.
               </p>
-            </div>
-            <div className="md:w-1/2 relative">
-              <Image
-                src="/screenshots/pricing.png"
-                alt="Pricing Plans"
-                width={1200}
-                height={800}
-                className="cursor-pointer transition-transform duration-300 ease-in-out"
-                onClick={() => handleImageClick("/screenshots/pricing.png")}
-              />
             </div>
           </div>
         </div>

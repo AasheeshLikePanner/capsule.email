@@ -8,6 +8,7 @@ import { BrandKitDialog } from "@/components/brand-kit-dialog";
 import { useRouter } from "next/navigation";
 import { Globe } from "@/components/magicui/globe";
 import axios from "axios";
+import { generateEmailAndCreateChat } from "@/lib/actions/chat";
 
 
 interface BrandKit {
@@ -140,13 +141,11 @@ export default function CreatePage() {
     if (emailContent.trim() && !isLoading) {
       setIsLoading(true);
       try {
-        const response = await axios.post('/api/generate-email', {
-          prompt: emailContent,
-          brandKit: selectedBrandKit,
-        });
-
-        if (response.data && response.data.chatId) {
-          router.push(`/chats/${response.data.chatId}`);
+        const response = await generateEmailAndCreateChat(emailContent, selectedBrandKit, '', '');
+        console.log(response);
+        
+        if (response.chatId) {
+          router.push(`/chats/${response.chatId}`);
         } else {
           console.error("No chatId received from API");
           setIsLoading(false);

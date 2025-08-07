@@ -10,7 +10,7 @@ export default function Home() {
       <div className="relative z-10"> {/* Content layered on top */}
         <Navbar />
         <Hero />
-        <Features />
+        {/* <Features /> */}
       </div>
     </div>
   );

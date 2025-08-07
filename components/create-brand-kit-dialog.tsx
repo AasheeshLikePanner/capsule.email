@@ -17,6 +17,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { useBrandKitStore } from "@/lib/store/brandKitStore";
+import { createBrandKit } from "@/lib/actions/brand-kit";
 
 export function CreateBrandKitDialog({
   open,
@@ -38,10 +39,8 @@ export function CreateBrandKitDialog({
     setLoading(true);
     onProcessingStart(); // Notify parent that processing has started
     try {
-      const response = await axios.post("/api/brand-kit", { url });
-      console.log(response);
-
-      addBrandKit(response.data); // Pass the complete brand kit data
+      const newBrandKit = await createBrandKit(url);
+      addBrandKit(newBrandKit); // Pass the complete brand kit data
       onOpenChange(false); // Close dialog on success
       onProcessingComplete(true, "Brand kit created successfully!");
     } catch (error: any) {

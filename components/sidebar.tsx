@@ -13,6 +13,8 @@ import {
   PanelRight,
   Mail,
   Sparkles,
+  LogOut,
+  LifeBuoy,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -20,6 +22,17 @@ import { Button } from "./ui/button";
 import Image from "next/image";
 import axios from 'axios';
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { getChatSessions } from "@/lib/actions/chat";
 
 interface SidebarProps {
   isExpanded: boolean;
@@ -36,13 +49,20 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/auth/login");
+  };
 
   useEffect(() => {
     const fetchChatSessions = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get<ChatSession[]>('/api/chats');
-        setChatSessions(Array.isArray(response.data) ? response.data : []);
+        const data = await getChatSessions();
+        setChatSessions(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Error fetching chat sessions:", error);
       } finally {
@@ -63,7 +83,6 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
   const bottomNavItems = [
     { href: "/upgrade", icon: Sparkles, label: "Upgrade" },
     { href: "/help", icon: HelpCircle, label: "Help" },
-    { href: "/profile", icon: CircleUser, label: "Profile" },
   ];
 
   const sidebarContent = (isMobile = false) => (
@@ -262,6 +281,40 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
             </Link>
           </Button>
         ))}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className={cn(
+                "w-full rounded-lg",
+                "text-muted-foreground hover:text-foreground hover:bg-sidebar-hover",
+                !(isExpanded || isMobile) ? "justify-center" : "justify-start"
+              )}
+            >
+              <CircleUser className="h-5 w-5 shrink-0" />
+              <span
+                className={cn(
+                  "whitespace-nowrap transition-opacity ease-in-out duration-200",
+                  (isExpanded || isMobile) ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+                )}
+                aria-hidden={!(isExpanded || isMobile)}
+              >
+                Profile
+              </span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56" sideOffset={20}>
+            <DropdownMenuItem onClick={() => router.push("/help")}>
+              <LifeBuoy className="mr-2 h-4 w-4" />
+              <span>Support</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Log out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </nav>
     </div>
   );

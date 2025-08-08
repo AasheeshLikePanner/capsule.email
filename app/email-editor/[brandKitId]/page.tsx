@@ -1,4 +1,4 @@
-"use client"
+'use client'
 import { useState, useEffect, useRef, memo } from "react";
 import { useParams } from 'next/navigation';
 import BrandKitForm from "@/components/brand-kit-form";
@@ -10,7 +10,7 @@ import { Building, FileText, Palette, Users, BadgeInfo } from 'lucide-react';
 import { Button  } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import axios from "axios";
+import { getBrandKitById } from "@/lib/actions/brand-kit";
 
 const navItems = [
   {
@@ -55,8 +55,8 @@ export default function EmailEditorContent() {
 
     const fetchBrandKit = async () => {
       try {
-        const response = await axios.get(`/api/brand-kit/${brandKitId}`);
-        setBrandKit(response.data);
+        const response = await getBrandKitById(brandKitId);
+        setBrandKit(response);
       } catch (err: any) {
         setError(err.message || "An unknown error occurred.");
       } finally {

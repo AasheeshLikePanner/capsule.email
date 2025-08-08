@@ -29,7 +29,9 @@ export async function createBrandKit(url: string) {
     const browser = await getBrowser();
 
     const page = await browser.newPage();
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
+    await page.goto(url, { waitUntil: 'networkidle0', timeout: 60000 });
+    // @ts-ignore
+    // await page.waitForTimeout(2000); // Wait for 2 seconds to ensure all content is loaded
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
     await page.setViewport({ width: 1366, height: 768 });
     const result = await page.evaluate(() => {
@@ -365,6 +367,29 @@ export async function getBrandKits() {
   }
 
   return brandKits;
+}
+
+export async function getBrandKitById(brandKitId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  const { data: brandKit, error } = await supabase
+    .from('brandkits')
+    .select('*')
+    .eq('id', brandKitId)
+    .eq('user_id', user.id)
+    .single(); // Use .single() to get a single record
+
+  if (error) {
+    console.error('[Supabase fetch by ID error]', error);
+    throw new Error('Failed to fetch brand kit by ID');
+  }
+
+  return brandKit;
 }
 
 export async function deleteBrandKit(brandKitId: string) {

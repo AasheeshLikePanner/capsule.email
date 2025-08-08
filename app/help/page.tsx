@@ -102,14 +102,12 @@ export default function HelpPage() {
 
               <Section title="Summary">
                 <p>Capsule.email helps you ship beautiful emails, faster.</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <ul className="space-y-3">
-                    <ListItem><strong>AI-Powered Generation:</strong> Go from a simple prompt to a complete email in seconds.</ListItem>
-                    <ListItem><strong>Clean, Responsive HTML:</strong> No more broken layouts. Our templates work everywhere.</ListItem>
-                    <ListItem><strong>Branding Baked In:</strong> Your brand's look and feel are automatically applied to every email.</ListItem>
-                    <ListItem><strong>Use Any Tech Stack:</strong> Copy the HTML and use it with Node.js, Python, Ruby, or any other language or framework.</ListItem>
-                  </ul>
-                </div>
+                <ul className="space-y-3">
+                  <ListItem><strong>AI-Powered Generation:</strong> Go from a simple prompt to a complete email in seconds.</ListItem>
+                  <ListItem><strong>Clean, Responsive HTML:</strong> No more broken layouts. Our templates work everywhere.</ListItem>
+                  <ListItem><strong>Branding Baked In:</strong> Your brand's look and feel are automatically applied to every email.</ListItem>
+                  <ListItem><strong>Use Any Tech Stack:</strong> Copy the HTML and use it with Node.js, Python, Ruby, or any other language or framework.</ListItem>
+                </ul>
               </Section>
             </div>
           </main>

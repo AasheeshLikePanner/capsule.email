@@ -12,10 +12,12 @@ export function Hero() {
           <p className="mx-auto max-w-3xl text-lg text-muted-foreground">
             Create beautiful, AI-powered emails in moments.
           </p>
+          {/*
           <div className="mt-12 flex w-full max-w-md items-center space-x-2">
             <Input type="email" placeholder="Email" className="h-9 text-sm" />
             <Button type="submit" variant="default" className="h-9 px-4 text-sm animate-glow">Join Waitlist</Button>
           </div>
+          */}
         </div>
       <div className="w-[150%] mt-20 border">
         <Image

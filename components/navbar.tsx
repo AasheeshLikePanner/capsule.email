@@ -6,9 +6,9 @@ import Image from "next/image";
 import DotPattern from "@/components/dot-pattern";
 
 const Logo = () => (
-  <Link href="/" className="flex flex-col items-center">
+  <Link href="/" className="flex items-center">
     <Image src="/icon.svg" alt="Logo" width={40} height={40} />
-    <Badge className="text-[0.6rem] -mt-1">pre-beta</Badge>
+    <span className="ml-2 text-lg font-medium text-white ">Capsule.email</span>
   </Link>
 );
 
@@ -35,7 +35,7 @@ export function Navbar() {
                 <Link href="https://github.com/AasheeshLikePanner/mail" target="_blank" className="flex items-center">
                   <Github className="mr-2 h-4 w-4" />
                   <Star className="mr-1 h-4 w-4 fill-yellow-400 text-yellow-400" /> 
-                  <span className="font-semibold">0</span>
+                  <span className="font-semibold">5</span>
                 </Link>
               </Button>
               <Button asChild size="default" className="font-semibold">

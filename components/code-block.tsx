@@ -7,6 +7,7 @@ import { githubLight } from '@uiw/codemirror-theme-github';
 import { langs } from '@uiw/codemirror-extensions-langs';
 import { useTheme } from 'next-themes';
 import { Check, Copy } from 'lucide-react';
+import { EditorView } from '@codemirror/view';
 
 interface CodeBlockProps {
   code: string;
@@ -27,11 +28,11 @@ export const CodeBlock = ({ code, language }: CodeBlockProps) => {
   const langExtension = language === 'javascript' ? [langs.javascript({ jsx: true })] : [langs.python()];
 
   return (
-    <div className="relative rounded-lg border bg-card font-mono text-sm overflow-hidden">
+    <div className="relative rounded-xl border bg-card font-mono text-sm overflow-hidden">
       <div className="absolute top-2.5 right-2.5 z-10">
         <button
           onClick={onCopy}
-          className="p-1.5 rounded-md bg-gray-800/70 hover:bg-gray-700/70 transition-colors duration-200"
+          className="p-1.5 rounded-md bg-muted/70 text-muted-foreground hover:bg-muted/50 transition-colors duration-200"
         >
           {hasCopied ? (
             <Check className="h-4 w-4 text-green-400" />
@@ -42,8 +43,24 @@ export const CodeBlock = ({ code, language }: CodeBlockProps) => {
       </div>
       <CodeMirror
         value={code.trim()}
-        theme={theme === 'dark' ? vscodeDark : githubLight}
-        extensions={langExtension}
+        theme={vscodeDark}
+        extensions={[
+          ...langExtension,
+          EditorView.theme({
+            "&": {
+              backgroundColor: "hsl(var(--card))",
+              color: "hsl(var(--foreground))",
+            },
+            ".cm-gutters": {
+              backgroundColor: "hsl(var(--card))",
+              color: "hsl(var(--muted-foreground))",
+            },
+            
+            "&.cm-focused .cm-selectionBackground, ::selection": {
+              backgroundColor: "hsl(var(--primary-200))",
+            },
+          }),
+        ]}
         readOnly
         basicSetup={{
           foldGutter: false,

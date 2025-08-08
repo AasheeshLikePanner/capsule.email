@@ -4,12 +4,11 @@ import DotPattern from '@/components/dot-pattern';
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen w-full overflow-hidden">
+    <div className="relative w-full">
       <DotPattern opacity={0.2} />
       <div className="relative z-10"> {/* Content layered on top */}
         <Navbar />
         <Hero />
-        {/* <Features /> */}
       </div>
     </div>
   );

@@ -203,7 +203,7 @@ export default function EmailEditorContent() {
       <Toaster />
       <div className="flex flex-grow-[1] flex-shrink-0">
         <div className="w-1/6 lg:w-64 p-4 rounded-lg shadow-sm">
-        <h1 className="text-lg font-semibold mb-4">Email Editor</h1>
+        <h1 className="text-lg font-semibold mb-4">Brand-Kit</h1>
         <nav className="space-y-1">
           {navItems.map((item:any) => (
             <div key={item.id || item.label}>

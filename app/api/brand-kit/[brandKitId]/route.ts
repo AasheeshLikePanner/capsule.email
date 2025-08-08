@@ -2,11 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 
+export async function GET(req: NextRequest, context: any){
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { brandKitId: string } }
-) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -16,7 +13,8 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { brandKitId } = await params;
+  const { params } = await context;
+  const brandKitId = params.brandKitId;
 
   if (!brandKitId) {
     return NextResponse.json({ error: "Brand kit ID is required" }, { status: 400 });
@@ -44,7 +42,7 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { brandKitId: string } }
+  context:any
 ) {
   const supabase = await createClient();
   const {
@@ -55,7 +53,8 @@ export async function PUT(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { brandKitId } = await params;
+    const { params } = await context;
+    const brandKitId = params.brandKitId;
 
   if (!brandKitId) {
     return NextResponse.json({ error: "Brand kit ID is required" }, { status: 400 });
@@ -152,7 +151,7 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { brandKitId: string } }
+  context:any
 ) {
   const supabase = await createClient();
   const {
@@ -163,7 +162,8 @@ export async function DELETE(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { brandKitId } = params;
+  const { params } = await context;
+  const brandKitId = params.brandKitId;
 
   if (!brandKitId) {
     return NextResponse.json({ error: "Brand kit ID is required" }, { status: 400 });

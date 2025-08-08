@@ -7,7 +7,6 @@ import Image from "next/image";
 const MemoizedEmailPreview :any= memo(EmailPreview);
 import { cn } from "@/lib/utils";
 import { Building, FileText, Palette, Users, BadgeInfo } from 'lucide-react';
-import { Suspense } from 'react';
 import { Button  } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
@@ -92,11 +91,6 @@ export default function EmailEditorContent() {
     }
 
     try {
-      const response = await axios.put(`/api/brand-kit/${brandKit.id}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
 
       toast.success("Brand kit updated successfully!");
     } catch (err: any) {

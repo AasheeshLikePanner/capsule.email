@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiRequest } from 'next';
 
 export default function runMiddleware(req: NextApiRequest, res: any, fn: Function) {
   return new Promise((resolve, reject) => {

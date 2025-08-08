@@ -51,7 +51,6 @@ export const CodeBlock = ({ code, language }: CodeBlockProps) => {
           allowMultipleSelections: false,
           indentOnInput: false,
           lineNumbers: false,
-          gutter: false,
         }}
         className="p-4"
       />

@@ -1,6 +1,5 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import { getBrowser } from '@/lib/puppeteer-browser';
 import { improvteBrandKit } from '@/lib/gemini';
 import { createClient } from '@/lib/supabase/server';

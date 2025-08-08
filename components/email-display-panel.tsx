@@ -25,14 +25,13 @@ interface EmailDisplayPanelProps {
   onSave: (htmlContent: string, title: string) => Promise<boolean>;
   emailId: string | null;
   
-  onTogglePublic: () => void;
+  onTogglePublic?: () => void;
   onSend: (recipient: string, subject: string) => void;
   isSaving: boolean;
-  isOwner: boolean;
-  isPublic: boolean;
-  isTogglingPublic: boolean;
+  isOwner?: boolean;
+  isPublic?: boolean;
+  isTogglingPublic?: boolean;
 }
-
 export default function EmailDisplayPanel({ emailMarkup, isLoading, emailTitle, onSave, emailId, onTogglePublic, onSend, isSaving, isOwner, isPublic: initialIsPublic, isTogglingPublic }: EmailDisplayPanelProps) {
   const [view, setView] = useState<'preview' | 'code'>('preview');
   const [mobileView, setMobileView] = useState(false);

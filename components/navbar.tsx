@@ -8,7 +8,7 @@ import DotPattern from "@/components/dot-pattern";
 const Logo = () => (
   <Link href="/" className="flex flex-col items-center">
     <Image src="/icon.svg" alt="Logo" width={40} height={40} />
-    <Badge variant="light-black" className="text-[0.6rem] -mt-1">pre-beta</Badge>
+    <Badge className="text-[0.6rem] -mt-1">pre-beta</Badge>
   </Link>
 );
 

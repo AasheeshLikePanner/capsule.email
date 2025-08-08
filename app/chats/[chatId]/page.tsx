@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
-import { useBrandKitStore } from '@/lib/store/brandKitStore';
 
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -72,9 +71,7 @@ export default function ChatPage() {
 
 
   const recipientNames = ["Aasheesh", "Aniket", "Priya", "Rahul", "Sneha"];
-  const { brandKits } = useBrandKitStore();
   const [selectedBrandKit, setSelectedBrandKit] = useState<any>(null);
-  const selectedBrandKitRef = useRef<any>(null);
   const hasSetInitialBrandKit = useRef(false);
 
   useEffect(() => {
@@ -92,7 +89,7 @@ export default function ChatPage() {
       try {
         const { messages, isOwner, isPublic } = await getChatMessages(chatId);
         setMessages(messages);
-        setIsOwner(isOwner);
+        setIsOwner(isOwner!);
         setIsPublic(isPublic);
 
         const lastBotMessage = messages.findLast((msg: ChatMessage) => msg.type === 'bot' && (msg.content as BotMessageContent).code);
@@ -192,10 +189,6 @@ export default function ChatPage() {
     }
   };
 
-  const handleCopyShareLink = useCallback(() => {
-    navigator.clipboard.writeText(window.location.href);
-  }, []);
-
   const handleSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
     handleSendMessage(prompt);
@@ -259,7 +252,7 @@ export default function ChatPage() {
         <ResizablePanel defaultSize={isDesktop ? 50 : 100} minSize={20} className="flex flex-col h-full">
           <div className="flex-1 overflow-y-auto p-6 ">
             <div className="flex flex-col space-y-5">
-              {messages.map((msg: ChatMessage, index) => {
+              {messages.map((msg: ChatMessage) => {
                 const isUser = msg.type === 'user';
 
                 return (

@@ -1,6 +1,5 @@
 
 import axios from 'axios';
-import fs from 'fs/promises'
 
 // It uses the OpenRouter API with the specified DeepSeek model
 export async function createEmailTemplate(prompt: string, brandKit: any, context: string) {

@@ -7,7 +7,6 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { BrandKitDialog } from "@/components/brand-kit-dialog";
 import { useRouter } from "next/navigation";
 import { Globe } from "@/components/magicui/globe";
-import axios from "axios";
 import { generateEmailAndCreateChat } from "@/lib/actions/chat";
 
 

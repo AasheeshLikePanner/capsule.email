@@ -70,7 +70,7 @@ const createMockComponents = () => ({
       {children}
     </div>
   ),
-  Preview: ({ children, ...props }: any) => (
+  Preview: ({ children }: any) => (
     <div data-email-preview style={{ display: 'none', overflow: 'hidden', lineHeight: '1px', opacity: 0, maxHeight: 0, maxWidth: 0 }}>
       {children}
     </div>
@@ -99,7 +99,7 @@ export function EmailRenderer({ jsxString, onError, className }: EmailRendererPr
 
     try {
       // Check if Babel is available (loaded via script tag)
-      if (!window.Babel) {
+      if (!(window as any).Babel) {
         throw new Error('Babel is not loaded. Include @babel/standalone script.');
       }
 
@@ -110,7 +110,7 @@ export function EmailRenderer({ jsxString, onError, className }: EmailRendererPr
       })`;
 
       // Transform JSX using Babel (browser compilation)
-      const transpiled = window.Babel.transform(wrappedJSX, {
+      const transpiled = (window as any).Babel.transform(wrappedJSX, {
         presets: [['react', { pragma: 'React.createElement' }]],
       }).code;
 
@@ -150,7 +150,7 @@ export function useEmailRenderer() {
     }
 
     try {
-      if (!window.Babel) {
+      if (!(window as any).Babel) {
         throw new Error('Babel is not loaded');
       }
 
@@ -159,7 +159,7 @@ export function useEmailRenderer() {
         return (${jsxString});
       })`;
 
-      const transpiled = window.Babel.transform(wrappedJSX, {
+      const transpiled = (window as any).Babel.transform(wrappedJSX, {
         presets: [['react', { pragma: 'React.createElement' }]],
       }).code;
 

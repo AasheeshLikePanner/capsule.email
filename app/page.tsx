@@ -1,5 +1,4 @@
 import { Hero } from '@/components/hero';
-import { Features } from '@/components/features';
 import { Navbar } from '@/components/navbar';
 import DotPattern from '@/components/dot-pattern';
 

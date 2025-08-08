@@ -12,7 +12,6 @@ import { Input } from "./ui/input";
 import { FaPlus } from "react-icons/fa";
 import { FiLink } from "react-icons/fi";
 import { cn } from "@/lib/utils";
-import axios from "axios";
 import Link from "next/link";
 import Image from "next/image";
 

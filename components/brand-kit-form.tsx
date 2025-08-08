@@ -6,7 +6,6 @@ import { BadgeInfo, Building, Palette, FileText, Users, Trash2, XCircle } from '
 import ColorPickerInput from "@/components/color-picker-input";
 import { Button } from "@/components/ui/button";
 import React, { useRef, useState, useEffect } from 'react';
-import Image from "next/image";
 
 interface BrandKitFormProps {
   brandKit: any;

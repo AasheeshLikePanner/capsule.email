@@ -135,7 +135,7 @@ export default function ChatPage() {
 
       setIsLoading(false);
 
-      const data = response.data;
+      const data = response;
 
       let botMessageContent: BotMessageContent | string;
       

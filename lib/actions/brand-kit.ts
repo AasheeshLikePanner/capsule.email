@@ -366,3 +366,25 @@ export async function getBrandKits() {
 
   return brandKits;
 }
+
+export async function deleteBrandKit(brandKitId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  const { error } = await supabase
+    .from('brandkits')
+    .delete()
+    .eq('id', brandKitId)
+    .eq('user_id', user.id);
+
+  if (error) {
+    console.error('[Supabase delete error]', error);
+    throw new Error('Failed to delete brand kit');
+  }
+
+  return { success: true };
+}

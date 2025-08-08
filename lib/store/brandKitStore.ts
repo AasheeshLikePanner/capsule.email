@@ -1,6 +1,5 @@
 import { create } from 'zustand';
-import axios from 'axios';
-import { getBrandKits } from '../actions/brand-kit';
+import { getBrandKits, deleteBrandKit as deleteBrandKitAction } from '../actions/brand-kit';
 
 interface BrandKit {
   id: string;
@@ -40,7 +39,7 @@ export const useBrandKitStore = create<BrandKitState>((set) => ({
   deleteBrandKit: async (id: string) => {
     set({ isLoading: true, error: null });
     try {
-      await axios.delete(`/api/brand-kit/${id}`);
+      await deleteBrandKitAction(id);
       set((state) => ({
         brandKits: state.brandKits.filter((kit) => kit.id !== id),
         isLoading: false,

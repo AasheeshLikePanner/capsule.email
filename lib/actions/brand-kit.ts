@@ -413,3 +413,45 @@ export async function deleteBrandKit(brandKitId: string) {
 
   return { success: true };
 }
+
+export async function createEmptyBrandKit() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  const { data, error } = await supabase
+    .from('brandkits')
+    .insert([
+      {
+        user_id: user.id,
+        kit_name: 'New Brand Kit',
+        website: '',
+        brand_summary: '',
+        address: '',
+        tone_of_voice: '',
+        copyright: '',
+        footer: '',
+        disclaimers: '',
+        socials: [],
+        logo_primary: '',
+        logo_icon: '',
+        color_background: '',
+        color_container: '',
+        color_accent: '',
+        color_button_text: '',
+        color_foreground: '',
+      },
+    ])
+    .select('id')
+    .single();
+
+  if (error) {
+    console.error('[Supabase insert empty brand kit error]', error);
+    throw new Error('Failed to create empty brand kit');
+  }
+
+  return data.id;
+}

@@ -16,7 +16,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { useBrandKitStore } from "@/lib/store/brandKitStore";
-import { createBrandKit } from "@/lib/actions/brand-kit";
+import { createBrandKit, createEmptyBrandKit } from "@/lib/actions/brand-kit";
 
 export function CreateBrandKitDialog({
   open,
@@ -33,6 +33,22 @@ export function CreateBrandKitDialog({
   const [step, setStep] = useState("options"); // "options" | "match"
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const handleCreateEmptyBrandKit = async () => {
+    setLoading(true);
+    onProcessingStart();
+    try {
+      const newBrandKitId = await createEmptyBrandKit();
+      onOpenChange(false);
+      onProcessingComplete(true, "Empty brand kit created!");
+      window.location.href = `/email-editor/${newBrandKitId}`;
+    } catch (error: any) {
+      console.error("Error creating empty brand kit:", error);
+      onProcessingComplete(false, error.message || "Failed to create empty brand kit.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleMatchBrand = async () => {
     setLoading(true);
@@ -84,15 +100,16 @@ export function CreateBrandKitDialog({
                 Automatically match your website&#39;s branding
               </p>
             </div>
-            <Link href="/email-editor">
-              <div className="h-80 flex flex-col items-center justify-center p-8 bg-neutral-800 rounded-2xl cursor-pointer transition-colors hover:bg-neutral-700">
-                <FaPlus className="w-8 h-8 mb-3 text-muted-foreground" />
-                <h3 className="font-semibold text-base">Start from scratch</h3>
-                <p className="text-xs text-muted-foreground text-center mt-1">
-                  Upload your own logos, colors, and branded assets
-                </p>
-              </div>
-            </Link>
+            <div
+              className="h-80 flex flex-col items-center justify-center p-8 bg-neutral-800 rounded-2xl cursor-pointer transition-colors hover:bg-neutral-700"
+              onClick={handleCreateEmptyBrandKit}
+            >
+              <FaPlus className="w-8 h-8 mb-3 text-muted-foreground" />
+              <h3 className="font-semibold text-base">Start from scratch</h3>
+              <p className="text-xs text-muted-foreground text-center mt-1">
+                Upload your own logos, colors, and branded assets
+              </p>
+            </div>
           </div>
         )}
         {step === "match" && (

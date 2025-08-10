@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server'
 
 const handler = Checkout({
   accessToken: process.env.POLAR_ACCESS_TOKEN,
-  successUrl: `https://32d726e73b37.ngrok-free.app/success`, // use https from ngrok
+  successUrl: `https://0250b1ae5b2c.ngrok-free.app/success`, // use https from ngrok
   server: "sandbox",
 })
 

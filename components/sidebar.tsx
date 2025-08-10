@@ -15,7 +15,10 @@ import {
   Sparkles,
   LogOut,
   LifeBuoy,
+  Zap,
+  Settings,
 } from "lucide-react";
+
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
@@ -31,6 +34,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getChatSessions } from "@/lib/actions/chat";
+import { User } from "@supabase/supabase-js"; // Added import
 
 interface SidebarProps {
   isExpanded: boolean;
@@ -46,6 +50,8 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
   const pathname = usePathname();
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [userPlan, setUserPlan] = useState<string | null>(null); // Added state
+  const [subscriptionExpiresAt, setSubscriptionExpiresAt] = useState<string | null>(null); // Added state
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const router = useRouter();
 
@@ -67,9 +73,30 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
         setIsLoading(false);
       }
     };
+
+    const fetchUserData = async () => { // Added function to fetch user data
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: userData, error } = await supabase
+          .from('users')
+          .select('plan, subscription_expires_at')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error("Error fetching user data:", error);
+        } else if (userData) {
+          setUserPlan(userData.plan);
+          setSubscriptionExpiresAt(userData.subscription_expires_at);
+        }
+      }
+    };
+
     if (isExpanded || !isDesktop) {
       fetchChatSessions();
     }
+    fetchUserData(); // Call fetchUserData
   }, [isExpanded, isDesktop]);
 
   const navItems = [
@@ -79,9 +106,17 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
   ];
 
   const bottomNavItems = [
-    { href: "/upgrade", icon: Sparkles, label: "Upgrade" },
     { href: "/help", icon: HelpCircle, label: "Help" },
+    { href: "/support", icon: LifeBuoy, label: "Support" },
   ];
+
+  const calculateRemainingDays = (expiresAt: string) => {
+    const now = new Date();
+    const expiryDate = new Date(expiresAt);
+    const diffTime = expiryDate.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? `${diffDays} days left` : "Expired";
+  };
 
   const sidebarContent = (isMobile = false) => (
     <div className="flex flex-col h-full  border-r">
@@ -113,7 +148,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
       <nav className="flex flex-col gap-2 p-2 flex-1 overflow-hidden">
         <Button asChild variant="ghost" className={cn(
           "w-full rounded-lg",
-          pathname === "/create" ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-sidebar-hover",
+          pathname === "/create" ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-accent",
           !(isExpanded || isMobile) ? "justify-center" : "justify-start",
         )}>
           <Link
@@ -145,7 +180,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
               "w-full rounded-lg",
               pathname === item.href
                 ? "bg-muted text-foreground"
-                : "text-muted-foreground hover:text-foreground hover:bg-sidebar-hover",
+                : "text-muted-foreground hover:text-foreground hover:bg-accent",
               !(isExpanded || isMobile) ? "justify-center" : "justify-start"
             )}
           >
@@ -195,7 +230,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
                     !(isExpanded || isMobile) ? "justify-center" : "justify-start",
                     pathname === `/chats/${session.id}`
                       ? (isExpanded || isMobile ? "bg-muted text-foreground" : "text-foreground")
-                      : "text-muted-foreground hover:text-foreground hover:bg-sidebar-hover"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
                   )}
                 >
                   <Link
@@ -246,6 +281,58 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
             Collapse
           </span>
         </Button>
+        {userPlan === "pro" ? (
+          <Button
+            variant="ghost"
+            className={cn(
+              "w-full rounded-lg",
+              "bg-accent text-accent-foreground",
+              !(isExpanded || isMobile) ? "justify-center" : "justify-start"
+            )}
+          >
+            <Zap className="h-5 w-5 shrink-0" />
+            <span
+              className={cn(
+                "whitespace-nowrap transition-opacity ease-in-out duration-200",
+                (isExpanded || isMobile) ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+              )}
+              aria-hidden={!(isExpanded || isMobile)}
+            >
+              Subscribed {subscriptionExpiresAt && `(${calculateRemainingDays(subscriptionExpiresAt)})`}
+            </span>
+          </Button>
+        ) : (
+          <Button
+            asChild
+            variant="ghost"
+            className={cn(
+              "w-full rounded-lg",
+              pathname === "/upgrade"
+                ? "bg-muted text-foreground"
+                : "text-muted-foreground hover:text-foreground hover:bg-accent",
+              !(isExpanded || isMobile) ? "justify-center" : "justify-start"
+            )}
+          >
+            <Link
+              href="/upgrade"
+              className={cn(
+                "flex items-center",
+                (isExpanded || isMobile) && "gap-3",
+              )}
+            >
+              <Sparkles className="h-5 w-5 shrink-0" />
+              <span
+                className={cn(
+                  "whitespace-nowrap transition-opacity ease-in-out duration-200",
+                  (isExpanded || isMobile) ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+                )}
+                aria-hidden={!(isExpanded || isMobile)}
+              >
+                Upgrade
+              </span>
+            </Link>
+          </Button>
+        )}
         {bottomNavItems.map((item) => (
           <Button
             key={item.href}
@@ -255,7 +342,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
               "w-full rounded-lg",
               pathname === item.href
                 ? "bg-muted text-foreground"
-                : "text-muted-foreground hover:text-foreground hover:bg-sidebar-hover",
+                : "text-muted-foreground hover:text-foreground hover:bg-accent",
               !(isExpanded || isMobile) ? "justify-center" : "justify-start"
             )}
           >
@@ -279,40 +366,27 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
             </Link>
           </Button>
         ))}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className={cn(
-                "w-full rounded-lg",
-                "text-muted-foreground hover:text-foreground hover:bg-sidebar-hover",
-                !(isExpanded || isMobile) ? "justify-center" : "justify-start"
-              )}
-            >
-              <CircleUser className="h-5 w-5 shrink-0" />
-              <span
-                className={cn(
-                  "whitespace-nowrap transition-opacity ease-in-out duration-200",
-                  (isExpanded || isMobile) ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
-                )}
-                aria-hidden={!(isExpanded || isMobile)}
-              >
-                Profile
-              </span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56" sideOffset={20}>
-            <DropdownMenuItem onClick={() => router.push("/help")}>
-              <LifeBuoy className="mr-2 h-4 w-4" />
-              <span>Support</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Log out</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        
+      <Button
+          variant="ghost"
+          className={cn(
+            "w-full rounded-lg",
+            "text-muted-foreground hover:text-foreground hover:bg-accent",
+            !(isExpanded || isMobile) ? "justify-center" : "justify-start"
+          )}
+          onClick={handleLogout}
+        >
+          <LogOut className="h-5 w-5 shrink-0" />
+          <span
+            className={cn(
+              "whitespace-nowrap transition-opacity ease-in-out duration-200",
+              (isExpanded || isMobile) ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+            )}
+            aria-hidden={!(isExpanded || isMobile)}
+          >
+            Logout
+          </span>
+        </Button>
       </nav>
     </div>
   );

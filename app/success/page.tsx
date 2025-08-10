@@ -14,8 +14,8 @@ export default function SuccessPage() {
           Welcome to Pro. You can now access all premium features.
         </p>
         <Button asChild>
-          <Link href="/profile">
-            Go to Profile
+          <Link href="/create">
+            Go to Home
           </Link>
         </Button>
       </div>

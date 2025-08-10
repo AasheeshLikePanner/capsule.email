@@ -105,10 +105,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
     { href: "/emails", icon: Mail, label: "Emails" },
   ];
 
-  const bottomNavItems = [
-    { href: "/help", icon: HelpCircle, label: "Help" },
-    { href: "/support", icon: LifeBuoy, label: "Support" },
-  ];
+  
 
   const calculateRemainingDays = (expiresAt: string) => {
     const now = new Date();
@@ -333,27 +330,17 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
             </Link>
           </Button>
         )}
-        {bottomNavItems.map((item) => (
-          <Button
-            key={item.href}
-            asChild
-            variant="ghost"
-            className={cn(
-              "w-full rounded-lg",
-              pathname === item.href
-                ? "bg-muted text-foreground"
-                : "text-muted-foreground hover:text-foreground hover:bg-accent",
-              !(isExpanded || isMobile) ? "justify-center" : "justify-start"
-            )}
-          >
-            <Link
-              href={item.href}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
               className={cn(
-                "flex items-center",
-                (isExpanded || isMobile) && "gap-3",
+                "w-full rounded-lg",
+                "text-muted-foreground hover:text-foreground hover:bg-accent",
+                !(isExpanded || isMobile) ? "justify-center" : "justify-start"
               )}
             >
-              <item.icon className="h-5 w-5 shrink-0" />
+              <Settings className="h-5 w-5 shrink-0" />
               <span
                 className={cn(
                   "whitespace-nowrap transition-opacity ease-in-out duration-200",
@@ -361,32 +348,30 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
                 )}
                 aria-hidden={!(isExpanded || isMobile)}
               >
-                {item.label}
+                Settings
               </span>
-            </Link>
-          </Button>
-        ))}
-        
-      <Button
-          variant="ghost"
-          className={cn(
-            "w-full rounded-lg",
-            "text-muted-foreground hover:text-foreground hover:bg-accent",
-            !(isExpanded || isMobile) ? "justify-center" : "justify-start"
-          )}
-          onClick={handleLogout}
-        >
-          <LogOut className="h-5 w-5 shrink-0" />
-          <span
-            className={cn(
-              "whitespace-nowrap transition-opacity ease-in-out duration-200",
-              (isExpanded || isMobile) ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
-            )}
-            aria-hidden={!(isExpanded || isMobile)}
-          >
-            Logout
-          </span>
-        </Button>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-48" align="end" forceMount>
+            <DropdownMenuItem asChild>
+              <Link href="/help" className="flex items-center gap-2 cursor-pointer">
+                <HelpCircle className="h-4 w-4" />
+                <span>Help</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <a href="mailto:ashishrathour1102@gmail.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 cursor-pointer">
+                <LifeBuoy className="h-4 w-4" />
+                <span>Support</span>
+              </a>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+              <LogOut className="h-4 w-4 mr-2" />
+              <span>Logout</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </nav>
     </div>
   );

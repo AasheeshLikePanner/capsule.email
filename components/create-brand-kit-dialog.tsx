@@ -60,7 +60,7 @@ export function CreateBrandKitDialog({
       onProcessingComplete(true, "Brand kit created successfully!");
     } catch (error: any) {
       console.error("Error matching brand:", error);
-      onProcessingComplete(false, error.response?.data?.error || "Failed to create brand kit.");
+      onProcessingComplete(false, error.message || "Failed to create brand kit.");
     } finally {
       setLoading(false);
     }

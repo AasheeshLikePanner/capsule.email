@@ -25,6 +25,25 @@ export async function createBrandKit(url: string) {
     throw new Error('User not authenticated');
   }
 
+  // Fetch user's plan and brand_kit_count
+  const { data: userProfile, error: userProfileError } = await supabase
+    .from('users')
+    .select('plan, brand_kit_count')
+    .eq('id', user.id)
+    .single();
+
+  if (userProfileError || !userProfile) {
+    console.error('[Supabase fetch user profile error]', userProfileError);
+    throw new Error('Failed to fetch user profile');
+  }
+
+  // Enforce brand kit limit for free users
+  if (userProfile.plan === 'free' && userProfile.brand_kit_count >= 1) {
+    throw new Error('Free plan users can only create one brand kit.');
+  } else if (userProfile.plan === 'pro' && userProfile.brand_kit_count >= 10) {
+    throw new Error('Pro plan users can only create up to 10 brand kits.');
+  }
+
   try {
     const browser = await getBrowser();
 
@@ -341,6 +360,17 @@ export async function createBrandKit(url: string) {
       throw new Error('Failed to save brand kit');
     }
 
+    // Increment brand_kit_count for the user
+    const { error: updateCountError } = await supabase
+      .from('users')
+      .update({ brand_kit_count: userProfile.brand_kit_count + 1 })
+      .eq('id', user.id);
+
+    if (updateCountError) {
+      console.error('[Supabase update brand_kit_count error]', updateCountError);
+      throw new Error('Failed to update brand kit count.');
+    }
+
     return data[0];
   } catch (err) {
     console.error('[Scraper error]', err);
@@ -400,6 +430,18 @@ export async function deleteBrandKit(brandKitId: string) {
     throw new Error('User not authenticated');
   }
 
+  // Fetch user's profile to get current brand_kit_count
+  const { data: userProfile, error: userProfileError } = await supabase
+    .from('users')
+    .select('brand_kit_count')
+    .eq('id', user.id)
+    .single();
+
+  if (userProfileError || !userProfile) {
+    console.error('[Supabase fetch user profile error]', userProfileError);
+    throw new Error('Failed to fetch user profile');
+  }
+
   const { error } = await supabase
     .from('brandkits')
     .delete()
@@ -411,6 +453,17 @@ export async function deleteBrandKit(brandKitId: string) {
     throw new Error('Failed to delete brand kit');
   }
 
+  // Decrement brand_kit_count for the user
+  const { error: updateCountError } = await supabase
+    .from('users')
+    .update({ brand_kit_count: userProfile.brand_kit_count - 1 })
+    .eq('id', user.id);
+
+  if (updateCountError) {
+    console.error('[Supabase update brand_kit_count error]', updateCountError);
+    throw new Error('Failed to update brand kit count.');
+  }
+
   return { success: true };
 }
 
@@ -420,6 +473,25 @@ export async function createEmptyBrandKit() {
 
   if (!user) {
     throw new Error('User not authenticated');
+  }
+
+  // Fetch user's plan and brand_kit_count
+  const { data: userProfile, error: userProfileError } = await supabase
+    .from('users')
+    .select('plan, brand_kit_count')
+    .eq('id', user.id)
+    .single();
+
+  if (userProfileError || !userProfile) {
+    console.error('[Supabase fetch user profile error]', userProfileError);
+    throw new Error('Failed to fetch user profile');
+  }
+
+  // Enforce brand kit limit for free users
+  if (userProfile.plan === 'free' && userProfile.brand_kit_count >= 1) {
+    throw new Error('Free plan users can only create one brand kit.');
+  } else if (userProfile.plan === 'pro' && userProfile.brand_kit_count >= 10) {
+    throw new Error('Pro plan users can only create up to 10 brand kits.');
   }
 
   const { data, error } = await supabase
@@ -451,6 +523,17 @@ export async function createEmptyBrandKit() {
   if (error) {
     console.error('[Supabase insert empty brand kit error]', error);
     throw new Error('Failed to create empty brand kit');
+  }
+
+  // Increment brand_kit_count for the user
+  const { error: updateCountError } = await supabase
+    .from('users')
+    .update({ brand_kit_count: userProfile.brand_kit_count + 1 })
+    .eq('id', user.id);
+
+  if (updateCountError) {
+    console.error('[Supabase update brand_kit_count error]', updateCountError);
+    throw new Error('Failed to update brand kit count.');
   }
 
   return data.id;

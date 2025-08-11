@@ -42,6 +42,56 @@ export async function generateEmailAndCreateChat(prompt: string, brandKit: any, 
     throw new Error('Unauthorized');
   }
 
+  // Fetch user's plan and chat counts
+  const { data: userProfile, error: userProfileError } = await supabase
+    .from('users')
+    .select('plan, monthly_chat_count, last_chat_month_reset_date')
+    .eq('id', user.id)
+    .single();
+
+  if (userProfileError || !userProfile) {
+    console.error('[Supabase fetch user profile error]', userProfileError);
+    throw new Error('Failed to fetch user profile for chat limit check.');
+  }
+
+  let { plan, monthly_chat_count, last_chat_month_reset_date } = userProfile;
+
+  // Monthly reset logic
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  let resetRequired = false;
+  if (last_chat_month_reset_date) {
+    const lastResetDate = new Date(last_chat_month_reset_date);
+    if (lastResetDate.getMonth() !== currentMonth || lastResetDate.getFullYear() !== currentYear) {
+      resetRequired = true;
+    }
+  } else {
+    // If last_chat_month_reset_date is null, it's a new user or first chat, so reset is needed.
+    resetRequired = true;
+  }
+
+  if (resetRequired) {
+    monthly_chat_count = 0;
+    last_chat_month_reset_date = now.toISOString(); // Set to current date
+  }
+
+  // Calculate next reset date for error message
+  const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const nextMonthFormatted = nextMonth.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+  // Define limits
+  const FREE_CHAT_LIMIT = 10;
+  const PRO_CHAT_LIMIT = 300;
+
+  // Enforce limits
+  if (plan === 'free' && monthly_chat_count >= FREE_CHAT_LIMIT) {
+    throw new Error(`You have reached your monthly chat limit of ${FREE_CHAT_LIMIT} messages. Upgrade to Pro for more! Your limit will reset on ${nextMonthFormatted}.`);
+  } else if (plan === 'pro' && monthly_chat_count >= PRO_CHAT_LIMIT) {
+    throw new Error(`You have reached your monthly chat limit of ${PRO_CHAT_LIMIT} messages. Your limit will reset on ${nextMonthFormatted}.`);
+  }
+
   let currentChatId = chatId;
 
   try {
@@ -84,6 +134,21 @@ export async function generateEmailAndCreateChat(prompt: string, brandKit: any, 
     }
 
     const response: any = await createEmailTemplate(prompt, brandKit, context);
+
+    // Increment monthly_chat_count and update last_chat_month_reset_date
+    const { error: updateCountError } = await supabase
+      .from('users')
+      .update({
+        monthly_chat_count: monthly_chat_count + 1,
+        last_chat_month_reset_date: last_chat_month_reset_date // Use the potentially reset date
+      })
+      .eq('id', user.id);
+
+    if (updateCountError) {
+      console.error('[Supabase update monthly_chat_count error]', updateCountError);
+      // Log the error but don't prevent the chat from being returned
+      // as the AI response was already generated.
+    }
 
     // Save bot message
     const botMessageContent = {

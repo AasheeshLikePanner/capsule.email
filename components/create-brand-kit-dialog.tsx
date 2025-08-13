@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, KeyboardEvent } from "react";
 import {
   Dialog,
   DialogContent,
@@ -75,6 +75,16 @@ export function CreateBrandKitDialog({
     onOpenChange(isOpen);
   };
 
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const isDisabled = loading || !url || !/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(url);
+      if (!isDisabled) {
+        handleMatchBrand();
+      }
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
@@ -123,6 +133,7 @@ export function CreateBrandKitDialog({
                 placeholder="https://example.com"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
+                onKeyDown={handleKeyDown}
                 className="bg-card/75 border-border text-foreground focus:ring-offset-background focus:ring-ring rounded-lg"
               />
               <Button

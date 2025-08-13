@@ -3,7 +3,13 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
 import { useBrandKitStore } from "@/lib/store/brandKitStore";
 import { useEffect } from "react";
+import { Button } from "./ui/button";
+import { useRouter } from "next/navigation";
+
 import Image from "next/image";
+
+
+import { Card } from "./ui/card";
 
 interface BrandKit {
   id: string;
@@ -20,6 +26,7 @@ interface BrandKitDialogProps {
 
 export function BrandKitDialog({ isOpen, onOpenChange, onSelectBrandKit }: BrandKitDialogProps) {
   const { brandKits, isLoading, error, fetchBrandKits } = useBrandKitStore();
+  const router = useRouter()
 
   useEffect(() => {
     if (isOpen) {
@@ -55,7 +62,20 @@ export function BrandKitDialog({ isOpen, onOpenChange, onSelectBrandKit }: Brand
           )}
           {error && <p className="text-red-500">Error: {error}</p>}
           {!isLoading && !error && brandKits.length === 0 && (
-            <p>No brand kits found. Create one from the Brand Kit page.</p>
+            <div className="flex flex-col items-center justify-center text-center p-4">
+              <p className="text-muted-foreground text-sm mb-4">
+                No brand kits found.
+              </p>
+              <Button
+                onClick={() => {
+                  onOpenChange(false); // Close the dialog
+                  router.push('/brand-kit');
+                }}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold py-2 px-4 rounded-xl"
+              >
+                Create Brand Kit
+              </Button>
+            </div>
           )}
           {!isLoading && !error && brandKits.length > 0 && (
             <div className="grid grid-cols-1 gap-4">

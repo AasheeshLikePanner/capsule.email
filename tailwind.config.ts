@@ -34,6 +34,10 @@ export default {
           DEFAULT: "hsl(var(--light-black))",
           foreground: "hsl(var(--light-black-foreground))",
         },
+        tooltip: {
+          DEFAULT: "hsl(var(--tooltip))",
+          foreground: "hsl(var(--tooltip-foreground))",
+        },
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",

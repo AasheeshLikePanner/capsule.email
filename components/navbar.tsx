@@ -1,4 +1,8 @@
+'use client'
+
 import Link from "next/link";
+import { useState } from "react";
+
 import { Github, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +16,14 @@ const Logo = () => (
   </Link>
 );
 
-export function Navbar() {
+export function Navbar({ stars }: { stars: number }) {
+  const [isStarred, setIsStarred] = useState(false);
+
+  const handleStarClick = () => {
+    setIsStarred(true); // Only turn yellow on click, not toggle
+    // Optionally, you might want to send an event to GitHub or save the state
+  };
+
   return (
     <div className="fixed top-0 left-0 right-0 z-50 border-b bg-background/90 backdrop-blur-md shadow-lg overflow-hidden">
       {/* Left Dot Pattern */}
@@ -32,10 +43,10 @@ export function Navbar() {
                 Pricing
               </Link>
               <Button asChild variant="outline" size="default">
-                <Link href="https://github.com/AasheeshLikePanner/mail" target="_blank" className="flex items-center">
-                  <Github className="mr-2 h-4 w-4" />
-                  <Star className="mr-1 h-4 w-4 fill-yellow-400 text-yellow-400" /> 
-                  <span className="font-semibold">5</span>
+                <Link href="https://github.com/AasheeshLikePanner/mail" target="_blank" className="group flex items-center" onClick={handleStarClick}>
+                  <Github className="mr-2 h-4 w-4 fill-white text-white" />
+                  <Star className={isStarred ? "mr-1 h-3 w-3 fill-yellow-400 text-yellow-400" : "mr-1 h-3 w-3 fill-gray-700 text-gray-700"} /> 
+                  <span className="font-semibold">{stars}</span>
                 </Link>
               </Button>
               <Button asChild size="default" className="font-semibold">

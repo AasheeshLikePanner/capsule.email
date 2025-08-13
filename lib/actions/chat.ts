@@ -1,7 +1,8 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { createEmailTemplate } from '@/lib/openrouter';
+import { createEmailTemplate as createEmailTemplateGroq } from '@/lib/groq';
+import { createEmailTemplate as createEmailTemplateOpenRouter } from '@/lib/openrouter';
 
 export async function getChatSessions() {
   const supabase = await createClient();
@@ -133,7 +134,12 @@ export async function generateEmailAndCreateChat(prompt: string, brandKit: any, 
       // Continue even if user message fails to save, but log it
     }
 
-    const response: any = await createEmailTemplate(prompt, brandKit, context);
+    let response: any;
+    // if (plan === 'pro') {
+      // response = await createEmailTemplateOpenRouter(prompt, brandKit, context);
+    // } else {
+      response = await createEmailTemplateGroq(prompt, brandKit, context);
+    // }
 
     // Increment monthly_chat_count and update last_chat_month_reset_date
     const { error: updateCountError } = await supabase

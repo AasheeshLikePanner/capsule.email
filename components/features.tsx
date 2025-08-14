@@ -24,7 +24,7 @@ export default function Features() {
   ];
 
   return (
-    <section id="features" className="relative z-10 w-full lg:px-8"> {/* Removed mx-auto and py-16 from inner div */}
+    <section id="features" className="relative z-10 w-full items-center justify-center lg:px-8 pt-20"> {/* Removed mx-auto and py-16 from inner div */}
       <div className="text-center mb-16">
         <h2 className="text-4xl font-semibold tracking-tight mb-4">
           Powerful Features to Elevate Your Emails
@@ -34,14 +34,23 @@ export default function Features() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-16"> {/* Removed py-16 */}
+      <div className="flex flex-col gap-24 py-16">
         {features.map((feature, index) => (
-          <div key={index} className="flex flex-col gap-4 items-center text-center">
-            <div className="w-full h-[550px] flex items-center justify-center ">
+          <div
+            key={index}
+            className={`flex flex-col md:flex-row items-center justify-center gap-20 p-12 ${
+              index % 2 === 1 ? "md:flex-row-reverse" : ""
+            }`}
+          >
+            <div className="w-full md:w-1/2 h-[550px] flex items-center justify-center">
               {feature.component}
             </div>
-            <h3 className="text-xl font-normal text-muted-foreground mt-3">{feature.title}</h3>
-            <p className="font-light text-sm text-muted-foreground/60 -mt-3">{feature.description}</p>
+            <div className="w-full md:w-1/2 text-center md:text-left">
+              <h3 className="text-3xl font-normal tracking-tight mb-3">{feature.title}</h3>
+              <p className="text-base text-muted-foreground/70 leading-relaxed">
+                {feature.description}
+              </p>
+            </div>
           </div>
         ))}
       </div>

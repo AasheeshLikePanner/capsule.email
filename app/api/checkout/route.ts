@@ -3,8 +3,8 @@ import { NextRequest } from 'next/server'
 
 const handler = Checkout({
   accessToken: process.env.POLAR_ACCESS_TOKEN,
-  successUrl: `https://54578351108f.ngrok-free.app/success`, // use https from ngrok
-  server: "sandbox",
+  successUrl: `https://capsule-email.vercel.app/success`, // use https from ngrok
+  server: "production",
 })
 
 export const GET = async (req: NextRequest) => {

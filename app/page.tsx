@@ -22,7 +22,7 @@ export default async function Home() {
       <div className="relative z-10"> {/* Content layered on top */}
         <Navbar stars={stars} />
         <Hero />
-        <div className="mt-40 px-40"> {/* Added div for vertical padding */}
+        <div className="mt-40 w-1/2 mx-auto border-l border-r fade-border">
           <Features />
         </div>
         <Pricing userEmail={userEmail} />

@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { Building, FileText, Palette, Users, BadgeInfo } from 'lucide-react';
 import { Button  } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Toaster } from "@/components/ui/sonner";
+
 import { getBrandKitById } from "@/lib/actions/brand-kit";
 
 const navItems = [
@@ -200,7 +200,7 @@ export default function EmailEditorContent() {
 
   return (
     <div className="flex flex-col lg:flex-row h-screen p-4 lg:p-8 gap-4 relative">
-      <Toaster />
+      
       <div className="flex flex-grow-[1] flex-shrink-0">
         <div className="w-1/6 lg:w-64 p-4 rounded-lg shadow-sm">
         <h1 className="text-lg font-semibold mb-4">Brand-Kit</h1>

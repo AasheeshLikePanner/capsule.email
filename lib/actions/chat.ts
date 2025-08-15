@@ -194,37 +194,49 @@ export async function updateChatVisibility(chatId: string, isPublic: boolean) {
     throw new Error('Unauthorized');
   }
 
-  try {
-    const { data: chatSession, error: sessionError } = await supabase
-      .from('chat_sessions')
-      .select('user_id')
-      .eq('id', chatId)
-      .single();
+  // Fetch user's plan
+  const { data: userProfile, error: profileError } = await supabase
+    .from('users')
+    .select('plan')
+    .eq('id', user.id)
+    .single();
 
-    if (sessionError) {
-      console.error("Error fetching chat session:", sessionError);
-      throw new Error('Chat not found');
-    }
-
-    if (user.id !== chatSession.user_id) {
-      throw new Error('Forbidden');
-    }
-
-    const { error: updateError } = await supabase
-      .from('chat_sessions')
-      .update({ ispublic: isPublic })
-      .eq('id', chatId);
-
-    if (updateError) {
-      console.error("Error updating chat session:", updateError);
-      throw new Error(updateError.message);
-    }
-
-    return { message: 'Chat session updated successfully' };
-  } catch (err: any) {
-    console.error('[API Error]', err);
-    throw new Error('Failed to update chat session');
+  if (profileError || !userProfile) {
+    console.error("Error fetching user profile:", profileError);
+    throw new Error('Failed to fetch user profile.');
   }
+
+  // Prevent free users from making chats public
+  if (isPublic && userProfile.plan === 'free') {
+    throw new Error('You must upgrade to a Pro plan to make chats public.');
+  }
+
+  const { data: chatSession, error: sessionError } = await supabase
+    .from('chat_sessions')
+    .select('user_id')
+    .eq('id', chatId)
+    .single();
+
+  if (sessionError) {
+    console.error("Error fetching chat session:", sessionError);
+    throw new Error('Chat not found');
+  }
+
+  if (user.id !== chatSession.user_id) {
+    throw new Error('Forbidden');
+  }
+
+  const { error: updateError } = await supabase
+    .from('chat_sessions')
+    .update({ ispublic: isPublic })
+    .eq('id', chatId);
+
+  if (updateError) {
+    console.error("Error updating chat session:", updateError);
+    throw new Error(updateError.message);
+  }
+
+  return { message: 'Chat session updated successfully' };
 }
 
 export async function getChatMessages(chatId: string) {

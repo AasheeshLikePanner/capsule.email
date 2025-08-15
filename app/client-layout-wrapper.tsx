@@ -8,6 +8,7 @@ import { Sidebar } from "@/components/sidebar";
 import { usePathname } from "next/navigation";
 
 import NextNProgressClient from "@/components/next-nprogress";
+import { Toaster } from "sonner";
 
 
 export function RootLayoutClient({
@@ -27,6 +28,7 @@ export function RootLayoutClient({
       disableTransitionOnChange
     >
       <NextNProgressClient>
+        <Toaster theme="dark" />
         <div className="flex h-full w-full ">
           {!noSidebarPaths.includes(pathname) && (
             <Sidebar

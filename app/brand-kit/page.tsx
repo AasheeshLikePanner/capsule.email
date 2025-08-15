@@ -9,7 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useBrandKitStore } from "@/lib/store/brandKitStore";
 import { toast } from "sonner";
-import { Toaster } from "@/components/ui/sonner";
+
 import { Trash2 } from "lucide-react";
 import { useRef, useCallback } from "react";
 
@@ -92,7 +92,7 @@ export default function BrandKitPage() {
 
   return (
     <div className="p-4 sm:p-6 md:p-10">
-      <Toaster />
+      
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl font-medium text-foreground">Brand Kit</h1>
         <Button

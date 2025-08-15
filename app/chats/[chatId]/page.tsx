@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/input';
 import { generateEmailAndCreateChat, getChatMessages, updateChatVisibility } from '@/lib/actions/chat';
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { createEmail, sendEmail } from '@/lib/actions/email';
+import { toast } from 'sonner';
 
 
 
@@ -170,7 +171,7 @@ export default function ChatPage() {
         chat_session_id: chatId, 
         user_id: 'error_id', 
         type: 'bot', 
-        content: `Sorry, something went wrong: ${errorMessage}`, 
+        content: `${errorMessage}`, 
         created_at: new Date().toISOString() 
       }]);
     }
@@ -182,8 +183,10 @@ export default function ChatPage() {
       const newIsPublic = !isPublic;
       await updateChatVisibility(chatId, newIsPublic);
       setIsPublic(newIsPublic);
+      toast.success(`Chat is now ${newIsPublic ? 'public' : 'private'}.`);
     } catch (error) {
-      console.error("Error updating chat status:", error);
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+      toast.error(errorMessage);
     } finally {
       setIsTogglingPublic(false);
     }

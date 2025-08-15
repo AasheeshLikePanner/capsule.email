@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils";
 import { Building, FileText, Palette, Users, BadgeInfo } from 'lucide-react';
 import { Button  } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useMediaQuery } from "@/lib/hooks/use-media-query";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 
 import { getBrandKitById } from "@/lib/actions/brand-kit";
 
@@ -41,6 +43,7 @@ const navItems = [
 export default function EmailEditorContent() {
   const params = useParams();
   const brandKitId = params.brandKitId as string;
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   const [brandKit, setBrandKit] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -201,8 +204,7 @@ export default function EmailEditorContent() {
   return (
     <div className="flex flex-col lg:flex-row h-screen p-4 lg:p-8 gap-4 relative">
       
-      <div className="flex flex-grow-[1] flex-shrink-0">
-        <div className="w-1/6 lg:w-64 p-4 rounded-lg shadow-sm">
+      <div className={cn("w-full lg:w-64 p-4 rounded-lg shadow-sm", isDesktop ? "block" : "hidden")}>
         <h1 className="text-lg font-semibold mb-4">Brand-Kit</h1>
         <nav className="space-y-1">
           {navItems.map((item:any) => (
@@ -248,22 +250,28 @@ export default function EmailEditorContent() {
           ))}
         </nav>
       </div>
-      <div
-        ref={mainContentRef}
-        className="overflow-y-auto h-full border-r shadow-sm border-l border-border relative flex-grow-[3] flex-shrink-0"
-      >
-        <h1 className="text-lg font-medium mb-4 ml-5">{brandKit.kit_name}</h1>
-        <BrandKitForm brandKit={brandKit} setBrandKit={setBrandKit} />
-      </div>
-      </div>
-      <div className="h-full lg:w-5/12 flex flex-col relative">
-        <div className="flex justify-end mb-4">
-          <Button onClick={handleUpdateBrandKit}>Save</Button>
-        </div>
-        <div className="flex-grow relative overflow-y-auto">
-          <MemoizedEmailPreview brandKit={brandKit} className="h-full" />
-        </div>
-      </div>
+      <ResizablePanelGroup direction={isDesktop ? "horizontal" : "vertical"} className="w-full">
+        <ResizablePanel>
+          <div
+            ref={mainContentRef}
+            className="overflow-y-auto h-full border-r shadow-sm border-l border-border relative w-full"
+          >
+            <h1 className="text-lg font-medium mb-4 ml-5">{brandKit.kit_name}</h1>
+            <BrandKitForm brandKit={brandKit} setBrandKit={setBrandKit} />
+          </div>
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel>
+          <div className="h-full flex flex-col relative w-full">
+            <div className="flex justify-end mb-4">
+              <Button onClick={handleUpdateBrandKit}>Save</Button>
+            </div>
+            <div className="flex-grow relative overflow-y-auto">
+              <MemoizedEmailPreview brandKit={brandKit} className="h-full" />
+            </div>
+          </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </div>
   );
 }

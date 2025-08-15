@@ -230,7 +230,7 @@ export default function BrandKitForm({ brandKit, setBrandKit }: BrandKitFormProp
         <div className="mb-4">
           <div className="flex items-center gap-2"><Palette size={20} /> Colors</div>
         </div>
-        <div className="grid grid-cols-2 items-center justify-items-center gap-8 min-h-[300px] mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 items-center justify-items-center gap-8 min-h-[300px] mt-8">
           <ColorPickerInput
             color={brandKit.color_background}
             onChange={(color) => setBrandKit({ ...brandKit, color_background: color })}

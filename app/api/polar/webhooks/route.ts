@@ -1,13 +1,11 @@
 import { Webhooks } from '@polar-sh/nextjs';
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase Admin Client to modify user data
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Helper function to update user subscription data in Supabase
 async function updateUserSubscription(subscription: any, customer: any) {
   console.log("updateUserSubscription: Received subscription:", subscription);
   console.log("updateUserSubscription: Received customer:", customer);
@@ -20,7 +18,7 @@ async function updateUserSubscription(subscription: any, customer: any) {
 
   if (error || !user) {
     console.error(`updateUserSubscription Error: User with email ${customer.email} not found.`, error);
-    return; // The Webhooks helper will still send a 200 OK to Polar
+    return; 
   }
   console.log("updateUserSubscription: Found user with ID:", user.id);
 

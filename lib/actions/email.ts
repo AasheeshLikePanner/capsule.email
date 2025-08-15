@@ -44,7 +44,6 @@ export async function createEmail(html_content: string, name: string, kit_name: 
   } else {
     const newEmailId = data[0].id;
 
-    // Get current user metadata
     const { data: userProfile, error: profileError } = await supabase
       .from('users') // Assuming you have a 'profiles' table linked to auth.users
       .select('emails')
@@ -53,14 +52,12 @@ export async function createEmail(html_content: string, name: string, kit_name: 
 
     if (profileError) {
       console.error("Error fetching user profile:", profileError);
-      // Still return success for email save, but log the profile update error
       return { message: 'Email saved successfully, but failed to update user profile', data };
     }
 
     const currentSavedEmails = userProfile?.emails || [];
     const updatedSavedEmails = [...currentSavedEmails, newEmailId];
 
-    // Update user metadata
     const { error: updateError } = await supabase.from('users')
       .update({ emails: updatedSavedEmails })
       .eq('id', user.id);
@@ -83,7 +80,6 @@ export async function deleteEmail(emailId: string) {
     throw new Error('Unauthorized');
   }
 
-  // Fetch the user's current emails array
   const { data: profileData, error: profileError } = await supabase
     .from('users')
     .select('emails')
@@ -97,10 +93,8 @@ export async function deleteEmail(emailId: string) {
 
   let userEmails = profileData?.emails || [];
 
-  // Filter out the deleted emailId
   userEmails = userEmails.filter((id: string) => id !== emailId);
 
-  // Update the user's profile with the new emails array
   const { error: updateError } = await supabase
     .from('users')
     .update({ emails: userEmails })
@@ -111,7 +105,6 @@ export async function deleteEmail(emailId: string) {
     throw new Error(updateError.message);
   }
 
-  // Delete the email from the emails table
   const { error } = await supabase.from('emails').delete().eq('id', emailId);
 
   if (error) {
@@ -162,7 +155,6 @@ export async function sendEmail(to: string, subject: string, html: string) {
       throw new Error('Unauthorized');
     }
 
-    // Fetch user's plan and email counts
     const { data: userProfile, error: userProfileError } = await supabase
       .from('users')
       .select('plan, email_sent_today, last_email_sent_date')
@@ -176,7 +168,6 @@ export async function sendEmail(to: string, subject: string, html: string) {
 
     let { plan, email_sent_today, last_email_sent_date } = userProfile;
 
-    // Daily reset logic
     const now = new Date();
     const today = now.toISOString().split('T')[0]; // YYYY-MM-DD format
 
@@ -186,7 +177,6 @@ export async function sendEmail(to: string, subject: string, html: string) {
         resetRequired = true;
       }
     } else {
-      // If last_email_sent_date is null, it's a new user or first email, so reset is needed.
       resetRequired = true;
     }
 
@@ -195,11 +185,9 @@ export async function sendEmail(to: string, subject: string, html: string) {
       last_email_sent_date = today;
     }
 
-    // Define limits
     const FREE_EMAIL_LIMIT = 5;
     const PRO_EMAIL_LIMIT = 40;
 
-    // Enforce limits
     if (plan === 'free' && email_sent_today >= FREE_EMAIL_LIMIT) {
       throw new Error(`You have reached your daily email limit of ${FREE_EMAIL_LIMIT} messages. Upgrade to Pro for more! Your limit will reset tomorrow.`);
     } else if (plan === 'pro' && email_sent_today >= PRO_EMAIL_LIMIT) {
@@ -218,7 +206,6 @@ export async function sendEmail(to: string, subject: string, html: string) {
       throw new Error(error.message);
     }
 
-    // Increment email_sent_today and update last_email_sent_date
     const { error: updateCountError } = await supabase
       .from('users')
       .update({
@@ -229,8 +216,7 @@ export async function sendEmail(to: string, subject: string, html: string) {
 
     if (updateCountError) {
       console.error('[Supabase update email_sent_today error]', updateCountError);
-      // Log the error but don't prevent the email from being sent
-      // as the email was already sent.
+
     }
 
     return { message: 'Email sent successfully', data };

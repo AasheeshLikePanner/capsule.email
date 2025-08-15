@@ -194,7 +194,6 @@ export async function updateChatVisibility(chatId: string, isPublic: boolean) {
     throw new Error('Unauthorized');
   }
 
-  // Fetch user's plan
   const { data: userProfile, error: profileError } = await supabase
     .from('users')
     .select('plan')
@@ -206,7 +205,6 @@ export async function updateChatVisibility(chatId: string, isPublic: boolean) {
     throw new Error('Failed to fetch user profile.');
   }
 
-  // Prevent free users from making chats public
   if (isPublic && userProfile.plan === 'free') {
     throw new Error('You must upgrade to a Pro plan to make chats public.');
   }

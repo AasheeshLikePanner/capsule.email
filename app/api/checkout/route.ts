@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server'
 
 const handler = Checkout({
   accessToken: process.env.POLAR_ACCESS_TOKEN,
-  successUrl: `https://capsule-email.vercel.app/success`, // use https from ngrok
+  successUrl: `https://capsule-email.vercel.app/success`,
   server: "production",
 })
 

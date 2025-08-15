@@ -66,7 +66,6 @@ export async function createBrandKit(url: string) {
       const extractHighResLogo = () => {
         const logoSources = [];
 
-        // 1. Look for structured data (JSON-LD)
         const jsonLdScripts = Array.from(document.querySelectorAll('script[type="application/ld+json"]'));
         for (const script of jsonLdScripts) {
           try {
@@ -86,11 +85,9 @@ export async function createBrandKit(url: string) {
               });
             }
           } catch (e) {
-            // Skip invalid JSON-LD
           }
         }
 
-        // 2. Look for common logo selectors with high priority
         const logoSelectors = [
           'img[alt*="logo" i]',
           'img[class*="logo" i]',

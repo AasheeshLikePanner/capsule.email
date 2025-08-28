@@ -95,7 +95,8 @@ export default function ChatPage() {
 
         const lastBotMessage = messages.findLast((msg: ChatMessage) => msg.type === 'bot' && (msg.content as BotMessageContent).code);
         if (lastBotMessage) {
-          setEmailMarkup((lastBotMessage.content as BotMessageContent).code || '');
+          const cleanedCode = ((lastBotMessage.content as BotMessageContent).code || '').replace(/@lib\/hooks\/use-media-query\.ts only screen and \(max-width: 600px\) \{/g, '@media only screen and (max-width: 600px) {');
+          setEmailMarkup(cleanedCode);
           setEmailTitle((lastBotMessage.content as BotMessageContent).title || '');
         }
 
@@ -144,8 +145,9 @@ export default function ChatPage() {
         const name = recipientNames[currentRecipientIndex.current];
         currentRecipientIndex.current = (currentRecipientIndex.current + 1) % recipientNames.length;
         const replacedCode = data.code.replace(/\[Recipient Name\]/g, name);
+        const cleanedCode = replacedCode.replace(/@lib\/hooks\/use-media-query\.ts only screen and \(max-width: 600px\) \{/g, '@media only screen and (max-width: 600px) {');
 
-        setEmailMarkup(replacedCode);
+        setEmailMarkup(cleanedCode);
         setEmailTitle(data.title || '');
         botMessageContent = { title: data.title, text: data.text, description: data.description, code: replacedCode };
       } else {

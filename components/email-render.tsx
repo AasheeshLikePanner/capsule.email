@@ -85,7 +85,7 @@ export function EmailRenderer({ jsxString, onError, className }: EmailRendererPr
     }
 
     // Check if the string is a full HTML document
-    const isHtmlDocument = jsxString.startsWith('<!DOCTYPE html>') || jsxString.startsWith('<html');
+    const isHtmlDocument = /^\s*<!DOCTYPE html/i.test(safeJsxString) || /^\s*<html/i.test(safeJsxString);
 
     if (isHtmlDocument) {
       return (
@@ -97,112 +97,23 @@ export function EmailRenderer({ jsxString, onError, className }: EmailRendererPr
       );
     }
 
-    try {
-      // Check if Babel is available (loaded via script tag)
-      if (!(window as any).Babel) {
-        throw new Error('Babel is not loaded. Include @babel/standalone script.');
-      }
-
-      // Create the wrapper function that receives React and components
-      const wrappedJSX = `(function(React, components) {
-        const { Html, Head, Tailwind, Body, Container, Section, Text, Heading, Img, Button, Link, Hr, Column, Row, Preview, Divider } = components;
-        return (${jsxString});
-      })`;
-
-      // Transform JSX using Babel (browser compilation)
-      const transpiled = (window as any).Babel.transform(wrappedJSX, {
-        presets: [['react', { pragma: 'React.createElement' }]],
-      }).code;
-
-      // Execute the transpiled code
-      const componentFunction = eval(transpiled);
-      const components = createMockComponents();
-      const reactElement = componentFunction(React, components);
-
-      return reactElement;
-    } catch (error: any) {
-      const errorMessage = error.message || 'Unknown error occurred';
-      onError?.(errorMessage);
-      
-      return (
-        <div className="p-8 border-2 border-red-200 bg-red-50 rounded-2xl">
-          <div className="flex items-center mb-2">
-            <svg className="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-            </svg>
-            <h3 className="font-medium text-red-800">Compilation Error</h3>
-          </div>
-          <p className="text-red-700 text-sm font-mono">{errorMessage}</p>
+    // If not a full HTML document, display an error
+    const errorMessage = "Only full HTML documents (starting with <!DOCTYPE html> or <html) are supported for rendering.";
+    onError?.(errorMessage);
+    return (
+      <div className="p-8 border-2 border-red-200 bg-red-50 rounded-2xl">
+        <div className="flex items-center mb-2">
+          <svg className="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+          </svg>
+          <h3 className="font-medium text-red-800">Rendering Error</h3>
         </div>
-      );
-    }
+        <p className="text-red-700 text-sm font-mono">{errorMessage}</p>
+      </div>
+    );
   }, [jsxString, onError]);
 
   return <div className={`w-full h-full ${className || ''}`}>{renderedComponent}</div>;
 }
-
-// Hook for email compilation (reusable logic)
-export function useEmailRenderer() {
-  const compileEmail = (jsxString: string) => {
-    const safeJsxString = typeof jsxString === 'string' ? jsxString : '';
-    if (!safeJsxString.trim()) {
-      return { success: false, component: null, error: 'JSX string is empty' };
-    }
-
-    try {
-      if (!(window as any).Babel) {
-        throw new Error('Babel is not loaded');
-      }
-
-      const wrappedJSX = `(function(React, components) {
-        const { Html, Head, Tailwind, Body, Container, Section, Text, Heading, Img, Button, Link, Hr, Column, Row, Preview, Divider } = components;
-        return (${jsxString});
-      })`;
-
-      const transpiled = (window as any).Babel.transform(wrappedJSX, {
-        presets: [['react', { pragma: 'React.createElement' }]],
-      }).code;
-
-      const componentFunction = eval(transpiled);
-      const components = createMockComponents();
-      const reactElement = componentFunction(React, components);
-
-      return { success: true, component: reactElement, error: null };
-    } catch (error: any) {
-      return { success: false, component: null, error: error.message };
-    }
-  };
-
-  return { compileEmail };
-}
-
-// Example usage:
-/*
-// In your Next.js page or component:
-
-import { EmailRenderer } from '../components/EmailRenderer';
-
-const MyPage = () => {
-  const emailJSX = `
-    <Html>
-      <Tailwind>
-        <Body className="bg-gray-50">
-          <Container>
-            <Text>Hello World!</Text>
-            <Button href="https://example.com">Click me</Button>
-          </Container>
-        </Body>
-      </Tailwind>
-    </Html>
-  `;
-
-  return (
-    <div>
-      <h1>My Email Preview</h1>
-      <EmailRenderer jsxString={emailJSX} />
-    </div>
-  );
-};
-*/
 
 export default EmailRenderer;

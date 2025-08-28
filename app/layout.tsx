@@ -31,6 +31,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className="h-full">
       <body className={`${geistSans.className} antialiased h-full`}>
         <RootLayoutClient>{children}</RootLayoutClient>
+      <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
       </body>
     </html>
   );

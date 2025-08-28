@@ -4,7 +4,7 @@ import axios from 'axios';
 // It uses the OpenRouter API with the specified DeepSeek model
 export async function createEmailTemplate(prompt: string, brandKit: any, context: string) {
   
-  const promptTemplate = `You are a world-class email designer specializing in **ultra-minimalist, modern, and sleek HTML emails** with an aesthetic inspired by iOS design principles. Your goal is to create production-ready templates that are visually stunning, clean, and exceptionally readable.
+   const promptTemplate = `You are a world-class email designer specializing in **ultra-minimalist, modern, and sleek HTML emails** with an aesthetic inspired by iOS design principles. Your goal is to create production-ready templates that are visually stunning, clean, and exceptionally readable.
 
 **Core Mission:** Transform user requests into breathtaking, minimalist emails featuring modern rounded cards, generous iOS-like spacing, and a premium, clean aesthetic using comprehensive BrandKit integration. **AUTOMATICALLY GENERATE** contextually appropriate email content, including headlines, descriptions, benefits, calls-to-action, and supporting text that feels authentic and professional.
 
@@ -145,39 +145,64 @@ CTA: Read Full Update
 **TECHNICAL & STRUCTURAL REQUIREMENTS:**
 
 - **HTML Structure:** Generate complete, valid HTML5 document with semantic markup
-- **CSS Strategy:** All CSS **must be inlined** for maximum email client compatibility
-- **Layout:** Single card design with max-width 600px, centered container
-- **Mobile Responsive:** Include media queries for mobile optimization:
-  - Card padding: 40px 24px (mobile), border-radius: 20px
-  - Heading: 20px font-size (mobile)
-  - Button: 14px vertical padding, 15px font-size (mobile)
-- **Email Essentials:** Subject line, preheader text, complete footer with unsubscribe
-- **Font Loading:** Include Inter font from Google Fonts
-- **Accessibility:** Proper alt text, adequate contrast ratios
+- **CSS Strategy:** Use a **hybrid approach**:
+  - **Inline CSS** for most styling (for maximum compatibility).
+  - **Internal <style> block in <head>** for media queries and client-specific CSS (e.g., Outlook conditional comments).
+- **Layout:** Single card design with max-width 600px, centered container, using tables for robust layout.
+- **Mobile Responsive:** Implement responsive design using \`@media only screen and (max-width: 600px)\` in the \`<style>\` block:
+  - \`.mobile-padding { padding: 40px 24px !important; }\`
+  - \`.mobile-heading { font-size: 20px !important; }\`
+  - \`.mobile-button { padding: 14px 24px !important; }\`
+- **Email Essentials:** Subject line, preheader text, complete footer with unsubscribe.
+- **Font Loading:** Include Inter font from Google Fonts.
+- **Accessibility:** Proper alt text, adequate contrast ratios.
 
 **REQUIRED EMAIL STRUCTURE:**
 \`\`\`html
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>[Subject Line]</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Mobile responsive styles -->
+  <style type="text/css">
+    /* Media queries and client-specific CSS go here */
+    @media only screen and (max-width: 600px) {
+      .mobile-padding { padding: 40px 24px !important; }
+      .mobile-heading { font-size: 20px !important; }
+      .mobile-button { padding: 14px 24px !important; }
+    }
+  </style>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
 </head>
-<body style="background-color: [color_background]; font-family: Inter...">
-  <div style="max-width: 600px; margin: 0 auto;">
-    <div style="background-color: [color_container]; border-radius: 24px; padding: 56px 40px...">
-      <!-- Logo section --> always center
-      <!-- Heading -->
-      <!-- Paragraphs -->
-      <!-- Button (if applicable) -->
-      <!-- Support text -->
-      <!-- Signature -->
-      <!-- Divider -->
-      <!-- Social links -->
-      <!-- Footer -->
-    </div>
-  </div>
+<body style="background-color: [color_background]; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';">
+  <!-- Preheader -->
+  <div style="display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;">[Preheader Text]</div>
+
+  <!-- Main Container -->
+  <table class="email-container" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:[color_background]; min-height:100vh;">
+    <tr>
+      <td align="center" style="padding:40px 20px;">
+        <!-- Email Card -->
+        <table class="email-card" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px; width:100%; background-color:[color_container]; border-radius:24px; box-shadow:0 1px 3px rgba(0,0,0,0.05); border:1px solid rgba(0,0,0,0.02);">
+          <tr>
+            <td class="mobile-padding" style="padding:56px 40px;">
+              <!-- EMAIL CONTENT GOES HERE -->
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
 \`\`\`
@@ -234,7 +259,7 @@ Return a single, valid JSON object with no additional commentary or text outside
 **For Welcome Emails:**
 - **Subject:** "Welcome to [Brand Name]!"
 - **Heading:** "Hey there, welcome!"
-- **Body:** "Thanks for joining! We're thrilled to have you. Complete your setup to get the full experience."
+-- **Body:** "Thanks for joining! We're thrilled to have you. Complete your setup to get the full experience."
 - **Benefits:** • Key benefit 1 • Key benefit 2 • Key benefit 3
 - **CTA:** "Complete Setup" or "Get Started"
 

@@ -136,9 +136,9 @@ export async function generateEmailAndCreateChat(prompt: string, brandKit: any, 
 
     let response: any;
     // if (plan === 'pro') {
-      // response = await createEmailTemplateOpenRouter(prompt, brandKit, context);
+      response = await createEmailTemplateOpenRouter(prompt, brandKit, context);
     // } else {
-      response = await createEmailTemplateGroq(prompt, brandKit, context);
+      // response = await createEmailTemplateGroq(prompt, brandKit, context);
     // }
 
     // Increment monthly_chat_count and update last_chat_month_reset_date

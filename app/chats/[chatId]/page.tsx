@@ -106,8 +106,10 @@ export default function ChatPage() {
           hasSetInitialBrandKit.current = true;
         }
 
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching messages:", error);
+        const errorMessage = error.message || "AI limit exceeded. Please try again after some time.";
+        toast.error(errorMessage);
       } finally {
         setIsLoading(false);
       }
@@ -165,9 +167,10 @@ export default function ChatPage() {
       };
       setMessages(prev => [...prev, newBotMessage]);
 
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false);
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+      const errorMessage = error.message || "AI limit exceeded. Please try again after some time.";
+      toast.error(errorMessage);
       setMessages(prev => [...prev, { 
         id: Date.now().toString(), 
         chat_session_id: chatId, 
@@ -186,8 +189,8 @@ export default function ChatPage() {
       await updateChatVisibility(chatId, newIsPublic);
       setIsPublic(newIsPublic);
       toast.success(`Chat is now ${newIsPublic ? 'public' : 'private'}.`);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to toggle chat visibility. Please try again after some time.";
       toast.error(errorMessage);
     } finally {
       setIsTogglingPublic(false);
@@ -214,8 +217,10 @@ export default function ChatPage() {
         setEmailId(response.data.data[0].id);
       }
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving email:", error);
+      const errorMessage = error.message || "Failed to save email. Please try again after some time.";
+      toast.error(errorMessage);
       return false;
     } finally {
       setIsSaving(false);
@@ -225,8 +230,10 @@ export default function ChatPage() {
   const handleSendEmail = async (recipient: string, subject: string) => {
     try {
       await sendEmail(recipient, subject, emailMarkup);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error sending email:", error);
+      const errorMessage = error.message || "Failed to send email. Please try again after some time.";
+      toast.error(errorMessage);
     }
   };
 

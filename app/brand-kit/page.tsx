@@ -45,7 +45,8 @@ export default function BrandKitPage() {
       toast.success(message);
       fetchBrandKits(); 
     } else {
-      toast.error(message);
+      const errorMessage = message.includes("limit") || message.includes("upgrade") ? message : "AI limit exceeded. Please try again after some time.";
+      toast.error(errorMessage);
     }
   };
 
@@ -53,8 +54,9 @@ export default function BrandKitPage() {
     try {
       await deleteBrandKit(kitId);
       toast.success("Brand kit deleted successfully");
-    } catch (error) {
-      toast.error("Failed to delete brand kit");
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to delete brand kit. Please try again after some time.";
+      toast.error(errorMessage);
     }
   };
 

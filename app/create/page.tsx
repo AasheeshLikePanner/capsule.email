@@ -8,6 +8,7 @@ import { BrandKitDialog } from "@/components/brand-kit-dialog";
 import { useRouter } from "next/navigation";
 import { Globe } from "@/components/magicui/globe";
 import { generateEmailAndCreateChat } from "@/lib/actions/chat";
+import { toast } from "sonner";
 
 
 interface BrandKit {
@@ -149,8 +150,10 @@ export default function CreatePage() {
           console.error("No chatId received from API");
           setIsLoading(false);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error sending message:", error);
+        const errorMessage = error.message || "AI limit exceeded. Please try again after some time.";
+        toast.error(errorMessage);
         setIsLoading(false);
       }
     }

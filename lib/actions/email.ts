@@ -185,14 +185,14 @@ export async function sendEmail(to: string, subject: string, html: string) {
       last_email_sent_date = today;
     }
 
-    const FREE_EMAIL_LIMIT = 5;
-    const PRO_EMAIL_LIMIT = 40;
+    // const FREE_EMAIL_LIMIT = 5;
+    // const PRO_EMAIL_LIMIT = 40;
 
-    if (plan === 'free' && email_sent_today >= FREE_EMAIL_LIMIT) {
-      throw new Error(`You have reached your daily email limit of ${FREE_EMAIL_LIMIT} messages. Upgrade to Pro for more! Your limit will reset tomorrow.`);
-    } else if (plan === 'pro' && email_sent_today >= PRO_EMAIL_LIMIT) {
-      throw new Error(`You have reached your daily email limit of ${PRO_EMAIL_LIMIT} messages. Your limit will reset tomorrow.`);
-    }
+    // if (plan === 'free' && email_sent_today >= FREE_EMAIL_LIMIT) {
+    //   throw new Error(`You have reached your daily email limit of ${FREE_EMAIL_LIMIT} messages. Upgrade to Pro for more! Your limit will reset tomorrow.`);
+    // } else if (plan === 'pro' && email_sent_today >= PRO_EMAIL_LIMIT) {
+    //   throw new Error(`You have reached your daily email limit of ${PRO_EMAIL_LIMIT} messages. Your limit will reset tomorrow.`);
+    // }
 
     const { data, error } = await resend.emails.send({
       from: 'onboarding@resend.dev', // Replace with your verified sender email

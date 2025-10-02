@@ -39,9 +39,9 @@ export function Navbar({ stars }: { stars: number }) {
           <div className="flex items-center justify-between h-16">
             <Logo />
             <div className="hidden md:flex items-center space-x-6">
-              <Link href="/pricing" className="text-sm font-medium text-muted-foreground hover:text-light-black-foreground hover:bg-muted/20 transition-colors px-3 py-2 rounded-md">
+              {/* <Link href="/pricing" className="text-sm font-medium text-muted-foreground hover:text-light-black-foreground hover:bg-muted/20 transition-colors px-3 py-2 rounded-md">
                 Pricing
-              </Link>
+              </Link> */}
               <Button asChild variant="outline" size="default">
                 <Link href="https://github.com/AasheeshLikePanner/mail" target="_blank" className="group flex items-center" onClick={handleStarClick}>
                   <Github className="mr-2 h-4 w-4 fill-white text-white" />

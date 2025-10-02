@@ -83,15 +83,15 @@ export async function generateEmailAndCreateChat(prompt: string, brandKit: any, 
   const nextMonthFormatted = nextMonth.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
   // Define limits
-  const FREE_CHAT_LIMIT = 10;
-  const PRO_CHAT_LIMIT = 300;
+  // const FREE_CHAT_LIMIT = 10;
+  // const PRO_CHAT_LIMIT = 300;
 
   // Enforce limits
-  if (plan === 'free' && monthly_chat_count >= FREE_CHAT_LIMIT) {
-    throw new Error(`You have reached your monthly chat limit of ${FREE_CHAT_LIMIT} messages. Upgrade to Pro for more! Your limit will reset on ${nextMonthFormatted}.`);
-  } else if (plan === 'pro' && monthly_chat_count >= PRO_CHAT_LIMIT) {
-    throw new Error(`You have reached your monthly chat limit of ${PRO_CHAT_LIMIT} messages. Your limit will reset on ${nextMonthFormatted}.`);
-  }
+  // if (plan === 'free' && monthly_chat_count >= FREE_CHAT_LIMIT) {
+  //   throw new Error(`You have reached your monthly chat limit of ${FREE_CHAT_LIMIT} messages. Upgrade to Pro for more! Your limit will reset on ${nextMonthFormatted}.`);
+  // } else if (plan === 'pro' && monthly_chat_count >= PRO_CHAT_LIMIT) {
+  //   throw new Error(`You have reached your monthly chat limit of ${PRO_CHAT_LIMIT} messages. Your limit will reset on ${nextMonthFormatted}.`);
+  // }
 
   let currentChatId = chatId;
 
@@ -134,7 +134,6 @@ export async function generateEmailAndCreateChat(prompt: string, brandKit: any, 
       // Continue even if user message fails to save, but log it
     }
 
-    let response: any;
     // if (plan === 'pro') {
       response = await createEmailTemplateOpenRouter(prompt, brandKit, context);
     // } else {
@@ -205,9 +204,9 @@ export async function updateChatVisibility(chatId: string, isPublic: boolean) {
     throw new Error('Failed to fetch user profile.');
   }
 
-  if (isPublic && userProfile.plan === 'free') {
-    throw new Error('You must upgrade to a Pro plan to make chats public.');
-  }
+  // if (isPublic && userProfile.plan === 'free') {
+  //   throw new Error('You must upgrade to a Pro plan to make chats public.');
+  // }
 
   const { data: chatSession, error: sessionError } = await supabase
     .from('chat_sessions')

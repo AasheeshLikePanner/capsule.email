@@ -58,6 +58,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [userPlan, setUserPlan] = useState<string | null>(null); // Added state
   const [subscriptionExpiresAt, setSubscriptionExpiresAt] = useState<string | null>(null); // Added state
+  const [isSubscriptionExpired, setIsSubscriptionExpired] = useState<boolean>(false); // Added state
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const router = useRouter();
 
@@ -95,6 +96,7 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
         } else if (userData) {
           setUserPlan(userData.plan);
           setSubscriptionExpiresAt(userData.subscription_expires_at);
+          setIsSubscriptionExpired(userData.subscription_expires_at && new Date(userData.subscription_expires_at).getTime() < Date.now());
         }
       }
     };
@@ -312,7 +314,9 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
               </TooltipContent>
             )}
           </Tooltip>
-          {userPlan === "pro" ? (
+          {/*
+          {userPlan === "pro" && !isSubscriptionExpired ? (
+            // Active Pro Plan - Display "Subscribed" (no link)
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -341,7 +345,8 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
                 </TooltipContent>
               )}
             </Tooltip>
-          ) : (
+          ) : (userPlan === "pro" && isSubscriptionExpired) || userPlan !== "pro" ? (
+            // Expired Pro Plan OR Free Plan - Display "Upgrade" button with link
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -381,7 +386,8 @@ export function Sidebar({ isExpanded, setExpanded }: SidebarProps) {
                 </TooltipContent>
               )}
             </Tooltip>
-          )}
+          ) : null}
+          */}
           <DropdownMenu>
             <Tooltip>
               <TooltipTrigger asChild>

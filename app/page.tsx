@@ -25,7 +25,7 @@ export default async function Home() {
         <div className="mt-40 w-1/2 mx-auto border-l border-r fade-border">
           <Features />
         </div>
-        <Pricing userEmail={userEmail} />
+        {/* <Pricing userEmail={userEmail} /> */}
         <Footer />
       </div>
     </div>

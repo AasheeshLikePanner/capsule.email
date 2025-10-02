@@ -10,7 +10,7 @@ export function Hero() {
 
   return (
     <div className="relative mx-auto flex min-h-screen w-1/2 flex-col items-center justify-start border-l border-r pt-48">
-      <DotPattern opacity={0.2}/>
+      <DotPattern opacity={0.5}/>
         <div className="relative z-10 flex flex-col items-center px-4 text-center">
           <h1 className="mb-4 text-4xl font-medium tracking-tight md:text-5xl">
             Stand Out in Every Inbox.

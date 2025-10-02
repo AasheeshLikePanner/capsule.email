@@ -135,7 +135,7 @@ export async function generateEmailAndCreateChat(prompt: string, brandKit: any, 
     }
 
     // if (plan === 'pro') {
-      response = await createEmailTemplateOpenRouter(prompt, brandKit, context);
+      const response = await createEmailTemplateOpenRouter(prompt, brandKit, context);
     // } else {
       // response = await createEmailTemplateGroq(prompt, brandKit, context);
     // }

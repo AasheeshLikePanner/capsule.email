@@ -12,6 +12,11 @@ export function Hero() {
     <div className="relative mx-auto flex min-h-screen w-1/2 flex-col items-center justify-start border-l border-r pt-48">
       <DotPattern opacity={0.5}/>
         <div className="relative z-10 flex flex-col items-center px-4 text-center">
+          <div className="mb-4">
+            <div className="inline-block bg-secondary text-secondary-foreground py-1 px-3 rounded-full text-sm animate-shine">
+              Everything free, unlimited free to use
+            </div>
+          </div>
           <h1 className="mb-4 text-4xl font-medium tracking-tight md:text-5xl">
             Stand Out in Every Inbox.
           </h1>

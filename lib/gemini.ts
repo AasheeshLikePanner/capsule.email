@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY!);
 
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }, {});
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }, {});
 
 export async function improvteBrandKit(data: { name: string; description: string; logo: string; theme: { background: string | null; container: string | null; accent: string | null; buttonText: string | null; foreground: string | null; }; tone: string; footer: { text: string; socials: Record<string, string>; copyright: string; address: string; disclaimers: string; }; }) {
 

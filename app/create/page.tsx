@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowUp, Briefcase, Smile, ShoppingCart, Mail, Newspaper, Receipt, X } from "lucide-react";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, Suspense } from "react";
 import { BrandKitDialog } from "@/components/brand-kit-dialog";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Globe } from "@/components/magicui/globe";
@@ -18,8 +18,7 @@ interface BrandKit {
   logo_primary: string | null;
 }
 
-
-export default function CreatePage() {
+function CreatePageContent() {
   const [emailContent, setEmailContent] = useState(""); 
   const [animatedContent, setAnimatedContent] = useState(""); 
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null); 
@@ -315,5 +314,13 @@ export default function CreatePage() {
         <Globe className="w-full top-auto bottom-0 translate-y-[50%]" />
       </div>
     </div>
+  );
+}
+
+export default function CreatePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CreatePageContent />
+    </Suspense>
   );
 }

@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
         return redirect("/auth/error");
       }
 
-      return redirect(next);
+      return redirect("/create?welcome=true");
     }
   }
 

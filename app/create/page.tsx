@@ -5,10 +5,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowUp, Briefcase, Smile, ShoppingCart, Mail, Newspaper, Receipt, X } from "lucide-react";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { BrandKitDialog } from "@/components/brand-kit-dialog";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Globe } from "@/components/magicui/globe";
 import { generateEmailAndCreateChat } from "@/lib/actions/chat";
 import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 
 interface BrandKit {
@@ -26,6 +27,14 @@ export default function CreatePage() {
   const [selectedBrandKit, setSelectedBrandKit] = useState<BrandKit | null>(null);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [showWelcomeCard, setShowWelcomeCard] = useState(false);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("welcome")) {
+      setShowWelcomeCard(true);
+    }
+  }, [searchParams]);
 
   const [placeholderSuffix, setPlaceholderSuffix] = useState("");
   const [currentSuffixIndex, setCurrentSuffixIndex] = useState(0);
@@ -161,6 +170,39 @@ export default function CreatePage() {
 
   return (
     <div className="relative w-full h-full flex items-center justify-center">
+      {showWelcomeCard && (
+        <div className="absolute inset-0 bg-black/60 z-50 flex items-center justify-center">
+          <Card className="sm:max-w-lg">
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-2 right-2 h-6 w-6"
+                onClick={() => setShowWelcomeCard(false)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+              <Image
+                src="/welcome.png"
+                alt="Welcome background"
+                width={1024}
+                height={512}
+                className="rounded-t-lg"
+              />
+            </div>
+            <CardHeader>
+              <CardTitle>Welcome to Capsule!</CardTitle>
+              <CardDescription>
+                We're excited to have you on board. Here are a few things you can do:
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-sm text-muted-foreground">
+              <p>It's free to use! You can create unlimited brand kits and have unlimited chats with our AI, subject to daily API limits.</p>
+              <p className="mt-2">Get started by creating a new email template using natural language.</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
       <div className="relative flex flex-col items-center justify-center p-4 z-10 w-full">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-medium text-center mb-3 text-white tracking-normal">Build your dream email</h1>
         <p className="text-lg text-center text-muted-foreground mb-8 max-w-xl">
